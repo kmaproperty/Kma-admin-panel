@@ -1,9 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from '../App.jsx'
+import Dashbaord from "../pages/dashboard/page.jsx";
+import Layout from "../components/layout/layout.jsx";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <App/>
-  }
+    path: "/",
+    element: <Layout />,
+    children: [
+      { path: "/", element: <Dashbaord /> },
+    ],
+  },
 ]);
