@@ -1,37 +1,6 @@
 import axios from "axios";
 import { axiosInstance } from "./axiosService";
 
-
-export const sendSignUpOtpApiHandler = async (
-  payload
-) => {
-  try {
-    const response = await axiosInstance.post(
-      "users/signup/send-otp",
-      payload
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error.response?.data ?? error;
-  }
-};
-
-export const sendSignInOtpApiHandler = async (
-  payload
-) => {
-  try {
-    const response = await axiosInstance.post(
-      "users/login/send-otp",
-      payload
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error.response?.data ?? error;
-  }
-};
-
 export const handleRefreshToken = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
 
@@ -39,7 +8,7 @@ export const handleRefreshToken = async () => {
 
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/refresh-token`,
+      `${import.meta.env.VITE_API_URL}/users/refresh-token`,
       { refreshToken },
       {
         headers: {
@@ -58,5 +27,14 @@ export const handleRefreshToken = async () => {
   } catch (error) {
     console.error("Error refreshing token:", error);
     return null;
+  }
+};
+
+export const loginApi = async (payload) => {
+  try {
+    const response = await axiosInstance.post("admin/login", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
   }
 };

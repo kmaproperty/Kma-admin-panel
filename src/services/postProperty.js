@@ -1,0 +1,158 @@
+import { axiosInstance } from "./axiosService";
+
+export const step1PostPropertyCreateApiHandler = async (paylaod) => {
+    try{
+        const response = await axiosInstance.post(
+      "property/step-1", paylaod);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step1PostPropertyDetailsApiHandler = async (propertyId) => {
+    try{
+        const response = await axiosInstance.get(
+      `property/step-1/${propertyId}`,);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step2PostPropertyCreateApiHandler = async (paylaod) => {
+    try{
+        const response = await axiosInstance.post(
+      "property/step-2", paylaod);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step2PostPropertyDetailsApiHandler = async (propertyId) => {
+    try{
+        const response = await axiosInstance.get(
+      `property/step-2/${propertyId}`,);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step3PostPropertyCreateApiHandler = async (paylaod) => {
+    try{
+        const response = await axiosInstance.post(
+      "property/step-3", paylaod);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step3PostPropertyDetailsApiHandler = async (propertyId) => {
+    try{
+        const response = await axiosInstance.get(
+      `property/step-3/${propertyId}`,);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step4PostPropertyCreateApiHandler = async (paylaod) => {
+    try{
+        const response = await axiosInstance.post(
+      "property/step-4", paylaod);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const step4PostPropertyDetailsApiHandler = async (propertyId) => {
+    try{
+        const response = await axiosInstance.get(
+      `property/step-4/${propertyId}`,);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const resetPostPropertyApiHandler = async (paylaod) => {
+    try{
+        const response = await axiosInstance.post(
+      "property/reset", paylaod);
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const propertyListApiPayload = async (paylaod) => {
+    try{
+        const response = await axiosInstance.get(
+      "admin/properties",{
+        params: paylaod
+      });
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getPropertyDetailsApiHandler = async (id) => {
+    try{
+        const response = await axiosInstance.get(
+      "admin/properties/" + id);
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const deletePropertyApiHandler = async (id) => {
+    try{
+        const response = await axiosInstance.delete(
+      "admin/properties/" + id);
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const approvePropertyApiHandler = async (payload) => {
+    try{
+        const response = await axiosInstance.post(
+      `admin/properties/${payload.id}/approve`, {
+        comment: payload.comment
+      });
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const rejectPropertyApiHandler = async (payload) => {
+    try{
+        const response = await axiosInstance.post(
+      `admin/properties/${payload.id}/reject`, {
+        comment: payload.comment
+      });
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}

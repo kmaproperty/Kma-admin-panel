@@ -1,4 +1,4 @@
-import { POST_PROPERTY_STEPS } from '@/lib/enums';
+import { POST_PROPERTY_STEPS } from '../lib/enums';
 import { createSlice} from '@reduxjs/toolkit';
 
 const initialState = {

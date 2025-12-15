@@ -1,10 +1,7 @@
-import axios, {
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios from "axios";
 import { handleRefreshToken } from "./authService";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -15,7 +12,7 @@ export const axiosInstance = axios.create({
 
 // Request Interceptor: Attach access token
 axiosInstance.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
+  async (config) => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -30,7 +27,7 @@ axiosInstance.interceptors.request.use(
 
 // Response Interceptor: Handle 401 and refresh token
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
     const refreshToken = localStorage.getItem("refreshToken");
@@ -51,16 +48,16 @@ axiosInstance.interceptors.response.use(
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
           return axiosInstance(originalRequest);
         }else{
-          window.location.href = '/signup'
+          window.location.href = '/sign-in'
         }
       } catch (refreshError) {
         console.error("Token refresh failed", refreshError);
         localStorage.clear();
-        window.location.href = "/signup"
+        window.location.href = "/sign-in"
       }
     }else if(error.response?.status === 401){
       localStorage.clear();
-      window.location.href = "/signup"
+      window.location.href = "/sign-in"
     }
     console.log('error in reject', error)
     return Promise.reject(error?.response?.data ?? error);

@@ -9,7 +9,7 @@ export default function Layout() {
 
       {/* Main content */}
       <div className="pr-6 pl-3 py-6 w-full h-full ">
-        <div className="flex flex-col flex-1 bg-gray-950 h-full rounded-2xl shadow-xl">
+        <div className="flex flex-col flex-1 bg-white h-full rounded-2xl shadow-xl">
             <header className="p-5 flex items-center justify-end">
             <div className="flex items-center gap-3">
                 <img
