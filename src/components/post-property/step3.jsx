@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getActiveStep, setActiveStep, setTotalProgress } from "../../store/postPropertyProgress";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  getPropertyDetailsApiHandler,
   step1PostPropertyDetailsApiHandler,
   step3PostPropertyCreateApiHandler,
   step3PostPropertyDetailsApiHandler,
@@ -434,11 +435,11 @@ export default function Step3({containerRef}) {
   const { data: step3Details } = useQuery({
   queryKey: ["step3-details", params?.propertyId],
   queryFn: async () => {
-    return step3PostPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
+    return getPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
   },
   select: (resposne) => {
     console.log('step3 details',resposne)
-    return resposne
+    return resposne.data
   },
   enabled: params?.propertyId ? true : false,
   staleTime: 0,
@@ -494,7 +495,14 @@ export default function Step3({containerRef}) {
 
   useEffect(() => {
     if(step3Details){
-      let furnishing = step3Details.furnishingsCounts.map(item => ({name: item.item, count: item.count}))
+      setBasicStaticDetail((pre) => ({
+        ...pre,
+        propertyListFor: step3Details?.listingType,
+        propertyCategory: step3Details?.category,
+        propertyType: step3Details?.propertyType,
+        propertyCondition: step3Details?.propertyCondition
+      }));
+      let furnishing = step3Details.furnishingsCounts?.map(item => ({name: item.item, count: item.count})) ?? []
       setDynamicFieldDetails((pre) => ({
         ...pre,
         additionalRoom: step3Details?.additionalRooms,
@@ -504,7 +512,7 @@ export default function Step3({containerRef}) {
         waterSource: step3Details?.waterSource,
         liftAvalability: step3Details?.isLiftAvailable,
         propertyDescription: step3Details?.propertyDescription,
-        amenities: step3Details?.amenities,
+        amenities: step3Details?.amenities ? step3Details?.amenities : [],
         furnishType: step3Details?.furnishType,
         furnishingsCounts: furnishing,
         minNumberOfSeats: step3Details?.minNumberOfSeats,
@@ -521,18 +529,18 @@ export default function Step3({containerRef}) {
     }
   },[step3Details])
 
-  useEffect(() => {
-    if (step1Details) {
-      setBasicStaticDetail((pre) => ({
-        ...pre,
-        propertyListFor: step1Details?.listingType,
-        propertyCategory: step1Details?.category,
-        propertyType: step1Details?.propertyType,
-        propertyCondition: step1Details?.propertyCondition
-      }));
-      dispatch(setTotalProgress({progress: step1Details.progressPercentage}))
-    }
-  }, [step1Details]);
+  // useEffect(() => {
+  //   if (step1Details) {
+  //     setBasicStaticDetail((pre) => ({
+  //       ...pre,
+  //       propertyListFor: step1Details?.listingType,
+  //       propertyCategory: step1Details?.category,
+  //       propertyType: step1Details?.propertyType,
+  //       propertyCondition: step1Details?.propertyCondition
+  //     }));
+  //     dispatch(setTotalProgress({progress: step1Details.progressPercentage}))
+  //   }
+  // }, [step1Details]);
 
   // useEffect(() => {
   //   calculateProgress();
@@ -1144,7 +1152,8 @@ export default function Step3({containerRef}) {
                   return
                 }
               let payload = generatePayload()
-              handleStep3Submit(payload)
+              // handleStep3Submit(payload)
+              dispatch(setActiveStep({step: activeStep + 1}))
             }
           }} className="w-full md:w-[130px] text-sm 1xl:text-base animated-button px-12 py-3 border border-blue text-center cursor-pointer">
             <span className="gap-3 relative flex justify-center">

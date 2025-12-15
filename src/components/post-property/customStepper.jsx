@@ -1,5 +1,5 @@
 import { useStepProgress } from "../../hooks/useStepProgress";
-import { step1PostPropertyDetailsApiHandler } from "../../services/postProperty";
+import { getPropertyDetailsApiHandler, step1PostPropertyDetailsApiHandler } from "../../services/postProperty";
 import { getActiveStep, getStepList, setActiveStep } from "../../store/postPropertyProgress";
 import { step1Data } from "../../store/postPropertySlice";
 import {
@@ -223,7 +223,7 @@ export default function StepperCustom() {
   const { data: step1Details } = useQuery({
     queryKey: ["step1-in-stepper-details", params?.propertyId],
     queryFn: async () => {
-      return step1PostPropertyDetailsApiHandler(
+      return getPropertyDetailsApiHandler(
         String(params?.propertyId ?? "")
       );
     },

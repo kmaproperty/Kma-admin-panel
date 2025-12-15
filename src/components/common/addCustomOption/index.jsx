@@ -67,7 +67,7 @@ export default function CustomOptionField({open, onClose, label, onSubmit, isClo
         <DialogContent>
           <div >
             <div className="flex justify-end w-full">
-              <Image
+              <img
                 onClick={() => {
                    onClose()
                 }}

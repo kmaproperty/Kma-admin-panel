@@ -19,7 +19,7 @@ import { generateBHKAmeneties, generateBHKList } from "../../lib/helper";
 import DynamicSelect from "../common/select";
 import { AREA_UNIT_LIST, CONSTRUCTION_STATUS, CONSTRUCTION_TYPE, CUSTOM_SECTION_NAME, FACING_LIST, FIELD_NAME, LOCATED_NEAR, LOCATION_HUB, OWNERSHIP_LIST, PLOT_LAND_TYPE, PLOT_UNIT_LIST, PROPERTY_CONDITION, PROPERTY_CONSTRUCTION_STATUS, SUITABLE_FOR, TRANSACTION_TYPE_LIST, TRUTY_LIST, ZONE_TYPE } from "../../lib/enums";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPostPropertyApiHandler, step1PostPropertyCreateApiHandler, step1PostPropertyDetailsApiHandler } from "../../services/postProperty";
+import { getPropertyDetailsApiHandler, propertyEditAsAdminAPiPayload, resetPostPropertyApiHandler, step1PostPropertyCreateApiHandler, step1PostPropertyDetailsApiHandler } from "../../services/postProperty";
 import { toast } from "react-toastify";
 import DynamicAsyncAutocomplete from "../common/dynamicAsyncSelectMui";
 import { InputBase } from "@mui/material";
@@ -1024,7 +1024,7 @@ console.log('renderOtherBhk', renderOtherBhk())
       }
     }
     return {
-      ...(params?.propertyId ? {propertyId: String(params?.propertyId)} : {}),
+      // ...(params?.propertyId ? {propertyId: String(params?.propertyId)} : {}),
       listingTypeId: basicStaticDetails.propertyListFor?.id,
       categoryId: basicStaticDetails.propertyCategory?.id,
       propertyTypeId: basicStaticDetails.propertyType?.id,
@@ -1100,7 +1100,7 @@ console.log('renderOtherBhk', renderOtherBhk())
     mutationFn: async (
       payload
     ) => {
-      return await step1PostPropertyCreateApiHandler(payload);
+      return await propertyEditAsAdminAPiPayload(payload);
     },
     onSuccess: (response) => {
       console.log("step1 create response", response);
@@ -1123,11 +1123,11 @@ console.log('renderOtherBhk', renderOtherBhk())
   const { data: step1Details } = useQuery({
     queryKey: ["step1-details", params?.propertyId],
     queryFn: async () => {
-      return step1PostPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
+      return getPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
     },
     select: (resposne) => {
       console.log('step1 details',resposne)
-      return resposne
+      return resposne.data
     },
     enabled: params?.propertyId ? true : false,
     staleTime: 0,
@@ -1149,15 +1149,15 @@ console.log('renderOtherBhk', renderOtherBhk())
       let num = step1Details?.bhk?.name.match(/[\d.]+/)?.[0] || "2"
       setDynamicFieldDetails((pre) => ({
         ...pre,
-        ...(step1Details?.bhk?.name ? {bhk: {...step1Details?.bhk, bhk: Math.ceil(Number(num)), isCustom: true}} : ''),
+        ...(step1Details?.bhkType?.name ? {bhk: {...step1Details?.bhkType, bhk: Math.ceil(Number(num)), isCustom: true}} : ''),
         otherBhk: null,
         isStaticBhkDetails: false,
         staticBhKDetails: null,
         builtUpArea: step1Details?.bhk?.buildUpAreaSqFt ? step1Details?.bhk?.buildUpAreaSqFt : step1Details.builtUpArea,
         carpetArea: step1Details?.bhk?.carpetAreaSqFt ? step1Details?.bhk?.carpetAreaSqFt : step1Details?.carpetArea,
-        bathRooms: step1Details?.bhk?.noOfBathrooms,
-        bedRooms: step1Details?.bhk?.noOfBedrooms,
-        balconies: step1Details?.bhk?.balconies,
+        bathRooms: step1Details?.builtUpAreaMetadata?.noOfBathrooms,
+        bedRooms: step1Details?.builtUpAreaMetadata?.noOfBedrooms,
+        balconies: step1Details?.builtUpAreaMetadata?.balconies,
         facing: step1Details?.facing,
 
         plotArea: step1Details?.plotArea,
@@ -1235,13 +1235,13 @@ console.log('renderOtherBhk', renderOtherBhk())
                       setErrors((pre) => ({...pre, propertyListFor: ''}))
                       dispatch(setStep1Data({propertyType: null}))
                     }
-
-                    if(params?.propertyId && totalProgress != 0){
-                      setConfirmationPopup(true)
-                      setStoreUserAction(() => initialFn)
-                    }else{
                       initialFn()
-                    }
+                    // if(params?.propertyId && totalProgress != 0){
+                    //   setConfirmationPopup(true)
+                    //   setStoreUserAction(() => initialFn)
+                    // }else{
+                    //   initialFn()
+                    // }
                   }}
                   value={item.id}
                   iconSrc={item.icon}
@@ -1272,12 +1272,13 @@ console.log('renderOtherBhk', renderOtherBhk())
                       setErrors((pre) => ({...pre, propertyCategory: ''}))
                       dispatch(setStep1Data({propertyType: null}))
                     }
-                    if(params?.propertyId && totalProgress != 0){
-                      setConfirmationPopup(true)
-                      setStoreUserAction(() => initialFn)
-                    }else{
                       initialFn()
-                    }
+                    // if(params?.propertyId && totalProgress != 0){
+                    //   setConfirmationPopup(true)
+                    //   setStoreUserAction(() => initialFn)
+                    // }else{
+                    //   initialFn()
+                    // }
                   }}
                   value={item.id}
                   iconSrc={item.icon}
@@ -1308,12 +1309,13 @@ console.log('renderOtherBhk', renderOtherBhk())
                       setErrors((pre) => ({...pre, propertyType: ''}))
                       dispatch(setStep1Data({propertyType: item}))
                     }
-                    if(params?.propertyId && totalProgress != 0){
-                      setConfirmationPopup(true)
-                      setStoreUserAction(() => initialFn)
-                    }else{
                       initialFn()
-                    }
+                    // if(params?.propertyId && totalProgress != 0){
+                    //   setConfirmationPopup(true)
+                    //   setStoreUserAction(() => initialFn)
+                    // }else{
+                    //   initialFn()
+                    // }
                 }}
                 key={item.id}
               >
@@ -2481,7 +2483,8 @@ console.log('renderOtherBhk', renderOtherBhk())
               }
               let payload = generatePayload()
               console.log('payload', payload)
-              handleStep1Submit(payload)
+              // handleStep1Submit({id: params?.propertyId, data: payload})
+              dispatch(setActiveStep({step: activeStep + 1}))
             }
           }} className="w-full md:w-[130px] text-sm 1xl:text-base animated-button px-12 py-3 border border-blue text-center cursor-pointer">
             <span className="gap-3 relative flex justify-center">

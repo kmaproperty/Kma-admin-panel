@@ -6,7 +6,7 @@ import { BACHELOR_PREFERENCE, BROKRAGE_CHARGE, CONSTRUCTION_TYPE, CUSTOM_SECTION
 import DynamicSelect from "../common/select";
 import { generateFloors, generateLockInPeriod } from "../../lib/helper";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { step1PostPropertyDetailsApiHandler, step2PostPropertyCreateApiHandler, step2PostPropertyDetailsApiHandler } from "../../services/postProperty";
+import { getPropertyDetailsApiHandler, step1PostPropertyDetailsApiHandler, step2PostPropertyCreateApiHandler, step2PostPropertyDetailsApiHandler } from "../../services/postProperty";
 import CustomCheckbox from "../common/checkbox";
 import { useDispatch, useSelector } from "react-redux";
 import { getActiveStep, setActiveStep, setTotalProgress } from "../../store/postPropertyProgress";
@@ -30,7 +30,7 @@ export default function Step2({containerRef}) {
     propertyType: null,
   })
 
-  const [dynamicFieldDetails, setDynamicFieldDetails] = useState<any>({
+  const [dynamicFieldDetails, setDynamicFieldDetails] = useState({
     floorNumber: null,
     totalFloor: null,
     towerNumber: null,
@@ -92,7 +92,7 @@ export default function Step2({containerRef}) {
 
   const [errors, setErrors] = useState({})
 
-  console.log('step2 state details', dynamicFieldDetails, errors)
+  console.log('step2 state details', dynamicFieldDetails, basicStaticDetail)
 
   const renderFirstSectionLabel = () => {
     const isResidential = basicStaticDetail.propertyCategory?.code == 'residential'
@@ -1024,7 +1024,7 @@ export default function Step2({containerRef}) {
   const { data: step1Details } = useQuery({
     queryKey: ["step1-in-2-details", params?.propertyId],
     queryFn: async () => {
-      return step1PostPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
+      return getPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
     },
     select: (resposne) => {
       console.log('step1 details',resposne)
@@ -1038,31 +1038,38 @@ export default function Step2({containerRef}) {
   const { data: step2Details } = useQuery({
     queryKey: ["step2-details", params?.propertyId],
     queryFn: async () => {
-      return step2PostPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
+      return getPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
     },
     select: (resposne) => {
       console.log('step2 details',resposne)
-      return resposne
+      return resposne.data
     },
     enabled: params?.propertyId ? true : false,
     staleTime: 0,
     refetchOnMount: true
   });
 
-  useEffect(() => {
-      if(step1Details){
-        setBasicStaticDetail((pre) => ({
-            ...pre,
-            propertyListFor: step1Details?.listingType,
-            propertyCategory: step1Details?.category,
-            propertyType: step1Details?.propertyType,
-        }))
-        dispatch(setTotalProgress({progress: step1Details.progressPercentage}))
-      }
-    },[step1Details])
+  // useEffect(() => {
+  //     if(step2Details){
+  //       setBasicStaticDetail((pre) => ({
+  //           ...pre,
+  //           propertyListFor: step1Details?.listingType,
+  //           propertyCategory: step1Details?.category,
+  //           propertyType: step1Details?.propertyType,
+  //       }))
+  //       dispatch(setTotalProgress({progress: step1Details.progressPercentage}))
+  //     }
+  //   },[step2Details])
 
     useEffect(() => {
       if(step2Details){
+        setBasicStaticDetail((pre) => ({
+            ...pre,
+            propertyListFor: step2Details?.listingType,
+            propertyCategory: step2Details?.category,
+            propertyType: step2Details?.propertyType,
+        }))
+        dispatch(setTotalProgress({progress: step2Details.progressPercentage}))
         setDynamicFieldDetails((pre) => ({...pre, 
           floorNumber: step2Details?.floorNumber ? {value: step2Details?.floorNumber, label: step2Details?.floorNumber} : null,
           totalFloor: step2Details?.totalFloors,
@@ -2665,7 +2672,14 @@ export default function Step2({containerRef}) {
                   return
                 }
                 let payload = generatePayload()
-                handleStep2Submit(payload)
+                // handleStep2Submit(payload)
+                const propertyType = basicStaticDetail.propertyType?.code
+                const isStep3Skipped = ['res-sale-plot', 'res-sale-agri-land', 'com-rent-warehouse', 'com-sale-warehouse', 'com-rent-plot', 'com-sale-plot'].includes(propertyType ?? '')
+              if(isStep3Skipped){
+                dispatch(setActiveStep({step: activeStep + 2}))
+              }else{
+                dispatch(setActiveStep({step: activeStep + 1}))
+              }
               }
             }} className="w-full md:w-[130px] text-sm 1xl:text-base animated-button px-12 py-3 border border-blue text-center cursor-pointer">
               <span className="gap-3 relative flex justify-center">

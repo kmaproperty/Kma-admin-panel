@@ -113,7 +113,7 @@ const PhotoViewer = ({
                 }
               }}
             >
-              <Image alt="delete" src="/assets/delete.svg" width={16} height={16} />
+              <img alt="delete" src="/assets/delete.svg" width={16} height={16} />
             </div>
           </div>
 
@@ -124,7 +124,7 @@ const PhotoViewer = ({
                   previewVideo(data.url)
                 }
               }} className="flex items-center justify-center rounded-full w-10 h-10 bg-blue">
-                <Image alt="play" src="/assets/play-white.svg" width={16} height={16} />
+                <img alt="play" src="/assets/play-white.svg" width={16} height={16} />
               </div>
             </div>
           </div>

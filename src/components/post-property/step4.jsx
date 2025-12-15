@@ -13,6 +13,8 @@ import { toast } from "react-toastify";
 import { PROPERTY_IMAGE_TYPE } from "../../lib/enums";
 import VideoPreviewDialog from "../common/videoPreview";
 import {
+  getPropertyDetailsApiHandler,
+  propertyEditAsAdminAPiPayload,
   step1PostPropertyDetailsApiHandler,
   step4PostPropertyCreateApiHandler,
   step4PostPropertyDetailsApiHandler,
@@ -236,13 +238,13 @@ const handleUploadFileToS3 = async (files, type) => {
   const { data: step4Details } = useQuery({
     queryKey: ["step4-details", params?.propertyId],
     queryFn: async () => {
-      return step4PostPropertyDetailsApiHandler(
+      return getPropertyDetailsApiHandler(
         String(params?.propertyId ?? "")
       );
     },
     select: (resposne) => {
       console.log("step4 details", resposne);
-      return resposne;
+      return resposne.data;
     },
     enabled: params?.propertyId ? true : false,
     staleTime: 0,
@@ -274,7 +276,7 @@ const handleUploadFileToS3 = async (files, type) => {
     mutationFn: async (
       payload
     ) => {
-      return await step4PostPropertyCreateApiHandler(payload);
+      return await propertyEditAsAdminAPiPayload(payload);
     },
     onSuccess: (response) => {
       console.log("step4 success response", response);
@@ -296,49 +298,55 @@ const handleUploadFileToS3 = async (files, type) => {
     },
   });
 
-  const { data: step1Details } = useQuery({
-      queryKey: ["step1-in-4-details", params?.propertyId],
-      queryFn: async () => {
-        return step1PostPropertyDetailsApiHandler(
-          String(params?.propertyId ?? "")
-        );
-      },
-      select: (resposne) => {
-        return resposne;
-      },
-      enabled: params?.propertyId ? true : false,
-      staleTime: 0,
-      refetchOnMount: true,
-    });
+  // const { data: step1Details } = useQuery({
+  //     queryKey: ["step1-in-4-details", params?.propertyId],
+  //     queryFn: async () => {
+  //       return propertyEditAsAdminAPiPayload(
+  //         String(params?.propertyId ?? "")
+  //       );
+  //     },
+  //     select: (resposne) => {
+  //       return resposne;
+  //     },
+  //     enabled: params?.propertyId ? true : false,
+  //     staleTime: 0,
+  //     refetchOnMount: true,
+  //   });
 
-  useEffect(() => {
-      if (step1Details) {
-        setBasicStaticDetail((pre) => ({
-            ...pre,
-            propertyListFor: step1Details?.listingType,
-            propertyCategory: step1Details?.category,
-            propertyType: step1Details?.propertyType,
-        }))
-        dispatch(setTotalProgress({progress: step1Details.progressPercentage}))
-      }
-    }, [step1Details]);
+  // useEffect(() => {
+  //     if (step1Details) {
+  //       setBasicStaticDetail((pre) => ({
+  //           ...pre,
+  //           propertyListFor: step1Details?.listingType,
+  //           propertyCategory: step1Details?.category,
+  //           propertyType: step1Details?.propertyType,
+  //       }))
+  //       dispatch(setTotalProgress({progress: step1Details.progressPercentage}))
+  //     }
+  //   }, [step1Details]);
 
   useEffect(() => {
     if (step4Details) {
-      let photo = step4Details.photos.map((item) => {
+      setBasicStaticDetail((pre) => ({
+            ...pre,
+            propertyListFor: step4Details?.listingType,
+            propertyCategory: step4Details?.category,
+            propertyType: step4Details?.propertyType,
+        }))
+      let photo = step4Details.photos?.map((item) => {
         return {
           fileKey: item.fileKey,
           url: import.meta.env.VITE_AWS_URL + item.fileKey,
           view: { label: item.view, value: item.view },
           isCoverImage: item.isCoverImage,
         };
-      });
-      let video = step4Details.videos.map((item) => {
+      }) ?? [];
+      let video = step4Details.videos?.map((item) => {
         return {
           fileKey: item.fileKey,
           url: import.meta.env.VITE_AWS_URL + item.fileKey + "#t=5",
         };
-      });
+      }) ?? [];
 
       setPhotoList(photo);
       setVideoList(video);
@@ -471,7 +479,7 @@ const handleUploadFileToS3 = async (files, type) => {
                   return;
                 }
                 let payload = generatePayload();
-                handleStep4Submit(payload);
+                handleStep4Submit({id:params.propertyId, data: payload});
               }
             }}
             className="w-full md:w-[130px] text-sm 1xl:text-base animated-button px-12 py-3 border border-blue text-center cursor-pointer"
