@@ -51,9 +51,9 @@ export default function CustomPagination({
         renderItem={(item) => (
           <PaginationItem
             {...item}
-            slots={{
-              previous: () => <span>Prev</span>,
-              next: () => <span>Next</span>,
+            componentsProps={{
+              previous: { children: "Prev" },
+              next: { children: "Next" },
             }}
           />
         )}

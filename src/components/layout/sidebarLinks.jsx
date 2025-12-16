@@ -15,6 +15,7 @@ export const navLinks = [
         icon: <Building className="w-5 h-5" />,
         children: [
             { name: "Properties List", path: "/properties", icon: <Logs className="w-5 h-5" /> },
+            { name: "Emenities List", path: "/amenities", icon: <Logs className="w-5 h-5" /> },
         ],
     },
     {
