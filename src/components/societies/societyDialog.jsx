@@ -8,37 +8,38 @@ import {
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { createCities, fetchCitiesById, updateCities } from "../../services/cities";
+import { createSociety, fetchSocietyById, updateSociety } from "../../services/socities";
 
-export default function CityDialog({ open, onClose, cityID }) {
+export default function SocietyDialog({ open, onClose, societyId }) {
   const [form, setForm] = useState({
     name: "",
-    code: "",
-    state: '',
+    locality: "",
+    address: '',
+    pincode: '',
     latitude: '',
     longitude: '',
-    isFeatured: true
+    isVerified: true
   });
 
-  const isEdit = Boolean(cityID);
+  const isEdit = Boolean(societyId);
 
-  const {data: citiesData} = useQuery({
-    queryKey: ["city-details", cityID],
-    queryFn: () => fetchCitiesById(cityID),
+  const {data: societyData} = useQuery({
+    queryKey: ["society-details", societyId],
+    queryFn: () => fetchSocietyById(societyId),
     enabled: isEdit,
     staleTime: 0,
     refetchOnMount: true
   });
 
-  const {mutate: submitFurnishing, isPending: loader} = useMutation({
+  const {mutate: submitSociety, isPending: loader} = useMutation({
     mutationFn: isEdit
-      ? (payload) => updateCities({ id: cityID, payload })
-      : createCities,
+      ? (payload) => updateSociety({ id: societyId, payload })
+      : createSociety,
     onSuccess: () => {
       if(isEdit){
-        toast.success('City updated successfully')
+        toast.success('Society updated successfully')
       }else{
-        toast.success('City created successfully')
+        toast.success('Society created successfully')
       }
       onClose(true)
     },
@@ -60,21 +61,22 @@ export default function CityDialog({ open, onClose, cityID }) {
   const handleSubmit = () => {
       let payload = {
         name: form.name,
-        code: form.code,
-        state: form.state,
+        locality: form.locality,
+        address: form.address,
+        pincode:form.pincode,
         longitude: form.longitude,
         latitude: form.latitude,
-        isFeatured: form.isFeatured
+        isVerified: form.isFeatured
       }
-      submitFurnishing(payload)
+      submitSociety(payload)
   };
 
   useEffect(() => {
-    if(citiesData){
-      console.log('citiesData', citiesData)
-      setForm((pre) => ({...pre, code: citiesData.data.code, name: citiesData.data.name, state: citiesData.data.state, latitude: citiesData.data.latitude, longitude: citiesData.data.longitude, isFeatured: citiesData.data.isFeatured}))
+    if(societyData){
+      console.log('societyData', societyData)
+      setForm((pre) => ({...pre, locality: societyData.data.locality, name: societyData.data.name, address: societyData.data.address,pincode: societyData.data.pincode, latitude: societyData.data.latitude, longitude: societyData.data.longitude, isVerified: societyData.data.isVerified}))
     }
-  },[citiesData])
+  },[societyData])
 
   return (
     <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
@@ -92,7 +94,7 @@ export default function CityDialog({ open, onClose, cityID }) {
           />
         </div>
         <h2 className="text-xl font-semibold mb-4 text-center">
-          {isEdit ? "Edit City" : "Create City"}
+          {isEdit ? "Edit Society" : "Create Society"}
         </h2>
 
         <div className="space-y-4">
@@ -104,18 +106,26 @@ export default function CityDialog({ open, onClose, cityID }) {
           />
 
           <InputBase
-            placeholder="Code"
+            placeholder="Locality Name"
             className="border p-2 rounded w-full"
-            value={form.code}
-            onChange={(e) => handleChange("code", e.target.value)}
+            value={form.locality}
+            onChange={(e) => handleChange("locality", e.target.value)}
           />
 
           <InputBase
-            placeholder="State"
+            placeholder="Address"
             className="border p-2 rounded w-full"
-            value={form.state}
-            onChange={(e) => handleChange("state", e.target.value)}
+            value={form.address}
+            onChange={(e) => handleChange("address", e.target.value)}
           />
+
+          <InputBase
+            placeholder="Pincode"
+            className="border p-2 rounded w-full"
+            value={form.pincode}
+            onChange={(e) => handleChange("pincode", e.target.value)}
+          />
+
           <InputBase
             placeholder="Latitude"
             className="border p-2 rounded w-full"
@@ -132,9 +142,9 @@ export default function CityDialog({ open, onClose, cityID }) {
           <div className="flex items-center justify-between">
             <span>Is Featured</span>
             <Switch
-              checked={form.isFeatured}
+              checked={form.isVerified}
               onChange={(e) =>
-                handleChange("isFeatured", e.target.checked)
+                handleChange("isVerified", e.target.checked)
               }
             />
           </div>

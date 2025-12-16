@@ -7,6 +7,7 @@ import PropertyList from "../pages/post-property/propertyList.jsx";
 import Amenities from "../pages/amenities/page.jsx";
 import Furnishing from "../pages/furnishings/page.jsx";
 import Cities from "../pages/cities/page.jsx";
+import Socities from "../pages/societies/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       {path: '/amenities', element: <Amenities/>},
       {path: '/furnishing', element: <Furnishing/>},
       {path: '/cities', element: <Cities/>},
+      {path: '/socities', element: <Socities/>},
     ],
   },
 ]);
