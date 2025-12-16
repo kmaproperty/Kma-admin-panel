@@ -39,7 +39,11 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
       : createFurnishing,
     onSuccess: () => {
       onClose(true)
-      toast.success('Amenity added successfully')
+      if(isEdit){
+        toast.success('Furnisher updated successfully')
+      }else{
+        toast.success('Furnisher created successfully')
+      }
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {

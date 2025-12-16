@@ -39,7 +39,11 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
       : createAmenity,
     onSuccess: () => {
       onClose(true)
-      toast.success('Amenity added successfully')
+      if(isEdit){
+        toast.success('Amenity updated successfully')
+      }else{
+        toast.success('Amenity created successfully')
+      }
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
