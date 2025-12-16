@@ -5,6 +5,7 @@ import PostProperty from "../pages/post-property/page.jsx";
 import Login from "../pages/sign-in/page.jsx";
 import PropertyList from "../pages/post-property/propertyList.jsx";
 import Amenities from "../pages/amenities/page.jsx";
+import Furnishing from "../pages/furnishings/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +19,8 @@ export const router = createBrowserRouter([
       { path: "/", element: <Dashbaord /> },
       {path: '/properties', element: <PropertyList/>},
       {path: '/properties/:propertyId', element: <PostProperty/>},
-      {path: '/amenities', element: <Amenities/>}
+      {path: '/amenities', element: <Amenities/>},
+      {path: '/furnishing', element: <Furnishing/>}
     ],
   },
 ]);

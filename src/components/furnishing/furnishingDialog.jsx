@@ -8,11 +8,11 @@ import {
 import { UploadCloud, X  } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createAmenity, fetchAmenityById, updateAmenity } from "../../services/amenities";
 import { getFileUploadUrlApiHandler, uploadFileToS3ApiHandler } from "../../services/masterService";
 import { toast } from "react-toastify";
+import { createFurnishing, fetchFurnishingById, updateFurnishing } from "../../services/furnishing";
 
-export default function AmenityDialog({ open, onClose, amenityId }) {
+export default function FurnishingDialog({ open, onClose, furnishingId }) {
   const [form, setForm] = useState({
     name: "",
     code: "",
@@ -23,20 +23,20 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
 
   const [preview, setPreview] = useState(null);
 
-  const isEdit = Boolean(amenityId);
+  const isEdit = Boolean(furnishingId);
 
-  const {data: amenityData} = useQuery({
-    queryKey: ["amenity-details", amenityId],
-    queryFn: () => fetchAmenityById(amenityId),
+  const {data: furnishingData} = useQuery({
+    queryKey: ["furnishing-details", furnishingId],
+    queryFn: () => fetchFurnishingById(furnishingId),
     enabled: isEdit,
     staleTime: 0,
     refetchOnMount: true
   });
 
-  const {mutate: submitAmenity, isPending: loader} = useMutation({
+  const {mutate: submitFurnishing, isPending: loader} = useMutation({
     mutationFn: isEdit
-      ? (payload) => updateAmenity({ id: amenityId, payload })
-      : createAmenity,
+      ? (payload) => updateFurnishing({ id: furnishingId, payload })
+      : createFurnishing,
     onSuccess: () => {
       onClose(true)
       toast.success('Amenity added successfully')
@@ -109,7 +109,7 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
         sortOrder: form.sortOrder,
         isActive: form.isActive
       }
-      submitAmenity(payload)
+      submitFurnishing(payload)
     },
     onError: (error) => {
       console.log("get file url api", error);
@@ -124,7 +124,6 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
   });
 
   const handleSubmit = () => {
-    // submitAmenity()
     if(form.icon && form.icon instanceof File){
       handleGetFileUrl(
           {
@@ -141,19 +140,19 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
         sortOrder: form.sortOrder,
         isActive: form.isActive
       }
-      submitAmenity(payload)
+      submitFurnishing(payload)
     }
   };
 
   useEffect(() => {
-    if(amenityData){
-      console.log('amenityData', amenityData)
-      setForm((pre) => ({...pre, code: amenityData.data.code, name: amenityData.data.name, sortOrder: amenityData.data.sortOrder, isActive: amenityData.data.isActive, icon: amenityData.data.icon}))
-      if(amenityData?.data?.icon){
-        setPreview(`${import.meta.env.VITE_AWS_URL}${amenityData.data.icon}`)
+    if(furnishingData){
+      console.log('furnishingData', furnishingData)
+      setForm((pre) => ({...pre, code: furnishingData.data.code, name: furnishingData.data.name, sortOrder: furnishingData.data.sortOrder, isActive: furnishingData.data.isActive, icon: furnishingData.data.icon}))
+      if(furnishingData?.data?.icon){
+        setPreview(`${import.meta.env.VITE_AWS_URL}${furnishingData.data.icon}`)
       }
     }
-  },[amenityData])
+  },[furnishingData])
 
   return (
     <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
@@ -171,7 +170,7 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
           />
         </div>
         <h2 className="text-xl font-semibold mb-4 text-center">
-          {isEdit ? "Edit Amenity" : "Create Amenity"}
+          {isEdit ? "Edit Furnisher" : "Create Furnisher"}
         </h2>
 
         <div className="space-y-4">
