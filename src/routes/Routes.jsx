@@ -8,6 +8,7 @@ import Amenities from "../pages/amenities/page.jsx";
 import Furnishing from "../pages/furnishings/page.jsx";
 import Cities from "../pages/cities/page.jsx";
 import Socities from "../pages/societies/page.jsx";
+import Localities from "../pages/localities/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       {path: '/furnishing', element: <Furnishing/>},
       {path: '/cities', element: <Cities/>},
       {path: '/socities', element: <Socities/>},
+      {path: '/localities', element: <Localities/>},
     ],
   },
 ]);

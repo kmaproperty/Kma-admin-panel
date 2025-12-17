@@ -128,12 +128,14 @@ export default function SocietyDialog({ open, onClose, societyId }) {
 
           <InputBase
             placeholder="Latitude"
+            type="number"
             className="border p-2 rounded w-full"
             value={form.latitude}
             onChange={(e) => handleChange("latitude", e.target.value)}
           />
           <InputBase
             placeholder="Longitude"
+            type="number"
             className="border p-2 rounded w-full"
             value={form.longitude}
             onChange={(e) => handleChange("longitude", e.target.value)}

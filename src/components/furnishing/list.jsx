@@ -33,7 +33,7 @@ export default function FurnishingList() {
   const {mutate: handleDeleteFurnishing, isPending: deleteLoader} = useMutation({
     mutationFn: deleteFurnishing,
     onSuccess: () => {
-      toast.success('Amenity deleted successfully')
+      toast.success('Furnisher deleted successfully')
       fetchLatestFurnisher()
     },
     onError: (error) => {

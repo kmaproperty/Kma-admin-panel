@@ -33,7 +33,7 @@ export default function CityList() {
   const {mutate: handleDeleteCities, isPending: deleteLoader} = useMutation({
     mutationFn: deleteCities,
     onSuccess: () => {
-      toast.success('Amenity deleted successfully')
+      toast.success('City deleted successfully')
       fetchLatestCities()
     },
     onError: (error) => {

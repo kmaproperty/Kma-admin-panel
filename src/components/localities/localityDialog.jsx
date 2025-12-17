@@ -8,37 +8,39 @@ import {
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { createCities, fetchCitiesById, updateCities } from "../../services/cities";
+import { createLocality, fetchLocalityById, updateLocality } from "../../services/localities";
+import { useCitySearch } from "../../hooks/useCitySearch";
+import DynamicAsyncAutocomplete from "../common/dynamicAsyncSelectMui";
 
-export default function CityDialog({ open, onClose, cityID }) {
+export default function LocalityDialog({ open, onClose, localityId }) {
+  const { loadCities  } = useCitySearch();
   const [form, setForm] = useState({
     name: "",
-    code: "",
-    state: '',
+    city: '',
+    sector: "",
     latitude: '',
     longitude: '',
-    isFeatured: true
   });
 
-  const isEdit = Boolean(cityID);
+  const isEdit = Boolean(localityId);
 
-  const {data: citiesData} = useQuery({
-    queryKey: ["city-details", cityID],
-    queryFn: () => fetchCitiesById(cityID),
+  const {data: localityData} = useQuery({
+    queryKey: ["locality-details", localityId],
+    queryFn: () => fetchLocalityById(localityId),
     enabled: isEdit,
     staleTime: 0,
     refetchOnMount: true
   });
 
-  const {mutate: submitFurnishing, isPending: loader} = useMutation({
+  const {mutate: submitLocality, isPending: loader} = useMutation({
     mutationFn: isEdit
-      ? (payload) => updateCities({ id: cityID, payload })
-      : createCities,
+      ? (payload) => updateLocality({ id: localityId, payload })
+      : createLocality,
     onSuccess: () => {
       if(isEdit){
-        toast.success('City updated successfully')
+        toast.success('Locality updated successfully')
       }else{
-        toast.success('City created successfully')
+        toast.success('Locality created successfully')
       }
       onClose(true)
     },
@@ -60,21 +62,20 @@ export default function CityDialog({ open, onClose, cityID }) {
   const handleSubmit = () => {
       let payload = {
         name: form.name,
-        code: form.code,
-        state: form.state,
+        city: form.city?.id ?? '',
+        sector: form.sector,
         longitude: form.longitude,
         latitude: form.latitude,
-        isFeatured: form.isFeatured
       }
-      submitFurnishing(payload)
+      submitLocality(payload)
   };
 
   useEffect(() => {
-    if(citiesData){
-      console.log('citiesData', citiesData)
-      setForm((pre) => ({...pre, code: citiesData.data.code, name: citiesData.data.name, state: citiesData.data.state, latitude: citiesData.data.latitude, longitude: citiesData.data.longitude, isFeatured: citiesData.data.isFeatured}))
+    if(localityData){
+      console.log('localityData', localityData)
+      setForm((pre) => ({...pre, sector: localityData.data.sector, name: localityData.data.name, latitude: localityData.data.latitude, longitude: localityData.data.longitude, city: localityData.data.city}))
     }
-  },[citiesData])
+  },[localityData])
 
   return (
     <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
@@ -92,7 +93,7 @@ export default function CityDialog({ open, onClose, cityID }) {
           />
         </div>
         <h2 className="text-xl font-semibold mb-4 text-center">
-          {isEdit ? "Edit City" : "Create City"}
+          {isEdit ? "Edit Locality" : "Create Locality"}
         </h2>
 
         <div className="space-y-4">
@@ -103,19 +104,25 @@ export default function CityDialog({ open, onClose, cityID }) {
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
-          <InputBase
-            placeholder="Code"
-            className="border p-2 rounded w-full"
-            value={form.code}
-            onChange={(e) => handleChange("code", e.target.value)}
+          <DynamicAsyncAutocomplete
+            isMulti={false}
+            isError={false}
+            placeholder={'Search city'}
+            onChange={(value) => {
+              handleChange("city",value)
+            }}
+            loadOptions={loadCities}
+            value={form.city}
+            minHeight={"40px"}
           />
 
           <InputBase
-            placeholder="State"
+            placeholder="Sector Name"
             className="border p-2 rounded w-full"
-            value={form.state}
-            onChange={(e) => handleChange("state", e.target.value)}
+            value={form.sector}
+            onChange={(e) => handleChange("sector", e.target.value)}
           />
+
           <InputBase
             placeholder="Latitude"
             type="number"
@@ -130,16 +137,6 @@ export default function CityDialog({ open, onClose, cityID }) {
             value={form.longitude}
             onChange={(e) => handleChange("longitude", e.target.value)}
           />
-
-          <div className="flex items-center justify-between">
-            <span>Is Featured</span>
-            <Switch
-              checked={form.isFeatured}
-              onChange={(e) =>
-                handleChange("isFeatured", e.target.checked)
-              }
-            />
-          </div>
 
           <Button
             fullWidth

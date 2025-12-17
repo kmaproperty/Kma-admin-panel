@@ -19,6 +19,7 @@ export const navLinks = [
             { name: "Furnishing List", path: "/furnishing", icon: <Logs className="w-5 h-5" /> },
             { name: "Cities List", path: "/cities", icon: <Logs className="w-5 h-5" /> },
             { name: "Socities List", path: "/socities", icon: <Logs className="w-5 h-5" /> },
+            { name: "Localities List", path: "/localities", icon: <Logs className="w-5 h-5" /> },
         ],
     },
     {
