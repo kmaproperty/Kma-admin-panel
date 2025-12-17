@@ -13,12 +13,12 @@ export default function Login() {
   const {mutate: handleLogin,
       isPending, isError} = useMutation({
     mutationFn: loginApi,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log("Login success", data);
       localStorage.setItem('accessToken', data.accessToken)
       localStorage.setItem('refreshToken', data.refreshToken)
       localStorage.setItem('user', JSON.stringify(data.admin))
-      navigate('/properties')
+      navigate('/')
 
     },
     onError: (error) => {
