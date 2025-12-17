@@ -1,5 +1,39 @@
 import { axiosInstance } from "./axiosService";
 
+export const getPropertyListApiHandler = async () => {
+    try{
+        const response = await axiosInstance.get(
+      "property/listing-types");
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getPropertyCategoryApiHandler = async () => {
+    try{
+        const response = await axiosInstance.get(
+      "property/categories");
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getPropertyTypeApiHandler = async ({propertyListType, propertyCategory}) => {
+    try{
+        const response = await axiosInstance.get(
+      "property/master/property-types", {
+        params: { 'property-listing-type': propertyListType, 'property-category': propertyCategory} 
+      }); 
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
 export const step1PostPropertyCreateApiHandler = async (paylaod) => {
     try{
         const response = await axiosInstance.post(
