@@ -16,6 +16,7 @@ const DynamicAsyncAutocomplete = ({
   enableAddManually = false,
   menualAddItem,
   styles,
+  changeStyle = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
@@ -66,49 +67,65 @@ const DynamicAsyncAutocomplete = ({
       componentsProps={{
         popupIndicator: { style: { display: "none" } },
       }}
-      sx={{
+     sx={{
         width: "100%",
-        "& .MuiOutlinedInput-root": {
-          borderRadius: "9999px",
-          minHeight: typeof minHeight === "number" ? `${minHeight}px` : minHeight,
-          fontSize: "0.95rem",
-          paddingLeft: "0.75rem",
-          paddingRight: "0.5rem",
-          boxShadow: "none",
-          "& fieldset": {
-            borderColor: 'var(--color-border)',
-            boxShadow: "none",
-          },
-          "&:hover fieldset": {
-            borderColor: 'var(--color-border)',
-            boxShadow: "none",
-          },
-          "&.Mui-focused fieldset": {
-            borderColor: 'var(--color-border)',
-            boxShadow: "none",
-          },
-          "&.MuiOutlinedInput-root.Mui-focused": {
-            boxShadow: "none",
-          },
-        },
-        "& .MuiInputBase-input": {
-          padding: "0 !important",
-          paddingLeft: "12px !important",
-          height: "1.5rem",
-        },
-        "& .MuiInputLabel-root": {
-          fontSize: "0.9rem",
-          color: "var(--color-text-gray)",
-        },
-        "& .MuiOutlinedInput-notchedOutline": {
-          borderWidth: "1px",
-        },
-        "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: 'var(--color-border)',
-        },
+        ...(changeStyle
+          ? {
+              
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "8px",
+                minHeight: "52px",
+                paddingX: "12px",
+                fontSize: "1rem",
+                backgroundColor: "#fff",
+                "& fieldset": {
+                  borderColor: "#d1d5db",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#c7c7c7",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#c7c7c7", 
+                },
+              },
+              "& .MuiInputBase-input": {
+                padding: "0 !important",
+                height: "1.75rem",
+              },
+            }
+          : {
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "9999px",
+                minHeight:
+                  typeof minHeight === "number"
+                    ? `${minHeight}px`
+                    : minHeight,
+                fontSize: "0.95rem",
+                paddingLeft: "0.75rem",
+                paddingRight: "0.5rem",
+                boxShadow: "none",
+                "& fieldset": {
+                  borderColor: "var(--color-border)",
+                  boxShadow: "none",
+                },
+                "&:hover fieldset": {
+                  borderColor: "var(--color-border)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "var(--color-border)",
+                },
+              },
+              "& .MuiInputBase-input": {
+                padding: "0 !important",
+                paddingLeft: "12px !important",
+                height: "1.5rem",
+              },
+            }),
+
         "& .MuiAutocomplete-popupIndicator": {
           display: "none",
         },
+
         ...styles,
       }}
       renderInput={(params) => (

@@ -5,7 +5,7 @@ import {
   TableCell,
   TableBody,
   Pagination,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import { Pencil, Trash2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -14,28 +14,30 @@ import AmenityDialog from "./amenityDialog";
 import { deleteAmenity, fetchAmenities } from "../../services/amenities";
 import CustomPagination from "../common/pagination";
 import { toast } from "react-toastify";
+import AddButton from "../common/addButton";
 
 export default function AmenityList() {
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
-    totalPage: 1
+    totalPage: 1,
   });
-  const [openPopup, setOpenPopup] =  useState(false)
+  const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
   const { data, refetch: fetchLatestAmenity } = useQuery({
     queryKey: ["amenities", pagination.page],
-    queryFn: () => fetchAmenities({ page: pagination.page, limit: pagination.limit}),
+    queryFn: () =>
+      fetchAmenities({ page: pagination.page, limit: pagination.limit }),
     staleTime: 0,
-    refetchOnMount: true
+    refetchOnMount: true,
   });
 
-  const {mutate: deleteAmenities, isPending: deleteLoader} = useMutation({
+  const { mutate: deleteAmenities, isPending: deleteLoader } = useMutation({
     mutationFn: deleteAmenity,
     onSuccess: () => {
-      toast.success('Amenity deleted successfully')
-      fetchLatestAmenity()
+      toast.success("Amenity deleted successfully");
+      fetchLatestAmenity();
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
@@ -45,69 +47,84 @@ export default function AmenityList() {
       } else {
         toast.error(error.message);
       }
-    }
+    },
   });
 
   const handlePagination = (value) => {
-    setPagination((pre) => ({...pre, page: value}))
-  }
+    setPagination((pre) => ({ ...pre, page: value }));
+  };
 
   const handleOpenPopup = (id) => {
-    setOpenPopup(true)
-    setEditId(id)
-  }
+    setOpenPopup(true);
+    setEditId(id);
+  };
 
   useEffect(() => {
-    if(data){
-      setPagination((pre) => ({...pre, totalPage: Math.ceil(data.total / pagination.limit)}))
+    if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+      }));
     }
-  },[data])
+  }, [data]);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
-      <div className="flex justify-center mb-2">
-        <p className="text-2xl font-bold">Amenities</p>
-      </div>
-      <div className="flex justify-end w-full">
-      <button className="border border-blue p-2 cursor-pointer" onClick={() => handleOpenPopup('')}>
-        Add Amenity
-      </button>
-      </div>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Code</TableCell>
-            <TableCell>Sort Order</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell align="right">Action</TableCell>
-          </TableRow>
-        </TableHead>
+      <div className="flex items-center justify-between my-4 border-b pb-3">
+        <h1 className="text-xl font-semibold text-gray-800">Amenities</h1>
 
-        <TableBody>
-          {data?.data?.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.code}</TableCell>
-              <TableCell>{row.sortOrder}</TableCell>
-              <TableCell>
-                {row.isActive ? "Active" : "Inactive"}
-              </TableCell>
-              <TableCell align="right">
-                <IconButton onClick={() => handleOpenPopup(row.id)}>
-                  <Pencil size={18} />
-                </IconButton>
-                <IconButton disabled={deleteLoader} onClick={() => deleteAmenities(row.id)}>
-                  <Trash2 size={18} />
-                </IconButton>
-              </TableCell>
+        <AddButton
+          handleClick={() => handleOpenPopup("")}
+          title="Add Amenity"
+        />
+      </div>
+      <div className="overflow-x-auto border border-gray-200 rounded-lg">
+        <Table>
+          <TableHead>
+            <TableRow className="bg-gray-100">
+              {["Name", "Code", "Sort Order", "Status", "Action"].map(
+                (head) => (
+                  <TableCell
+                    key={head}
+                    className="font-semibold text-gray-700 whitespace-nowrap"
+                    {...{ align: head == "Action" ? "right" : "left" }}
+                  >
+                    {head}
+                  </TableCell>
+                )
+              )}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
 
+          <TableBody>
+            {data?.data?.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.code}</TableCell>
+                <TableCell>{row.sortOrder}</TableCell>
+                <TableCell>{row.isActive ? "Active" : "Inactive"}</TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={() => handleOpenPopup(row.id)}>
+                    <Pencil size={18} />
+                  </IconButton>
+                  <IconButton
+                    disabled={deleteLoader}
+                    onClick={() => deleteAmenities(row.id)}
+                  >
+                    <Trash2 size={18} />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
       <div className="flex justify-center mt-4">
-        <CustomPagination page={pagination.page} totalPages={pagination.totalPage} onChange={(value) => handlePagination(value)}/>
+        <CustomPagination
+          page={pagination.page}
+          totalPages={pagination.totalPage}
+          onChange={(value) => handlePagination(value)}
+        />
       </div>
 
       {openPopup && (
@@ -115,10 +132,10 @@ export default function AmenityList() {
           open={openPopup}
           amenityId={editId}
           onClose={(isUpdate) => {
-            setEditId(null)
-            setOpenPopup(false)
-            if(isUpdate){
-              fetchLatestAmenity()
+            setEditId(null);
+            setOpenPopup(false);
+            if (isUpdate) {
+              fetchLatestAmenity();
             }
           }}
         />

@@ -3,14 +3,21 @@ import {
   DialogContent,
   Switch,
   InputBase,
-  Button
+  Button,
 } from "@mui/material";
-import { UploadCloud, X  } from "lucide-react";
+import { UploadCloud, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getFileUploadUrlApiHandler, uploadFileToS3ApiHandler } from "../../services/masterService";
+import {
+  getFileUploadUrlApiHandler,
+  uploadFileToS3ApiHandler,
+} from "../../services/masterService";
 import { toast } from "react-toastify";
-import { createFurnishing, fetchFurnishingById, updateFurnishing } from "../../services/furnishing";
+import {
+  createFurnishing,
+  fetchFurnishingById,
+  updateFurnishing,
+} from "../../services/furnishing";
 
 export default function FurnishingDialog({ open, onClose, furnishingId }) {
   const [form, setForm] = useState({
@@ -18,31 +25,31 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
     code: "",
     icon: null,
     sortOrder: 1,
-    isActive: true
+    isActive: true,
   });
 
   const [preview, setPreview] = useState(null);
 
   const isEdit = Boolean(furnishingId);
 
-  const {data: furnishingData} = useQuery({
+  const { data: furnishingData } = useQuery({
     queryKey: ["furnishing-details", furnishingId],
     queryFn: () => fetchFurnishingById(furnishingId),
     enabled: isEdit,
     staleTime: 0,
-    refetchOnMount: true
+    refetchOnMount: true,
   });
 
-  const {mutate: submitFurnishing, isPending: loader} = useMutation({
+  const { mutate: submitFurnishing, isPending: loader } = useMutation({
     mutationFn: isEdit
       ? (payload) => updateFurnishing({ id: furnishingId, payload })
       : createFurnishing,
     onSuccess: () => {
-      onClose(true)
-      if(isEdit){
-        toast.success('Furnisher updated successfully')
-      }else{
-        toast.success('Furnisher created successfully')
+      onClose(true);
+      if (isEdit) {
+        toast.success("Furnisher updated successfully");
+      } else {
+        toast.success("Furnisher created successfully");
       }
     },
     onError: (error) => {
@@ -53,11 +60,10 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
       } else {
         toast.error(error.message);
       }
-    }
+    },
   });
 
-  const handleChange = (key, value) =>
-    setForm((p) => ({ ...p, [key]: value }));
+  const handleChange = (key, value) => setForm((p) => ({ ...p, [key]: value }));
 
   const handleFile = (file) => {
     if (!file) return;
@@ -76,13 +82,10 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
   };
 
   const { mutate: handleFileUpload } = useMutation({
-    mutationFn: async (
-      payload
-    ) => {
+    mutationFn: async (payload) => {
       return await uploadFileToS3ApiHandler(payload);
     },
-    onSuccess: (response) => {
-    },
+    onSuccess: (response) => {},
     onError: (error) => {
       console.log("file upload s3 api", error);
       if (Array.isArray(error.message)) {
@@ -96,14 +99,12 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
   });
 
   const { mutate: handleGetFileUrl, isPending: ownerLoader } = useMutation({
-    mutationFn: async (
-      payload
-    ) => {
+    mutationFn: async (payload) => {
       return await getFileUploadUrlApiHandler(payload);
     },
     onSuccess: (response) => {
       if (response.success) {
-        handleFileUpload({ url: response.data.url, file: form.icon })
+        handleFileUpload({ url: response.data.url, file: form.icon });
       }
 
       let payload = {
@@ -111,9 +112,9 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
         code: form.code,
         icon: response.data.key,
         sortOrder: form.sortOrder,
-        isActive: form.isActive
-      }
-      submitFurnishing(payload)
+        isActive: form.isActive,
+      };
+      submitFurnishing(payload);
     },
     onError: (error) => {
       console.log("get file url api", error);
@@ -128,94 +129,107 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
   });
 
   const handleSubmit = () => {
-    if(form.icon && form.icon instanceof File){
-      handleGetFileUrl(
-          {
-            contentType: form.icon.type,
-            filename: form.icon.name,
-            expiresIn: 3600,
-            folder: import.meta.env.VITE_AWS_FOLDER,
-          })
-    }else{
+    if (form.icon && form.icon instanceof File) {
+      handleGetFileUrl({
+        contentType: form.icon.type,
+        filename: form.icon.name,
+        expiresIn: 3600,
+        folder: import.meta.env.VITE_AWS_FOLDER,
+      });
+    } else {
       let payload = {
         name: form.name,
         code: form.code,
         icon: form.icon,
         sortOrder: form.sortOrder,
-        isActive: form.isActive
-      }
-      submitFurnishing(payload)
+        isActive: form.isActive,
+      };
+      submitFurnishing(payload);
     }
   };
 
   useEffect(() => {
-    if(furnishingData){
-      console.log('furnishingData', furnishingData)
-      setForm((pre) => ({...pre, code: furnishingData.data.code, name: furnishingData.data.name, sortOrder: furnishingData.data.sortOrder, isActive: furnishingData.data.isActive, icon: furnishingData.data.icon}))
-      if(furnishingData?.data?.icon){
-        setPreview(`${import.meta.env.VITE_AWS_URL}${furnishingData.data.icon}`)
+    if (furnishingData) {
+      console.log("furnishingData", furnishingData);
+      setForm((pre) => ({
+        ...pre,
+        code: furnishingData.data.code,
+        name: furnishingData.data.name,
+        sortOrder: furnishingData.data.sortOrder,
+        isActive: furnishingData.data.isActive,
+        icon: furnishingData.data.icon,
+      }));
+      if (furnishingData?.data?.icon) {
+        setPreview(
+          `${import.meta.env.VITE_AWS_URL}${furnishingData.data.icon}`
+        );
       }
     }
-  },[furnishingData])
+  }, [furnishingData]);
 
   return (
     <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
       <DialogContent className="p-6">
-        <div className="flex justify-end w-full">
-          <img
-            onClick={() => {
-                onClose(false)
-            }}
-            src="/assets/close-icon.svg"
-            alt="close"
-            width={24}
-            height={24}
-            className="cursor-pointer"
-          />
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {isEdit ? "Edit Furnisher" : "Create Furnisher"}
+          </h2>
+          <button
+            onClick={() => onClose(false)}
+            className="cursor-pointer text-gray-500 hover:text-gray-800 transition"
+          >
+            <X size={20} />
+          </button>
         </div>
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          {isEdit ? "Edit Furnisher" : "Create Furnisher"}
-        </h2>
 
         <div className="space-y-4">
           <InputBase
             placeholder="Name"
-            className="border p-2 rounded w-full"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                     transition"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
           <InputBase
             placeholder="Code"
-            className="border p-2 rounded w-full"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                     transition"
             value={form.code}
             onChange={(e) => handleChange("code", e.target.value)}
           />
 
           {/* Upload */}
-          
-            <label
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              className="border-dashed border-2 rounded p-4 flex flex-col items-center cursor-pointer text-center"
-            >
-              <UploadCloud />
-              <span className="text-sm mt-1">
-                Drag & Drop or Click to Upload
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={(e) => handleFile(e.target.files[0])}
-              />
-            </label>
-          
-            {preview && <div className="relative w-24 h-24 mx-auto">
+
+          <label
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            className="group border-2 border-dashed border-gray-300
+                     rounded-xl p-6 flex flex-col items-center
+                     cursor-pointer text-center
+                     hover:border-indigo-500 hover:bg-indigo-50
+                     transition"
+          >
+            <UploadCloud className="text-gray-400 group-hover:text-indigo-600" />
+            <span className="text-sm text-gray-600 mt-2">
+              Drag & drop or click to upload
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => handleFile(e.target.files[0])}
+            />
+          </label>
+
+          {preview && (
+            <div className="relative w-24 h-24 mx-auto">
               <img
                 src={preview}
                 alt="preview"
-                className="w-full h-full object-cover rounded"
+                className="w-full h-full object-cover rounded-lg rounded"
               />
               <button
                 type="button"
@@ -224,39 +238,40 @@ export default function FurnishingDialog({ open, onClose, furnishingId }) {
               >
                 <X size={14} />
               </button>
-            </div>}
+            </div>
+          )}
 
           <InputBase
             type="number"
             placeholder="Sort Order"
-            className="border p-2 rounded w-full"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
             value={form.sortOrder}
-            onChange={(e) =>
-              handleChange("sortOrder", Number(e.target.value))
-            }
+            onChange={(e) => handleChange("sortOrder", Number(e.target.value))}
           />
 
           <div className="flex items-center justify-between">
-            <span>Is Active</span>
+            <span className="text-sm font-medium text-gray-700">Is Active</span>
             <Switch
               checked={form.isActive}
-              onChange={(e) =>
-                handleChange("isActive", e.target.checked)
-              }
+              onChange={(e) => handleChange("isActive", e.target.checked)}
             />
           </div>
 
-          <Button
-            fullWidth
-            variant="contained"
+          <button
             onClick={handleSubmit}
             disabled={loader}
+            type="button"
+            className="w-full bg-indigo-600 text-white py-2.5
+                     rounded-lg font-medium cursor-pointer
+                     hover:bg-indigo-700
+                     disabled:opacity-60
+                     transition"
           >
-            {isEdit ? "Update" : "Create"}
-          </Button>
+            {isEdit ? "Update Furnisher" : "Create Furnisher"}
+          </button>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
-

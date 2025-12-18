@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { getPropertyCategoryApiHandler, getPropertyListApiHandler, getPropertyTypeApiHandler } from "../../services/postProperty";
 import DynamicSelect from "../common/select";
 import { createBhk, fetchBhkById, updateBhk } from "../../services/bhk";
+import { X } from "lucide-react";
 
 export default function BhkDialog({ open, onClose, bhdId }) {
   const [form, setForm] = useState({
@@ -113,33 +114,35 @@ export default function BhkDialog({ open, onClose, bhdId }) {
   return (
     <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
       <DialogContent className="p-6">
-        <div className="flex justify-end w-full">
-          <img
-            onClick={() => {
-                onClose(false)
-            }}
-            src="/assets/close-icon.svg"
-            alt="close"
-            width={24}
-            height={24}
-            className="cursor-pointer"
-          />
-        </div>
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          {isEdit ? "Edit Society" : "Create Society"}
+        
+
+            <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-800">
+           {isEdit ? "Edit Bhk" : "Create Bhk"}
         </h2>
+        <button
+          onClick={() => onClose(false)}
+          className="cursor-pointer text-gray-500 hover:text-gray-800 transition"
+        >
+          <X size={20} />
+        </button>
+      </div>
 
         <div className="space-y-4">
           <InputBase
             placeholder="Name"
-            className="border p-2 rounded w-full"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                     transition"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
           <InputBase
             placeholder="Code"
-            className="border p-2 rounded w-full"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                     transition"
             value={form.code}
             onChange={(e) => handleChange("code", e.target.value)}
           />
@@ -154,8 +157,9 @@ export default function BhkDialog({ open, onClose, bhdId }) {
               }}
               options={propertyTypeList ?? []}
               value={form.propertyType}
-              minHeight={"40px"}
+              minHeight={"50px"}
               fontwidth={'16px'}
+              changeStyle={true}
             />
 
             <DynamicSelect
@@ -168,8 +172,9 @@ export default function BhkDialog({ open, onClose, bhdId }) {
               }}
               options={propertyCategoryList ?? []}
               value={form.propertyCategory}
-              minHeight={"40px"}
+              minHeight={"50px"}
               fontwidth={'16px'}
+              changeStyle={true}
             />
 
             <DynamicSelect
@@ -181,28 +186,35 @@ export default function BhkDialog({ open, onClose, bhdId }) {
               }}
               options={propertyList ?? []}
               value={form.propertyList}
-              minHeight={"40px"}
+              minHeight={"50px"}
               fontwidth={'16px'}
+              changeStyle={true}
             />
 
             <InputBase
             type="number"
             placeholder="Sort Order"
-            className="border p-2 rounded w-full"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                     transition"
             value={form.sortOrder}
             onChange={(e) =>
               handleChange("sortOrder", Number(e.target.value))
             }
           />
 
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleSubmit}
-            disabled={loader}
-          >
-            {isEdit ? "Update" : "Create"}
-          </Button>
+          <button
+          onClick={handleSubmit}
+          disabled={loader}
+          type="button"
+          className="w-full bg-indigo-600 text-white py-2.5
+                     rounded-lg font-medium cursor-pointer
+                     hover:bg-indigo-700
+                     disabled:opacity-60
+                     transition"
+        >
+          {isEdit ? "Update Bhk" : "Create Bhk"}
+        </button>
         </div>
       </DialogContent>
     </Dialog>

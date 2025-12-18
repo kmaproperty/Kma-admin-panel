@@ -11,12 +11,13 @@ const DynamicSelect = ({
   minHeight = '47.81px',
   options = [],
   fontwidth,
+  changeStyle=false,
   ...rest
 }) => {
   const defaultStyles = {
     control: (base) => ({
       ...base,
-      borderRadius: 9999,
+      borderRadius: changeStyle ? '8px' : 9999,
       boxShadow: "none",
       borderColor: isError ? "#fb2c36" : "var(--color-border)",
       "&:hover": {
