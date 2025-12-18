@@ -76,3 +76,16 @@ export const getPartnerApiHandler = async (id) => {
         throw error.response?.data ?? error;
     }
 }
+
+
+export const editPartnerApiHandler = async ({ payload, id }) => {
+  try {
+    const response = await axiosInstance.put(
+      `/admin/users/${id}`,
+      payload // Match the variable name here
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+}

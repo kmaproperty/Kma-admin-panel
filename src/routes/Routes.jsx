@@ -9,6 +9,7 @@ import ChannelPartnerListing from "../pages/channel-partner/page.jsx";
 import ChannelPartnerCode from "../pages/channel-partner/code/page.jsx";
 import AddEditChannelPartnerCodes from "../pages/channel-partner/code/addEditCode.jsx";
 import AddEditChannelPartner from "../pages/channel-partner/addEditChannelPartner.jsx";
+import OwnersListingPage from "../pages/owners/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ export const router = createBrowserRouter([
           { path: '/channel-partners/code', element: <ChannelPartnerCode /> },
           { path: '/channel-partners/code/add', element: <AddEditChannelPartnerCodes /> },
           { path: '/channel-partners/code/edit/:id', element: <AddEditChannelPartnerCodes /> },
+          { path: '/owners', element: <OwnersListingPage /> },
         ],
       },
     ],

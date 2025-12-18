@@ -4,18 +4,23 @@ import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
+import { format, parseISO } from 'date-fns';
 import PageTitle from '../../components/common/layout/PageTitle';
 import TextField from '../../components/common/TextField';
 import MainWrapper from '../../components/common/layout/mainWrapper';
-import { addPartnerCodeApiHandler, editPartnerCodeApiHandler, getPartnerCodeApiHandler } from '../../services/channelPartnerService';
+import { addPartnerCodeApiHandler, editPartnerApiHandler, editPartnerCodeApiHandler, getPartnerCodeApiHandler } from '../../services/channelPartnerService';
 import { toast } from 'react-toastify';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getPartnerApiHandler } from '../../services/channelPartnerService';
+import DynamicSelectController from '../../components/common/select/controlledSelect';
+import ControlledDatePicker from '../../components/common/datePicker/ControlledDatePicker';
+import { getCityApiHandler } from '../../services/masterService';
 
 const AddEditChannelPartner = () => {
     const params = useParams();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [cities, setCities] = useState([]);
 
     const messageSchema = yup.object({
         name: yup.string().required('Please enter name'),
@@ -24,27 +29,40 @@ const AddEditChannelPartner = () => {
         cities: yup.array().min(1, 'Please select at least one city').required(),
         businessSince: yup.date().nullable(),
         aboutYourSelf: yup.string(),
-        phoneVerified: yup.boolean().required(),
-        isActive: yup.boolean().required()
+        phoneVerified: yup.object().shape({
+            label: yup.string().required(),
+            value: yup.boolean().required()
+        }).required(),
+        isActive: yup.object().shape({
+            label: yup.string().required(),
+            value: yup.boolean().required()
+        }).required(),
     });
 
     const {
         handleSubmit,
         control,
         setValue,
-        reset
+        reset,
+        watch
     } = useForm({
         resolver: yupResolver(messageSchema),
         defaultValues: {
-            phoneVerified: true,
-            isActive: true
+            phoneVerified: {
+                label: "Yes",
+                value: true
+            },
+            isActive: {
+                label: "Yes",
+                value: true
+            }
         }
     });
 
     const {
         data: channelPartnerData,
     } = useQuery({
-        queryKey: ["partner-details", params.id, "CHANNEL_PARTNER_CODE"],
+        queryKey: ["partner-details", params.id, "CHANNEL_PARTNER"],
         queryFn: () => {
             return getPartnerApiHandler(params.id);
         },
@@ -52,11 +70,22 @@ const AddEditChannelPartner = () => {
         staleTime: 0,
         refetchOnMount: true
     });
+    const {
+        data: citiesData,
+    } = useQuery({
+        queryKey: ["cities", params.id, "CITIES"],
+        queryFn: () => {
+            return getCityApiHandler(params.id);
+        },
+        Loadingd: isLoading,
+        staleTime: 0,
+        refetchOnMount: true
+    });
 
-    const { mutate: editCode } = useMutation({
-        mutationFn: editPartnerCodeApiHandler,
+    const { mutate: editPartner } = useMutation({
+        mutationFn: editPartnerApiHandler,
         onSuccess: (res) => {
-            toast.success("Channel Partner Code Updated Successfully")
+            toast.success("Channel Partner Updated Successfully")
         },
         onError: (error) => {
             if (Array.isArray(error.message)) {
@@ -70,15 +99,18 @@ const AddEditChannelPartner = () => {
     })
 
     const onSubmit = async (data) => {
+        console.log(data.businessSince)
         setIsSubmitting(true);
-        // const payload = {
-        //     ...data,
-        //     // ...(params?.id && { id: params.id })
-        // };
-
-        console.log(params?.id)
+        const payload = {
+            ...data,
+            isActive: data.isActive.value,
+            phoneVerified: data.phoneVerified.value,
+            cities: data.cities.map((city) => city.value).join(","),
+            businessSince: data.businessSince ? format(data.businessSince, "yyyy-MM-dd") : null,
+            // ...(params?.id && { id: params.id })
+        };
         try {
-            editCode({ payload: data, id: params?.id });
+            editPartner({ payload, id: params?.id });
         } catch (err) {
             console.log(err);
         } finally {
@@ -88,16 +120,32 @@ const AddEditChannelPartner = () => {
 
     useEffect(() => {
         if (channelPartnerData) {
-            setValue("name", channelPartnerData.data.name),
-                setValue("email", channelPartnerData.data.email),
-                setValue("firstName", channelPartnerData.data.firstName),
-                setValue("cities", channelPartnerData.data.cities),
-                setValue("businessSince", channelPartnerData.data.businessSince),
-                setValue("aboutYourSelf", channelPartnerData.data.aboutYourSelf),
-                setValue("isActive", channelPartnerData.data.isActive),
-                setValue("phoneVerified", channelPartnerData.data.phoneVerified)
+            const cities = channelPartnerData?.data?.cities.split(",").map((city) => {
+                return { value: city, label: city }
+            })
+            setValue("cities", cities || [])
+            setValue("name", channelPartnerData.data.name || "")
+            setValue("email", channelPartnerData.data.email || "")
+            setValue("firmName", channelPartnerData.data.firmName || "")
+            setValue("businessSince", channelPartnerData.data.businessSince ? new Date(channelPartnerData.data.businessSince) : null)
+            setValue("aboutYourSelf", channelPartnerData.data.aboutYourSelf || "")
+            setValue("isActive", channelPartnerData.data.isActive ? {label: "Yes",value: true} : {label: "No",value: false} || true)
+            setValue("phoneVerified", channelPartnerData.data.phoneVerified ? {label: "Yes",value: true} : {label: "No",value: false} || true)
         }
     }, [channelPartnerData])
+
+    useEffect(() => {
+        console.log(citiesData)
+        if (citiesData?.data.length) {
+            setCities(citiesData.data.map((city) => {
+                return { value: city, label: city }
+            }))
+        }
+    }, [citiesData])
+
+    useEffect(() => {
+        console.log(watch("cities"))
+    }, [watch("cities")])
 
     return (
         <MainWrapper>
@@ -112,7 +160,7 @@ const AddEditChannelPartner = () => {
                         <>
                             <PageTitle title={`Edit Channel Partner`} />
                             <form onSubmit={handleSubmit(onSubmit)}>
-                                <div className='bg-gray-50 w-[70%] px-5 py-4 rounded-lg'>
+                                <div className='bg-gray-50 w-[70%] px-5 py-4 rounded-lg space-y-3'>
                                     <div className='flex items-center gap-6'>
                                         <div className="mb-3 w-[48%]">
                                             <TextField
@@ -131,13 +179,88 @@ const AddEditChannelPartner = () => {
                                                 type="email"
                                             />
                                         </div>
-
+                                    </div>
+                                    <div className='flex items-center gap-6'>
+                                        <div className="mb-3 w-[48%]">
+                                            <TextField
+                                                control={control}
+                                                name="firmName"
+                                                label="First Name"
+                                                placeHolder="Enter firm name"
+                                            />
+                                        </div>
+                                        <div className="mb-3 w-[48%]">
+                                            <DynamicSelectController
+                                                name="cities"
+                                                control={control}
+                                                options={cities}
+                                                label="Cities"
+                                                isMulti
+                                                placeholder="Select cities"
+                                                rules={{ required: "City is required" }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center gap-6'>
+                                        <div className="mb-3 w-[48%]">
+                                            <ControlledDatePicker
+                                                name="businessSince"
+                                                control={control}
+                                                label="Business Since"
+                                                rules={{ required: "Business Since is required" }}
+                                                disableFuture
+                                            />
+                                        </div>
+                                        <div className="mb-3 w-[48%]">
+                                            <TextField
+                                                control={control}
+                                                name="aboutYourSelf"
+                                                label="About YourSelf"
+                                                placeHolder="Explain about yourself"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center gap-6'>
+                                        <div className="mb-3 w-[48%]">
+                                            <DynamicSelectController
+                                                name="isActive"
+                                                control={control}
+                                                options={[{
+                                                    label: "Yes",
+                                                    value: true
+                                                }, {
+                                                    label: "No",
+                                                    value: false
+                                                }
+                                                ]}
+                                                label="Is Active"
+                                                placeholder="Is Active"
+                                                rules={{ required: "This field is required" }}
+                                            />
+                                        </div>
+                                        <div className="mb-3 w-[48%]">
+                                            <DynamicSelectController
+                                                name="phoneVerified"
+                                                control={control}
+                                                options={[{
+                                                    label: "Yes",
+                                                    value: true
+                                                }, {
+                                                    label: "No",
+                                                    value: false
+                                                }
+                                                ]}
+                                                label="Is Phone Verified"
+                                                placeholder="Is Phone Verified"
+                                                rules={{ required: "This field is required" }}
+                                            />
+                                        </div>
                                     </div>
                                     <div className="mt-4 rounded flex gap-2 justify-end">
                                         <button type="submit" className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-white rounded-md bg-gray-800" disabled={isSubmitting}>
                                             Submit
                                         </button>
-                                        <Link to="/channel-partners/code">
+                                        <Link to="/channel-partners/">
                                             <button className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-gray-700 rounded-md bg-gray-300">
                                                 Cancel
                                             </button>
