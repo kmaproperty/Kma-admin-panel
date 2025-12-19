@@ -7,7 +7,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Pencil, Trash2 } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import CustomPagination from "../common/pagination";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import { deleteFurnishing, fetchFurnishing } from "../../services/furnishing";
 import AddButton from "../common/addButton";
 
 export default function FurnishingList() {
+  const [tableData, setTableData] = useState([])
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -24,10 +25,19 @@ export default function FurnishingList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data, refetch: fetchLatestFurnisher } = useQuery({
-    queryKey: ["amenities", pagination.page],
-    queryFn: () =>
-      fetchFurnishing({ page: pagination.page, limit: pagination.limit }),
+  const { mutate: fetchLatestFurnisher } = useMutation({
+    mutationFn: fetchFurnishing,
+    onSuccess: (data) => {
+      console.log('data', data)
+      if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+        }));
+      }
+      setTableData(data?.data ?? [])
+
+    },
     staleTime: 0,
     refetchOnMount: true,
   });
@@ -37,7 +47,7 @@ export default function FurnishingList() {
       mutationFn: deleteFurnishing,
       onSuccess: () => {
         toast.success("Furnisher deleted successfully");
-        fetchLatestFurnisher();
+        fetchLatestFurnisher({page: pagination.page, limit: pagination.limit, search: ''})
       },
       onError: (error) => {
         if (Array.isArray(error.message)) {
@@ -52,6 +62,7 @@ export default function FurnishingList() {
 
   const handlePagination = (value) => {
     setPagination((pre) => ({ ...pre, page: value }));
+    fetchLatestFurnisher({page: value, limit: pagination.limit, search: ''})
   };
 
   const handleOpenPopup = (id) => {
@@ -60,13 +71,8 @@ export default function FurnishingList() {
   };
 
   useEffect(() => {
-    if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-      }));
-    }
-  }, [data]);
+    fetchLatestFurnisher({page: pagination.page, limit: pagination.limit, search: ''})
+  }, []);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
@@ -97,7 +103,7 @@ export default function FurnishingList() {
           </TableHead>
 
           <TableBody>
-            {data?.data?.map((row) => (
+            {tableData?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.code}</TableCell>
@@ -136,7 +142,7 @@ export default function FurnishingList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestFurnisher();
+              fetchLatestFurnisher({page: pagination.page, limit: pagination.limit, search: ''});
             }
           }}
         />

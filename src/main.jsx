@@ -7,12 +7,14 @@ import App from "./App.jsx";
 import StoreProvider from "./providers/StoreProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
+  <>
     <QueryProvider>
     <StoreProvider>
         <App/>
     </StoreProvider>
     </QueryProvider>
       <ToasterProvider/>
-  </StrictMode>
+  </>
+  // </StrictMode>
 );

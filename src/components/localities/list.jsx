@@ -16,6 +16,7 @@ import { deleteLocality, fetchLocality } from "../../services/localities";
 import AddButton from "../common/addButton";
 
 export default function LocalityList() {
+  const [tableData, setTableData] = useState([])
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -24,10 +25,19 @@ export default function LocalityList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data, refetch: fetchLatestLocality } = useQuery({
-    queryKey: ["locality", pagination.page],
-    queryFn: () =>
-      fetchLocality({ page: pagination.page, limit: pagination.limit }),
+  const { mutate: fetchLatestLocality } = useMutation({
+    mutationFn: fetchLocality,
+    onSuccess: (data) => {
+      console.log('data', data)
+      if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+        }));
+      }
+      setTableData(data?.data ?? [])
+
+    },
     staleTime: 0,
     refetchOnMount: true,
   });
@@ -37,7 +47,7 @@ export default function LocalityList() {
       mutationFn: deleteLocality,
       onSuccess: () => {
         toast.success("Locality deleted successfully");
-        fetchLatestLocality();
+        fetchLatestLocality({page: pagination.page, limit: pagination.limit, search: ''})
       },
       onError: (error) => {
         if (Array.isArray(error.message)) {
@@ -53,6 +63,7 @@ export default function LocalityList() {
 
   const handlePagination = (value) => {
     setPagination((pre) => ({ ...pre, page: value }));
+    fetchLatestLocality({page: value, limit: pagination.limit, search: ''})
   };
 
   const handleOpenPopup = (id) => {
@@ -61,13 +72,8 @@ export default function LocalityList() {
   };
 
   useEffect(() => {
-    if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-      }));
-    }
-  }, [data]);
+    fetchLatestLocality({page: pagination.page, limit: pagination.limit, search: ''})
+  },[]);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
@@ -103,7 +109,7 @@ export default function LocalityList() {
           </TableHead>
 
           <TableBody>
-            {data?.data?.map((row) => (
+            {tableData?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.sector}</TableCell>
@@ -142,7 +148,7 @@ export default function LocalityList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestLocality();
+              fetchLatestLocality({page: pagination.page, limit: pagination.limit, search: ''});
             }
           }}
         />

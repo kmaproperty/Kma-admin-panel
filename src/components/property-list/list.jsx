@@ -2,14 +2,13 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
-  Button,
   Stack,
   Typography,
-  Tooltip
+  Tooltip,
+  IconButton
 } from "@mui/material";
 import { useState } from "react";
 import CustomPagination from "../common/pagination";
@@ -75,17 +74,21 @@ if(Array.isArray(error.message)){
         Properties List
       </Typography>
 
-      <TableContainer>
+     <div className="overflow-x-auto border border-gray-200 rounded-lg">
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>#ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>category</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Built Up Area</TableCell>
-              <TableCell>status</TableCell>
-              <TableCell align="center">Action</TableCell>
+            <TableRow className="bg-gray-100">
+              {["#ID", "Name", "category", "Type", "Built Up Area", 'status', 'Action'].map(
+                (head) => (
+                  <TableCell
+                    key={head}
+                    className="font-semibold text-gray-700 whitespace-nowrap"
+                    {...{ align: head == "Action" ? "right" : "left" }}
+                  >
+                    {head}
+                  </TableCell>
+                )
+              )}
             </TableRow>
           </TableHead>
 
@@ -100,51 +103,42 @@ if(Array.isArray(error.message)){
                 <TableCell>{PROPERTY_STATUS.find(item => item.value == row.status)?.name ?? '-'}</TableCell>
                 <TableCell className="flex gap-2">
   {row.status != 'approved' && <Tooltip title="Approve">
-    <Button
-      variant="light"
-      size="sm"
+    <IconButton
       onClick={() => handleOpenStatusPopup("approve", row.id)}
     >
       <CheckCircle size={18} />
-    </Button>
+    </IconButton>
   </Tooltip>}
 
   {row.status != 'rejected' && <Tooltip title="Reject">
-    <Button
-      variant="soft-danger"
-      size="sm"
+    <IconButton
       onClick={() => handleOpenStatusPopup("reject", row.id)}
     >
       <XCircle size={18} />
-    </Button>
+    </IconButton>
   </Tooltip>}
 
   <Tooltip title="Edit">
     <Link to={`/properties/${row.id}`}>
-      <Button
-        variant="soft-primary"
-        size="sm"
-      >
+      <IconButton>
         <Pencil size={18} />
-      </Button>
+      </IconButton>
     </Link>
   </Tooltip>
 
   <Tooltip title="Delete">  
-    <Button
-      variant="soft-danger"
-      size="sm"
+    <IconButton
       onClick={() => deleteProperty(row.id)}
     >
       <Trash2 size={18} />
-    </Button>
+    </IconButton>
   </Tooltip>
 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </div>
 
       <Stack alignItems="center" sx={{ mt: 3 }}>
         <CustomPagination page={pagination.page} totalPages={pagination.totalPage} onChange={(value) => handlePagination(value)}/>

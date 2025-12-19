@@ -16,6 +16,7 @@ import CityDialog from "./cityDialog";
 import AddButton from "../common/addButton";
 
 export default function CityList() {
+  const [tableData, setTableData] = useState([])
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -24,10 +25,19 @@ export default function CityList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data, refetch: fetchLatestCities } = useQuery({
-    queryKey: ["amenities", pagination.page],
-    queryFn: () =>
-      fetchCities({ page: pagination.page, limit: pagination.limit }),
+  const { mutate: fetchLatestCities } = useMutation({
+    mutationFn: fetchCities,
+    onSuccess: (data) => {
+      console.log('data', data)
+      if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+        }));
+      }
+      setTableData(data?.data ?? [])
+
+    },
     staleTime: 0,
     refetchOnMount: true,
   });
@@ -36,7 +46,7 @@ export default function CityList() {
     mutationFn: deleteCities,
     onSuccess: () => {
       toast.success("City deleted successfully");
-      fetchLatestCities();
+      fetchLatestCities({page: pagination.page, limit: pagination.limit, search: ''})
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
@@ -51,6 +61,7 @@ export default function CityList() {
 
   const handlePagination = (value) => {
     setPagination((pre) => ({ ...pre, page: value }));
+    fetchLatestCities({page: value, limit: pagination.limit, search: ''})
   };
 
   const handleOpenPopup = (id) => {
@@ -59,13 +70,8 @@ export default function CityList() {
   };
 
   useEffect(() => {
-    if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-      }));
-    }
-  }, [data]);
+    fetchLatestCities({page: pagination.page, limit: pagination.limit, search: ''})
+  }, []);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
@@ -99,7 +105,7 @@ export default function CityList() {
           </TableHead>
 
           <TableBody>
-            {data?.data?.map((row) => (
+            {tableData?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.code}</TableCell>
@@ -140,7 +146,7 @@ export default function CityList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestCities();
+              fetchLatestCities({page: pagination.page, limit: pagination.limit, search: ''});
             }
           }}
         />

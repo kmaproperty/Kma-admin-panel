@@ -7,7 +7,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Pencil, Trash2 } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import CustomPagination from "../common/pagination";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import { deleteBhk, fetchBhk } from "../../services/bhk";
 import AddButton from "../common/addButton";
 
 export default function BHKList() {
+  const [tableData, setTableData] = useState([])
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -24,18 +25,26 @@ export default function BHKList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data, refetch: fetchLatestBhk } = useQuery({
-    queryKey: ["bhk", pagination.page],
-    queryFn: () => fetchBhk({ page: pagination.page, limit: pagination.limit }),
-    staleTime: 0,
-    refetchOnMount: true,
+  const { mutate: fetchLatestBhk } = useMutation({
+    mutationFn: fetchBhk,
+    onSuccess: (data) => {
+      console.log('data', data)
+      if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+        }));
+      }
+      setTableData(data?.data ?? [])
+
+    },
   });
 
   const { mutate: handleDeleteBhk, isPending: deleteLoader } = useMutation({
     mutationFn: deleteBhk,
     onSuccess: () => {
       toast.success("Bhk deleted successfully");
-      fetchLatestBhk();
+      fetchLatestBhk({page: pagination.page, limit: pagination.limit, search: ''})
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
@@ -50,6 +59,7 @@ export default function BHKList() {
 
   const handlePagination = (value) => {
     setPagination((pre) => ({ ...pre, page: value }));
+    fetchLatestBhk({page: value, limit: pagination.limit, search: ''})
   };
 
   const handleOpenPopup = (id) => {
@@ -58,13 +68,8 @@ export default function BHKList() {
   };
 
   useEffect(() => {
-    if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-      }));
-    }
-  }, [data]);
+    fetchLatestBhk({page: pagination.page, limit: pagination.limit, search: ''})
+  }, []);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
@@ -90,7 +95,7 @@ export default function BHKList() {
           </TableHead>
 
           <TableBody>
-            {data?.data?.map((row) => (
+            {tableData?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.code}</TableCell>
@@ -128,7 +133,7 @@ export default function BHKList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestBhk();
+              fetchLatestBhk({page: pagination.page, limit: pagination.limit, search: ''});
             }
           }}
         />

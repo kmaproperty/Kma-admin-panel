@@ -7,7 +7,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Pencil, Trash2 } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import CustomPagination from "../common/pagination";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import { deleteSociety, fetchSociety } from "../../services/socities";
 import AddButton from "../common/addButton";
 
 export default function SocietyList() {
+  const [tableData, setTableData] = useState([])
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -24,10 +25,19 @@ export default function SocietyList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data, refetch: fetchLatestSociety } = useQuery({
-    queryKey: ["amenities", pagination.page],
-    queryFn: () =>
-      fetchSociety({ page: pagination.page, limit: pagination.limit }),
+  const { mutate: fetchLatestSociety } = useMutation({
+    mutationFn: fetchSociety,
+    onSuccess: (data) => {
+      console.log('data', data)
+      if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+        }));
+      }
+      setTableData(data?.data ?? [])
+
+    },
     staleTime: 0,
     refetchOnMount: true,
   });
@@ -36,7 +46,7 @@ export default function SocietyList() {
     mutationFn: deleteSociety,
     onSuccess: () => {
       toast.success("Society deleted successfully");
-      fetchLatestSociety();
+      fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''})
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
@@ -51,6 +61,7 @@ export default function SocietyList() {
 
   const handlePagination = (value) => {
     setPagination((pre) => ({ ...pre, page: value }));
+    fetchLatestSociety({page: value, limit: pagination.limit, search: ''})
   };
 
   const handleOpenPopup = (id) => {
@@ -59,13 +70,8 @@ export default function SocietyList() {
   };
 
   useEffect(() => {
-    if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-      }));
-    }
-  }, [data]);
+    fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''})
+  }, []);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
@@ -103,7 +109,7 @@ export default function SocietyList() {
           </TableHead>
 
           <TableBody>
-            {data?.data?.map((row) => (
+            {tableData?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.localityName}</TableCell>
@@ -144,7 +150,7 @@ export default function SocietyList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestSociety();
+              fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''});
             }
           }}
         />

@@ -4,11 +4,10 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Pagination,
   IconButton,
 } from "@mui/material";
 import { Pencil, Trash2 } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import AmenityDialog from "./amenityDialog";
 import { deleteAmenity, fetchAmenities } from "../../services/amenities";
@@ -17,6 +16,7 @@ import { toast } from "react-toastify";
 import AddButton from "../common/addButton";
 
 export default function AmenityList() {
+  const [tableData, setTableData] = useState([])
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -25,10 +25,19 @@ export default function AmenityList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { data, refetch: fetchLatestAmenity } = useQuery({
-    queryKey: ["amenities", pagination.page],
-    queryFn: () =>
-      fetchAmenities({ page: pagination.page, limit: pagination.limit }),
+  const { mutate: fetchLatestAmenity } = useMutation({
+    mutationFn: fetchAmenities,
+    onSuccess: (data) => {
+      console.log('data', data)
+      if (data) {
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: Math.ceil(data.total / pagination.limit),
+        }));
+      }
+      setTableData(data?.data ?? [])
+
+    },
     staleTime: 0,
     refetchOnMount: true,
   });
@@ -37,7 +46,7 @@ export default function AmenityList() {
     mutationFn: deleteAmenity,
     onSuccess: () => {
       toast.success("Amenity deleted successfully");
-      fetchLatestAmenity();
+      fetchLatestAmenity({page: pagination.page, limit: pagination.limit, search: ''})
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
@@ -52,6 +61,7 @@ export default function AmenityList() {
 
   const handlePagination = (value) => {
     setPagination((pre) => ({ ...pre, page: value }));
+    fetchLatestAmenity({page: value, limit: pagination.limit, search: ''})
   };
 
   const handleOpenPopup = (id) => {
@@ -60,13 +70,8 @@ export default function AmenityList() {
   };
 
   useEffect(() => {
-    if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-      }));
-    }
-  }, [data]);
+    fetchLatestAmenity({page: pagination.page, limit: pagination.limit, search: ''})
+  }, []);
 
   return (
     <div className="px-6 pb-6 bg-white rounded">
@@ -97,7 +102,7 @@ export default function AmenityList() {
           </TableHead>
 
           <TableBody>
-            {data?.data?.map((row) => (
+            {tableData?.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.code}</TableCell>
@@ -135,7 +140,7 @@ export default function AmenityList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestAmenity();
+              fetchLatestAmenity({page: pagination.page, limit: pagination.limit, search: ''});
             }
           }}
         />
