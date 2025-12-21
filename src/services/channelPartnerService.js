@@ -89,3 +89,20 @@ export const editPartnerApiHandler = async ({ payload, id }) => {
     throw error.response?.data ?? error;
   }
 }
+
+export const blockUserApi = async (id) => {
+  try {
+    const response = await axiosInstance.put(`/admin/users/${id}/block`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+export const unblockUserApi = async (id) => {
+  try {
+    const response = await axiosInstance.put(`/admin/users/${id}/unblock`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};

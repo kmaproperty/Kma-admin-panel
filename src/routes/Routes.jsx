@@ -16,6 +16,7 @@ import Cities from "../pages/cities/page.jsx";
 import Socities from "../pages/societies/page.jsx";
 import Localities from "../pages/localities/page.jsx";
 import BHk from "../pages/bhk/page.jsx";
+import AddEditOwner from "../pages/owners/AddEditOwners.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
           { path: '/channel-partners/code/add', element: <AddEditChannelPartnerCodes /> },
           { path: '/channel-partners/code/edit/:id', element: <AddEditChannelPartnerCodes /> },
           { path: '/owners', element: <OwnersListingPage /> },
+          { path: '/owners/edit/:id', element: <AddEditOwner /> },
           {path: '/amenities', element: <Amenities/>},
           {path: '/furnishing', element: <Furnishing/>},
           {path: '/cities', element: <Cities/>},

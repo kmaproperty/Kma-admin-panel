@@ -38,7 +38,7 @@ const CustomDialog = ({
                                 key={index}
                                 variant={action.variant || 'secondary'}
                                 onClick={action.onClick}
-                                className={`px-4 py-2 text-white cursor-pointer rounded-md ${action.variant === "danger" ? "bg-red-500" : "bg-gray-700"}`}
+                                className={`px-4 py-2 text-white cursor-pointer rounded-md ${action.variant === "danger" ? "bg-red-500" : action.variant === "primary" ? "bg-blue-800" : "bg-gray-700"}`}
                             >
                                 {action.label}
                             </button>

@@ -14,7 +14,7 @@ const CustomDataGrid = ({
     style
 }) => {
     return (
-        <div style={{ width: "100%", fontFamily: 'Figtree', ...style}} className={`rounded-xl ${className}`}>
+        <div style={{ width: "100%", fontFamily: 'Figtree', ...style }} className={`rounded-xl ${className}`}>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -30,8 +30,12 @@ const CustomDataGrid = ({
                 }}
 
                 onPaginationModelChange={(model) => {
-                    onPageChange?.(model.page);
-                    onPageSizeChange?.(model.pageSize);
+                    if (model.page !== page) {
+                        onPageChange?.(model.page);
+                    }
+                    if (model.pageSize !== pageSize) {
+                        onPageSizeChange?.(model.pageSize);
+                    }
                 }}
 
                 disableSelectionOnClick

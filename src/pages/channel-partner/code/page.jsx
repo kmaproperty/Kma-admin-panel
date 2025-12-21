@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import MainWrapper from "../../../components/common/layout/mainWrapper"
 import PageTitle from "../../../components/common/layout/PageTitle"
 import { decodeFilters } from "../../../lib/helper";
@@ -18,8 +18,6 @@ const ChannelPartnerCode = () => {
 
     const [filters, setFilters] = useState();
     const [confirmationDialog, setConfirmationDialog] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [partnerCodesData, setPartnerCodesData] = useState([]);
     const [pagination, setPagination] = useState({
         limit: 10,
         page: 1,
@@ -27,12 +25,13 @@ const ChannelPartnerCode = () => {
     });
     const [search, setSearch] = useState("");
 
-    
+
     const {
         data: channelPartnerCodes,
+        isLoading,
         refetch: fetchChannelPartnerCodes
     } = useQuery({
-        queryKey: ["partner-codes", pagination, "CHANNEL_PARTNER_CODE", search],
+        // queryKey: ["partner-codes", pagination, "CHANNEL_PARTNER_CODE", search],
         queryFn: () => {
             const payload = {
                 page: pagination.page,
@@ -41,7 +40,6 @@ const ChannelPartnerCode = () => {
 
             return channelPartnerCodesListApiPayload(payload);
         },
-        Loadingd: loading,
         staleTime: 0,
         refetchOnMount: true
     });
@@ -68,6 +66,10 @@ const ChannelPartnerCode = () => {
     const handleClose = () => {
         setConfirmationDialog(null);
     }
+
+    useEffect(() => {
+        fetchChannelPartnerCodes()
+    }, [pagination])
 
     const columns = [
         { field: "code", headerName: "Code", flex: 1 },
@@ -125,22 +127,22 @@ const ChannelPartnerCode = () => {
         },
     ];
 
-    const onPageChange = (uiPage) => {
+    const onPageChange = useCallback((uiPage) => {
+        const newPage = uiPage + 1;
         setPagination((prev) => {
-            const newState = {
-                page: uiPage + 1,
-                limit: prev.limit,
-            };
-            return newState;
+            // Only update if it's genuinely different to prevent loops
+            if (prev.page === newPage) return prev;
+            console.log("Setting State to Page:", newPage);
+            return { ...prev, page: newPage };
         });
-    };
+    }, []);
 
-    const onPageSizeChange = (newSize) => {
-        setPagination((prev) => ({
-            limit: newSize,
-            page: prev.page,
-        }));
-    };
+    const onPageSizeChange = useCallback((newSize) => {
+        setPagination((prev) => {
+            if (prev.limit === newSize) return prev;
+            return { ...prev, limit: newSize, page: 1 };
+        });
+    }, []);
 
     useEffect(() => {
         const query = searchParams.get("filters");
@@ -151,26 +153,13 @@ const ChannelPartnerCode = () => {
         // setLoading(true);
     }, [searchParams]);
 
-    useEffect(() => {
-        console.log(channelPartnerCodes)
-        if (channelPartnerCodes?.data?.length) {
-            const codes = channelPartnerCodes.data.map((item) => ({
-                id: item.id,
-                code: item.code,
-                createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy')
-            }));
-
-            setPartnerCodesData(codes);
-        }
-        if (channelPartnerCodes?.pagination) {
-            const { limit, page, totalPage } = channelPartnerCodes.pagination;
-            setPagination((prev) => ({
-                ...prev,
-                limit,
-                page,
-                totalPage
-            }));
-        }
+    const rows = useMemo(() => {
+        if (!channelPartnerCodes?.data) return [];
+        return channelPartnerCodes.data.map((item) => ({
+            id: item.id,
+            code: item.code,
+            createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy')
+        }));
     }, [channelPartnerCodes]);
 
     return (
@@ -178,8 +167,8 @@ const ChannelPartnerCode = () => {
             <PageTitle title={"Channel Partner Codes"} actions={buttons} />
             <CustomDataGrid
                 columns={columns}
-                rows={partnerCodesData}
-                loading={loading}
+                rows={rows}
+                loading={isLoading}
                 onPageChange={onPageChange}
                 onPageSizeChange={onPageSizeChange}
                 page={pagination.page - 1}

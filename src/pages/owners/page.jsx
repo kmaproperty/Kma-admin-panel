@@ -1,20 +1,22 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import MainWrapper from "../../components/common/layout/mainWrapper"
 import PageTitle from "../../components/common/layout/PageTitle"
 import { decodeFilters } from "../../lib/helper";
-import { channelPartnersListApiPayload } from "../../services/channelPartnerService";
+import { blockUserApi, channelPartnersListApiPayload, unblockUserApi } from "../../services/channelPartnerService";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from 'date-fns';
 import { Tooltip } from "@mui/material";
-import { EditIcon } from "lucide-react";
+import { EditIcon, Flag, OctagonMinusIcon } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
+import CustomDialog from "../../components/common/CustomDialog";
+import { toast } from "react-toastify";
 
 const OwnersListingPage = () => {
     const [searchParams] = useSearchParams();
-    const [filters, setFilters] = useState();
     const [loading, setLoading] = useState(false);
-    const [Owners, setOwners] = useState([]);
+    const [filters, setFilters] = useState();
+    const [confirmationDialog, setConfirmationDialog] = useState(false);
 
     const [pagination, setPagination] = useState({
         limit: 10,
@@ -22,6 +24,45 @@ const OwnersListingPage = () => {
         totalPage: 1
     });
     const [search, setSearch] = useState("");
+
+    const handleClose = () => {
+        setConfirmationDialog(null);
+    }
+
+    const blockUnblockUser = async () => {
+        setLoading(true);
+        try {
+            const res = await confirmationDialog.isBlocked ? unblockUserApi(confirmationDialog.id) : blockUserApi(confirmationDialog.id);
+            if (res.status === 200) {
+                refetch();
+                setConfirmationDialog(null);
+                toast.success(res.message)
+            }
+            else {
+                toast.error(error.message)
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error(error.message)
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const confirmationDialogActions = [
+        {
+            label: 'Block',
+            variant: 'primary',
+            onClick: () => {
+                blockUnblockUser()
+            }
+        },
+        {
+            label: 'Close',
+            variant: 'outline-secondary',
+            onClick: handleClose
+        },
+    ];
 
     const columns = [
         { field: "name", headerName: "Name", flex: 1 },
@@ -35,6 +76,13 @@ const OwnersListingPage = () => {
             width: 120,
             renderCell: (params) => (
                 <>
+                    <Tooltip title={params.isBlocked ? "Unblock" : "Block"}>
+                        <button className="mr-2 p-2 bg-gray-100 cursor-pointer" onClick={() => setConfirmationDialog({ id: params.id, isBlocked: params.isBlocked })}>
+                            {
+                                params.isBlocked ? <Flag className="text-gray-800 w-5 h-5" /> : <OctagonMinusIcon className="text-gray-800 w-5 h-5" />
+                            }
+                        </button>
+                    </Tooltip>
                     <Tooltip title="Edit">
                         <Link to={`/owners/edit/${params.id}`}>
                             <button className="mr-2 p-2 bg-gray-100 cursor-pointer">
@@ -55,9 +103,10 @@ const OwnersListingPage = () => {
 
     const {
         data: channelPartnerList,
+        isLoading,
         refetch: fetchChannelPartnerList
     } = useQuery({
-        queryKey: ["partner-list", pagination, "OWNER", search],
+        // queryKey: ["partner-list", pagination, "OWNER", search],
         queryFn: () => {
             const payload = {
                 page: pagination.page,
@@ -67,27 +116,30 @@ const OwnersListingPage = () => {
 
             return channelPartnersListApiPayload(payload);
         },
-        Loadingd: loading,
         staleTime: 0,
         refetchOnMount: true
     });
 
-    const onPageChange = (uiPage) => {
-    setPagination((prev) => {
-      const newState = {
-        page: uiPage + 1,
-        limit: prev.limit,
-      };
-      return newState;
-    });
-  };
+    const onPageChange = useCallback((uiPage) => {
+        const newPage = uiPage + 1;
+        setPagination((prev) => {
+            // Only update if it's genuinely different to prevent loops
+            if (prev.page === newPage) return prev;
+            console.log("Setting State to Page:", newPage);
+            return { ...prev, page: newPage };
+        });
+    }, []);
 
-  const onPageSizeChange = (newSize) => {
-    setPagination((prev) => ({
-      limit: newSize,
-      page: prev.page,
-    }));
-  };
+    const onPageSizeChange = useCallback((newSize) => {
+        setPagination((prev) => {
+            if (prev.limit === newSize) return prev;
+            return { ...prev, limit: newSize, page: 1 };
+        });
+    }, []);
+
+    useEffect(() => {
+        fetchChannelPartnerList()
+    }, [pagination])
 
     useEffect(() => {
         const query = searchParams.get("filters");
@@ -98,31 +150,18 @@ const OwnersListingPage = () => {
         // setLoading(true);
     }, [searchParams]);
 
-    useEffect(() => {
-        console.log(channelPartnerList)
-        if (channelPartnerList?.data?.length) {
-            const data = channelPartnerList.data.map((item) => ({
-                id: item.id,
-                name: item.name || "-",
-                intent: item.intent,
-                isActive: item.isActive ? "Yes" : "No",
-                createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy'),
-                email: item.email,
-                businessSince: item.businessSince,
-                phone: item.phone
-            }));
-
-            setOwners(data);
-        }
-        if (channelPartnerList?.pagination) {
-            const { limit, page, totalPage } = channelPartnerList.pagination;
-            setPagination((prev) => ({
-                ...prev,
-                limit,
-                page,
-                totalPage
-            }));
-        }
+    const rows = useMemo(() => {
+        if (!channelPartnerList?.data) return [];
+        return channelPartnerList.data.map((item) => ({
+            id: item.id,
+            name: item.name || "-",
+            intent: item.intent,
+            isActive: item.isActive ? "Yes" : "No",
+            createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy'),
+            email: item.email,
+            businessSince: item.businessSince,
+            phone: item.phone
+        }));
     }, [channelPartnerList]);
 
     return (
@@ -130,8 +169,8 @@ const OwnersListingPage = () => {
             <PageTitle title={"Owners"} />
             <CustomDataGrid
                 columns={columns}
-                rows={Owners}
-                loading={loading}
+                rows={rows}
+                loading={isLoading}
                 onPageChange={onPageChange}
                 onPageSizeChange={onPageSizeChange}
                 page={pagination.page - 1}
@@ -139,6 +178,17 @@ const OwnersListingPage = () => {
                 rowCount={channelPartnerList?.total}
                 style={{ height: "calc(100vh - 180px)" }}
             />
+            <CustomDialog
+                open={confirmationDialog ? true : false}
+                handleClose={handleClose}
+                heading={`Confirm Block Owner`}
+                actions={confirmationDialogActions}
+                size='md'
+            >
+                <div className="mb-3">
+                    <p>Are you sure you want to block this Owner?</p>
+                </div>
+            </CustomDialog>
         </MainWrapper>
     )
 }

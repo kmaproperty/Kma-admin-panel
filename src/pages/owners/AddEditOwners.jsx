@@ -16,7 +16,7 @@ import DynamicSelectController from '../../components/common/select/controlledSe
 import ControlledDatePicker from '../../components/common/datePicker/ControlledDatePicker';
 import { getCityApiHandler } from '../../services/masterService';
 
-const AddEditChannelPartner = () => {
+const AddEditOwner = () => {
     const params = useParams();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +28,6 @@ const AddEditChannelPartner = () => {
         email: yup.string().email('Invalid email format').required('Please enter email'),
         firmName: yup.string().required('Please enter First name'),
         cities: yup.array().min(1, 'Please select at least one city').required(),
-        businessSince: yup.date().nullable(),
         aboutYourSelf: yup.string(),
         phoneVerified: yup.object().shape({
             label: yup.string().required(),
@@ -87,7 +86,7 @@ const AddEditChannelPartner = () => {
         mutationFn: editPartnerApiHandler,
         onSuccess: (res) => {
             toast.success("Channel Partner Updated Successfully");
-            navigate("/channel-partners");
+            navigate("/owners");
         },
         onError: (error) => {
             if (Array.isArray(error.message)) {
@@ -101,7 +100,6 @@ const AddEditChannelPartner = () => {
     })
 
     const onSubmit = async (data) => {
-        console.log(data.businessSince)
         setIsSubmitting(true);
         const payload = {
             ...data,
@@ -160,7 +158,7 @@ const AddEditChannelPartner = () => {
                     )
                     : (
                         <>
-                            <PageTitle title={`Edit Channel Partner`} />
+                            <PageTitle title={`Edit Owner`} />
                             <form onSubmit={handleSubmit(onSubmit)}>
                                 <div className='bg-gray-50 w-[70%] px-5 py-4 rounded-lg space-y-3'>
                                     <div className='flex items-center gap-6'>
@@ -262,7 +260,7 @@ const AddEditChannelPartner = () => {
                                         <button type="submit" className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-white rounded-md bg-gray-800" disabled={isSubmitting}>
                                             Submit
                                         </button>
-                                        <Link to="/channel-partners/">
+                                        <Link to="/owners/">
                                             <button className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-gray-700 rounded-md bg-gray-300">
                                                 Cancel
                                             </button>
@@ -277,4 +275,4 @@ const AddEditChannelPartner = () => {
     )
 }
 
-export default AddEditChannelPartner
+export default AddEditOwner
