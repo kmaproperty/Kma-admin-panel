@@ -179,12 +179,12 @@ const ChannelPartnerCode = () => {
             <CustomDialog
                 open={confirmationDialog ? true : false}
                 handleClose={handleClose}
-                heading={`Confirm delete amenity`}
+                heading={`Confirm delete code`}
                 actions={confirmationDialogActions}
                 size='md'
             >
                 <div className="mb-3">
-                    <p>Are you sure you want to delete this amenity?</p>
+                    <p>Are you sure you want to delete this code?</p>
                 </div>
             </CustomDialog>
         </MainWrapper>

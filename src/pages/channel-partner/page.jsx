@@ -29,29 +29,45 @@ const ChannelPartnerListing = () => {
         setConfirmationDialog(null);
     }
 
+    const { data: channelPartnerList, isLoading, refetch: fetchChannelPartners } = useQuery({
+        // queryKey: ["partner-list", pagination.page, pagination.limit],
+        queryFn: () => channelPartnersListApiPayload({
+            page: pagination.page,
+            limit: pagination.limit,
+            role: "CHANNEL_PARTNER"
+        }),
+        staleTime: 0,
+    });
+
     const blockUnblockUser = async () => {
-        setLoading(true);
-        try {
-            const res = await confirmationDialog.isBlocked ? unblockUserApi(confirmationDialog.id) : blockUserApi(confirmationDialog.id);
-            if (res.status === 200) {
-                refetch();
-                setConfirmationDialog(null);
-                toast.success(res.message)
-            }
-            else{
-            toast.error(error.message)    
-            }
-        } catch (error) {
-            console.log(error)
-            toast.error(error.message)
-        } finally {
-            setLoading(false);
+    setLoading(true);
+    try {
+        const res = confirmationDialog.isBlocked 
+            ? await unblockUserApi(confirmationDialog.id) 
+            : await blockUserApi(confirmationDialog.id);
+
+        // Check if the API response actually uses the key "success"
+        if (res && res.success) {
+            console.log(1);
+            fetchChannelPartners();
+            setConfirmationDialog(null);
+            toast.success(res.message);
+        } else {
+            // This runs if the request worked but success was false
+            toast.error(res?.message || "Operation failed");
         }
+    } catch (error) {
+        // This runs if the API returned a 400/500 error
+        console.error("API Error:", error);
+        toast.error(error?.message || "An unexpected error occurred");
+    } finally {
+        setLoading(false);
     }
+};
 
     const confirmationDialogActions = [
         {
-            label: 'Block',
+            label: confirmationDialog?.isBlocked ? "unblock" : "block",
             variant: 'primary',
             onClick: () => {
                 blockUnblockUser()
@@ -76,11 +92,12 @@ const ChannelPartnerListing = () => {
             headerName: 'Actions',
             width: 140,
             renderCell: (params) => (
+                
                 <>
-                    <Tooltip title={params.isBlocked ? "Unblock" : "Block"}>
-                        <button className="mr-2 p-2 bg-gray-100 cursor-pointer" onClick={()=>setConfirmationDialog({id:params.id, isBlocked: params.isBlocked})}>
+                    <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
+                        <button className="mr-2 p-2 bg-gray-100 cursor-pointer" onClick={()=>setConfirmationDialog({id:params.id, isBlocked: params.row.isBlocked})}>
                             {
-                                params.isBlocked ? <Flag className="text-gray-800 w-5 h-5" /> : <OctagonMinus className="text-gray-800 w-5 h-5" />
+                                params.row.isBlocked ? <Flag className="text-gray-800 w-5 h-5" /> : <OctagonMinus className="text-gray-800 w-5 h-5" />
                             }
                         </button>
                     </Tooltip>
@@ -101,16 +118,6 @@ const ChannelPartnerListing = () => {
             ),
         }
     ];
-
-    const { data: channelPartnerList, isLoading, refetch: fetchChannelPartnerCodes } = useQuery({
-        // queryKey: ["partner-list", pagination.page, pagination.limit],
-        queryFn: () => channelPartnersListApiPayload({
-            page: pagination.page,
-            limit: pagination.limit,
-            role: "CHANNEL_PARTNER"
-        }),
-        staleTime: 0,
-    });
 
     const onPageChange = useCallback((uiPage) => {
         const newPage = uiPage + 1;
@@ -139,7 +146,7 @@ const ChannelPartnerListing = () => {
     }, [searchParams]);
 
     useEffect(() => {
-        fetchChannelPartnerCodes()
+        fetchChannelPartners()
     }, [pagination])
 
     const rows = useMemo(() => {
@@ -172,14 +179,14 @@ const ChannelPartnerListing = () => {
                 style={{ height: "calc(100vh - 180px)" }}
             />
             <CustomDialog
-                open={confirmationDialog ? true : false}
+                open={confirmationDialog?.id ? true : false}
                 handleClose={handleClose}
-                heading={`Confirm Block Channel Partner`}
+                heading={`Confirm ${confirmationDialog?.isBlocked ? "unblock" : "block"} Channel Partner`}
                 actions={confirmationDialogActions}
                 size='md'
             >
                 <div className="mb-3">
-                    <p>Are you sure you want to block this Channel Partner?</p>
+                    <p>Are you sure you want to {confirmationDialog?.isBlocked ? "unblock" : "block"} this Channel Partner?</p>
                 </div>
             </CustomDialog>
         </MainWrapper>
