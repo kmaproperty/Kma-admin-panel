@@ -17,6 +17,7 @@ import Socities from "../pages/societies/page.jsx";
 import Localities from "../pages/localities/page.jsx";
 import BHk from "../pages/bhk/page.jsx";
 import AddEditOwner from "../pages/owners/AddEditOwners.jsx";
+import ViewProperty from "../pages/post-property/view/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
           { path: "/", element: <Dashbaord /> },
           { path: '/properties', element: <PropertyList /> },
           { path: '/properties/:propertyId', element: <PostProperty /> },
+          { path: '/properties/view/:propertyId', element: <ViewProperty /> },
           { path: '/channel-partners', element: <ChannelPartnerListing /> },
           { path: '/channel-partners/edit/:id', element: <AddEditChannelPartner /> },
           { path: '/channel-partners/code', element: <ChannelPartnerCode /> },

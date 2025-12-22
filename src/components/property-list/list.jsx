@@ -17,7 +17,8 @@ import {
   CheckCircle,
   XCircle,
   Pencil,
-  Trash2
+  Trash2,
+  Eye 
 } from "lucide-react";
 import ApproveRejectProperty from "../common/approveReject/approveRejectProperty";
 import { PROPERTY_STATUS } from "../../lib/enums";
@@ -122,6 +123,13 @@ if(Array.isArray(error.message)){
     <Link to={`/properties/${row.id}`}>
       <IconButton>
         <Pencil size={18} />
+      </IconButton>
+    </Link>
+  </Tooltip>
+  <Tooltip title="View">
+    <Link to={`/properties/view/${row.id}`}>
+      <IconButton>
+        <Eye size={18} />
       </IconButton>
     </Link>
   </Tooltip>
