@@ -179,22 +179,27 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
 
       {/* Form */}
       <div className="space-y-4">
-        {/* Name */}
+        <label className="text-sm font-semibold text-gray-700">
+          Amenity Name
+        </label>
         <InputBase
           placeholder="Name"
+          label='Name'
           value={form.name}
           onChange={(e) => handleChange("name", e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
         />
 
-        {/* Code */}
+        <label className="text-sm font-semibold text-gray-700">
+          Code
+        </label>
         <InputBase
           placeholder="Code"
           value={form.code}
           onChange={(e) => handleChange("code", e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
         />
@@ -241,6 +246,9 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
         )}
 
         {/* Sort Order */}
+        <label className="text-sm font-semibold text-gray-700">
+          Sort Order
+        </label>
         <InputBase
           type="number"
           placeholder="Sort Order"
@@ -248,7 +256,7 @@ export default function AmenityDialog({ open, onClose, amenityId }) {
           onChange={(e) =>
             handleChange("sortOrder", Number(e.target.value))
           }
-          className="w-full rounded-lg border border-gray-300 px-3 py-2
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
         />
 

@@ -102,45 +102,62 @@ export default function CityDialog({ open, onClose, cityID }) {
           </button>
         </div>
         <div className="space-y-4">
+          <label className="text-sm font-semibold text-gray-700">
+            City
+          </label>
           <InputBase
             placeholder="Name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            Code
+          </label>
           <InputBase
             placeholder="Code"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.code}
             onChange={(e) => handleChange("code", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            State
+          </label>
           <InputBase
             placeholder="State"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.state}
             onChange={(e) => handleChange("state", e.target.value)}
           />
+
+          <label className="text-sm font-semibold text-gray-700">
+            Latitude
+          </label>
           <InputBase
             placeholder="Latitude"
             type="number"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.latitude}
             onChange={(e) => handleChange("latitude", e.target.value)}
           />
+
+          <label className="text-sm font-semibold text-gray-700">
+            Longitue
+          </label>
           <InputBase
             placeholder="Longitude"
             type="number"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.longitude}

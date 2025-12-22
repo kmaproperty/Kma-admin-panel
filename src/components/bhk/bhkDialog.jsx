@@ -129,24 +129,36 @@ export default function BhkDialog({ open, onClose, bhdId }) {
       </div>
 
         <div className="space-y-4">
+          <label className="text-sm font-semibold text-gray-700">
+            Name
+          </label>
           <InputBase
             placeholder="Name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            Code
+          </label>
           <InputBase
             placeholder="Code"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.code}
             onChange={(e) => handleChange("code", e.target.value)}
           />
 
+
+          <div className="mb-1">
+            <label className="text-sm font-semibold text-gray-700">
+              Select property
+            </label>
+          </div>
           <DynamicSelect
               isMulti={false}
               isError={false}
@@ -162,6 +174,11 @@ export default function BhkDialog({ open, onClose, bhdId }) {
               changeStyle={true}
             />
 
+            <div className="mb-1">
+              <label className="text-sm font-semibold text-gray-700">
+                Select category
+              </label>
+            </div>
             <DynamicSelect
               isMulti={false}
               isError={false}
@@ -177,6 +194,11 @@ export default function BhkDialog({ open, onClose, bhdId }) {
               changeStyle={true}
             />
 
+            <div className="mb-1">
+              <label className="text-sm font-semibold text-gray-700">
+                Select property Type
+              </label>
+            </div>
             <DynamicSelect
               isMulti={false}
               isError={false}
@@ -191,10 +213,13 @@ export default function BhkDialog({ open, onClose, bhdId }) {
               changeStyle={true}
             />
 
+            <label className="text-sm font-semibold text-gray-700">
+              Sort order
+            </label>
             <InputBase
             type="number"
             placeholder="Sort Order"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.sortOrder}
