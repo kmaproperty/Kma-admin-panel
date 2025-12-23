@@ -17,6 +17,9 @@ import Socities from "../pages/societies/page.jsx";
 import Localities from "../pages/localities/page.jsx";
 import BHk from "../pages/bhk/page.jsx";
 import AddEditOwner from "../pages/owners/AddEditOwners.jsx";
+import AdminList from "../pages/admin/page.jsx";
+import PermissionList from "../pages/permissions/page.jsx";
+import AddEditAdmin from "../pages/admin/AddEditAdmin.jsx";
 import ViewProperty from "../pages/post-property/view/page.jsx";
 
 export const router = createBrowserRouter([
@@ -25,11 +28,11 @@ export const router = createBrowserRouter([
     element: <Login />
   },
   {
-    element: <ProtectedRoute />, 
+    element: <ProtectedRoute />,
     children: [
       {
         path: "/",
-        element: <Layout />, 
+        element: <Layout />,
         children: [
           { path: "/", element: <Dashbaord /> },
           { path: '/properties', element: <PropertyList /> },
@@ -42,12 +45,16 @@ export const router = createBrowserRouter([
           { path: '/channel-partners/code/edit/:id', element: <AddEditChannelPartnerCodes /> },
           { path: '/owners', element: <OwnersListingPage /> },
           { path: '/owners/edit/:id', element: <AddEditOwner /> },
-          {path: '/amenities', element: <Amenities/>},
-          {path: '/furnishing', element: <Furnishing/>},
-          {path: '/cities', element: <Cities/>},
-          {path: '/socities', element: <Socities/>},
-          {path: '/localities', element: <Localities/>},
-          {path: '/bhk', element: <BHk/>},
+          { path: '/admins', element: <AdminList /> },
+          { path: '/admins/add', element: <AddEditAdmin /> },
+          { path: '/permissions', element: <PermissionList /> },
+          { path: '/permissions/add', element: <AddEditOwner /> },
+          { path: '/amenities', element: <Amenities /> },
+          { path: '/furnishing', element: <Furnishing /> },
+          { path: '/cities', element: <Cities /> },
+          { path: '/socities', element: <Socities /> },
+          { path: '/localities', element: <Localities /> },
+          { path: '/bhk', element: <BHk /> },
         ],
       },
     ],

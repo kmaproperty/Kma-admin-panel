@@ -1,4 +1,4 @@
-import { Binary, Building, ChartArea, CircleUserRound, Gauge, Home, Logs, UserStar } from "lucide-react";
+import { Binary, Building, ChartArea, CircleUserRound, Gauge, Home, Logs, Users, UserStar } from "lucide-react";
 
 export const navLinks = [
     {
@@ -38,6 +38,15 @@ export const navLinks = [
         icon: <CircleUserRound className="w-5 h-5" />,
         children: [
             { name: "List", path: "/owners", icon: <Logs className="w-5 h-5" /> },
+        ],
+    },
+    {
+        name: "User Management",
+        path: "/user-management",
+        icon: <Users className="w-5 h-5" />,
+        children: [
+            { name: "Admin List", path: "/admins", icon: <Logs className="w-5 h-5" /> },
+            { name: "Permission List", path: "/permissions", icon: <Logs className="w-5 h-5" /> },
         ],
     },
 ]

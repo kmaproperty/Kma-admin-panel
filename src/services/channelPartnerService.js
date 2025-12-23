@@ -92,7 +92,7 @@ export const editPartnerApiHandler = async ({ payload, id }) => {
 
 export const blockUserApi = async (id) => {
   try {
-    const response = await axiosInstance.put(`/admin/users/${id}/block`);
+    const response = await axiosInstance.post(`/admin/users/${id}/block`, {});
     return response.data;
   } catch (error) {
     throw error.response?.data ?? error;
@@ -100,7 +100,7 @@ export const blockUserApi = async (id) => {
 };
 export const unblockUserApi = async (id) => {
   try {
-    const response = await axiosInstance.put(`/admin/users/${id}/unblock`);
+    const response = await axiosInstance.post(`/admin/users/${id}/unblock`, {});
     return response.data;
   } catch (error) {
     throw error.response?.data ?? error;
