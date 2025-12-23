@@ -105,55 +105,74 @@ export default function SocietyDialog({ open, onClose, societyId }) {
         </div>
 
         <div className="space-y-4">
+          <label className="text-sm font-semibold text-gray-700">
+            Society Name
+          </label>
           <InputBase
             placeholder="Name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            Locality Name
+          </label>
           <InputBase
             placeholder="Locality Name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.locality}
             onChange={(e) => handleChange("locality", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            Address
+          </label>
           <InputBase
             placeholder="Address"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.address}
             onChange={(e) => handleChange("address", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            Pincode
+          </label>
           <InputBase
             placeholder="Pincode"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.pincode}
             onChange={(e) => handleChange("pincode", e.target.value)}
           />
 
+          <label className="text-sm font-semibold text-gray-700">
+            Latitude
+          </label>
           <InputBase
             placeholder="Latitude"
             type="number"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.latitude}
             onChange={(e) => handleChange("latitude", e.target.value)}
           />
+
+          <label className="text-sm font-semibold text-gray-700">
+            Longitude
+          </label>
           <InputBase
             placeholder="Longitude"
             type="number"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.longitude}

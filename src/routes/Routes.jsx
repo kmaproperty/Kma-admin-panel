@@ -20,6 +20,7 @@ import AddEditOwner from "../pages/owners/AddEditOwners.jsx";
 import AdminList from "../pages/admin/page.jsx";
 import PermissionList from "../pages/permissions/page.jsx";
 import AddEditAdmin from "../pages/admin/AddEditAdmin.jsx";
+import ViewProperty from "../pages/post-property/view/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
           { path: "/", element: <Dashbaord /> },
           { path: '/properties', element: <PropertyList /> },
           { path: '/properties/:propertyId', element: <PostProperty /> },
+          { path: '/properties/view/:propertyId', element: <ViewProperty /> },
           { path: '/channel-partners', element: <ChannelPartnerListing /> },
           { path: '/channel-partners/edit/:id', element: <AddEditChannelPartner /> },
           { path: '/channel-partners/code', element: <ChannelPartnerCode /> },

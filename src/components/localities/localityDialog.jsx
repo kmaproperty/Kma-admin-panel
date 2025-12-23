@@ -103,21 +103,29 @@ export default function LocalityDialog({ open, onClose, localityId }) {
         </div>
 
         <div className="space-y-4">
+          <label className="text-sm font-semibold text-gray-700">
+            Locality Name
+          </label>
           <InputBase
             placeholder="Name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.name}
             onChange={(e) => handleChange("name", e.target.value)}
           />
 
+          <div className="mb-1">
+            <label className="text-sm font-semibold text-gray-700">
+            Select City
+          </label>
+          </div>
           <DynamicAsyncAutocomplete
             isMulti={false}
             isError={false}
             placeholder={"Search city"}
             onChange={(value) => {
-              handleChange("city", value);
+            handleChange("city", value);
             }}
             loadOptions={loadCities}
             value={form.city}
@@ -125,28 +133,38 @@ export default function LocalityDialog({ open, onClose, localityId }) {
             changeStyle={true}
           />
 
+            <label className="text-sm font-semibold text-gray-700">
+            Sector Name
+          </label>
           <InputBase
             placeholder="Sector Name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.sector}
             onChange={(e) => handleChange("sector", e.target.value)}
           />
 
+            <label className="text-sm font-semibold text-gray-700">
+            Latitude
+          </label>
           <InputBase
             placeholder="Latitude"
             type="number"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.latitude}
             onChange={(e) => handleChange("latitude", e.target.value)}
           />
+
+          <label className="text-sm font-semibold text-gray-700">
+            Longitude
+          </label>
           <InputBase
             placeholder="Longitude"
             type="number"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
                      focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
                      transition"
             value={form.longitude}
