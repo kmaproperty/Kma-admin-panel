@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from 'date-fns';
 import { Tooltip } from "@mui/material";
-import { EditIcon, Flag, OctagonMinusIcon } from "lucide-react";
+import { EditIcon, Flag, OctagonMinusIcon, Pencil } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
@@ -81,18 +81,18 @@ const OwnersListingPage = () => {
             headerName: 'Actions',
             width: 120,
             renderCell: (params) => (
-                <>
+                <div className="w-full flex justify-end items-center">
                     <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
-                        <button className="mr-2 p-2 bg-gray-100 cursor-pointer" onClick={() => setConfirmationDialog({ id: params.id, isBlocked: params.row.isBlocked })}>
+                        <button className={`mr-2.5 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isBlocked ? "bg-green-50" : "bg-yellow-100"}`} onClick={() => setConfirmationDialog({ id: params.id, isBlocked: params.row.isBlocked })}>
                             {
-                                params.row.isBlocked ? <Flag className="text-gray-800 w-5 h-5" /> : <OctagonMinusIcon className="text-gray-800 w-5 h-5" />
+                                params.row.isBlocked ? <Flag className="text-green-800 w-4.5 h-4.5" /> : <OctagonMinusIcon className="text-yellow-800 w-4.5 h-4.5" />
                             }
                         </button>
                     </Tooltip>
                     <Tooltip title="Edit">
-                        <Link to={`/owners/edit/${params.id}`}>
-                            <button className="mr-2 p-2 bg-gray-100 cursor-pointer">
-                                <EditIcon className="text-gray-800 w-5 h-5" />
+                        <Link to={`/owners/edit/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                            <button className="py-2 px-3 bg-blue-50 cursor-pointer rounded-sm">
+                                <Pencil className="text-blue-800 w-4.5 h-4.5" />
                             </button>
                         </Link>
                     </Tooltip>
@@ -102,7 +102,7 @@ const OwnersListingPage = () => {
               <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
             </Button>
           </Tooltip> */}
-                </>
+                </div>
             ),
         }
     ];

@@ -122,7 +122,7 @@ const AddEditChannelPartner = () => {
 
     useEffect(() => {
         if (channelPartnerData) {
-            const cities = channelPartnerData?.data?.cities.split(",").map((city) => {
+            const cities = channelPartnerData?.data?.cities?.split(",").map((city) => {
                 return { value: city, label: city }
             })
             setValue("cities", cities || [])

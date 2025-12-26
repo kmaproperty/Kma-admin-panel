@@ -6,17 +6,22 @@ import {
   TableBody,
   IconButton,
 } from "@mui/material";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
 import { toast } from "react-toastify";
 import SocietyDialog from "./societyDialog";
 import { deleteSociety, fetchSociety } from "../../services/socities";
 import AddButton from "../common/addButton";
+import MainWrapper from "../common/layout/mainWrapper";
+import PageTitle from "../common/layout/PageTitle";
+import CustomDataGrid from "../common/CustomDataGrid";
+import CustomDialog from "../common/CustomDialog";
 
 export default function SocietyList() {
   const [tableData, setTableData] = useState([])
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -25,14 +30,69 @@ export default function SocietyList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { mutate: fetchLatestSociety } = useMutation({
+  const handleDelete = async () => {
+    handleDeleteSociety(confirmationDialog)
+  }
+  const handleClose = () => {
+    setConfirmationDialog(null);
+  }
+
+  const buttons = [
+    {
+      label: 'Add',
+      icon: <PlusIcon className="w-4 h-4" />,
+      onClick: () => {
+        handleOpenPopup("")
+      }
+    },
+  ];
+
+  const confirmationDialogActions = [
+    {
+      label: 'Delete',
+      variant: 'danger',
+      onClick: () => {
+        handleDelete()
+      }
+    },
+    {
+      label: 'Close',
+      variant: 'outline-secondary',
+      onClick: handleClose
+    },
+  ];
+
+  const columns = [
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "localityName", headerName: "Locality Name", flex: 1 },
+    { field: "address", headerName: "Address", flex: 2 },
+    { field: "city", headerName: "City", flex: 0.5 },
+    { field: "isVerfied", headerName: "Is Verfied", flex: 0.5 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      renderCell: (params) => (
+        <>
+          <IconButton onClick={() => handleOpenPopup(params.id)}>
+            <Pencil className="w-4 h-4" />
+          </IconButton>
+          <IconButton onClick={() => setConfirmationDialog(params.id)}>
+            <Trash2 className="w-4 h-4" />
+          </IconButton>
+        </>
+      ),
+    },
+  ];
+
+  const { mutate: fetchLatestSociety, isPending } = useMutation({
     mutationFn: fetchSociety,
     onSuccess: (data) => {
-      console.log('data', data)
+      
       if (data) {
       setPagination((pre) => ({
         ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
+        totalPage: data.total,
         }));
       }
       setTableData(data?.data ?? [])
@@ -47,6 +107,7 @@ export default function SocietyList() {
     onSuccess: () => {
       toast.success("Society deleted successfully");
       fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''})
+      setConfirmationDialog(null);
     },
     onError: (error) => {
       if (Array.isArray(error.message)) {
@@ -59,10 +120,22 @@ export default function SocietyList() {
     },
   });
 
-  const handlePagination = (value) => {
-    setPagination((pre) => ({ ...pre, page: value }));
-    fetchLatestSociety({page: value, limit: pagination.limit, search: ''})
-  };
+  const onPageChange = useCallback((uiPage) => {
+      const newPage = uiPage + 1;
+      setPagination((prev) => {
+        // Only update if it's genuinely different to prevent loops
+        if (prev.page === newPage) return prev;
+        console.log("Setting State to Page:", newPage);
+        return { ...prev, page: newPage };
+      });
+    }, []);
+  
+    const onPageSizeChange = useCallback((newSize) => {
+      setPagination((prev) => {
+        if (prev.limit === newSize) return prev;
+        return { ...prev, limit: newSize, page: 1 };
+      });
+    }, []);
 
   const handleOpenPopup = (id) => {
     setOpenPopup(true);
@@ -71,77 +144,45 @@ export default function SocietyList() {
 
   useEffect(() => {
     fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''})
-  }, []);
+  }, [pagination.page, pagination.limit]);
+
+  const rows = useMemo(() => {
+        if (!tableData) return [];
+        return tableData.map((item) => ({
+          id: item.id,
+          name: item.name,
+          city: item.city.name,
+          address: item.address,
+          isVerfied: item.isVerfied ? "Yes" : "No",
+          localityName: item.localityName,
+        }));
+      }, [tableData]);
 
   return (
-    <div className="px-6 pb-6 bg-white rounded">
-      <div className="flex items-center justify-between my-4 border-b pb-3">
-        <h1 className="text-xl font-semibold text-gray-800">Socities</h1>
-
-        <AddButton
-          handleClick={() => handleOpenPopup("")}
-          title="Add Society"
-        />
-      </div>
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <Table>
-          <TableHead>
-            <TableRow className="bg-gray-100">
-              {[
-                "Name",
-                "Locality Name",
-                "Address",
-                "Pincode",
-                "Latitude",
-                "Longitude",
-                "Is Verified",
-                "Action",
-              ].map((head) => (
-                <TableCell
-                  key={head}
-                  className="font-semibold text-gray-700 whitespace-nowrap"
-                  {...{ align: head == "Action" ? "right" : "left" }}
-                >
-                  {head}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {tableData?.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.localityName}</TableCell>
-                <TableCell>{row.address}</TableCell>
-                <TableCell>{row.pincode}</TableCell>
-                <TableCell>{row.latitude}</TableCell>
-                <TableCell>{row.longitude}</TableCell>
-                <TableCell>{row.isVerified ? "Active" : "Inactive"}</TableCell>
-                <TableCell align="right">
-                  <IconButton onClick={() => handleOpenPopup(row.id)}>
-                    <Pencil size={18} />
-                  </IconButton>
-                  <IconButton
-                    disabled={deleteLoader}
-                    onClick={() => handleDeleteSociety(row.id)}
-                  >
-                    <Trash2 size={18} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex justify-center mt-4">
-        <CustomPagination
-          page={pagination.page}
-          totalPages={pagination.totalPage}
-          onChange={(value) => handlePagination(value)}
-        />
-      </div>
-
+    <MainWrapper>
+      <PageTitle title={"Socities"} actions={buttons} />
+      <CustomDataGrid
+        columns={columns}
+        rows={rows}
+        loading={isPending || deleteLoader}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        page={pagination.page - 1}
+        pageSize={pagination.limit}
+        rowCount={pagination.totalPage}
+        style={{ height: "calc(100vh - 170px)" }}
+      />
+      <CustomDialog
+        open={confirmationDialog ? true : false}
+        handleClose={handleClose}
+        heading={`Confirm delete Society`}
+        actions={confirmationDialogActions}
+        size='sm'
+      >
+        <div className="mb-3">
+          <p>Are you sure you want to delete this Society?</p>
+        </div>
+      </CustomDialog>
       {openPopup && (
         <SocietyDialog
           open={openPopup}
@@ -155,6 +196,6 @@ export default function SocietyList() {
           }}
         />
       )}
-    </div>
+    </MainWrapper>
   );
 }

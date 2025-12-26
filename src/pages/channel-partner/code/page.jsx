@@ -7,7 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { format, parseISO, set } from 'date-fns';
 import { Tooltip } from "@mui/material";
-import { EditIcon, PlusIcon, Trash } from "lucide-react";
+import { EditIcon, Pencil, PlusIcon, Trash } from "lucide-react";
 import CustomDataGrid from "../../../components/common/CustomDataGrid";
 import CustomDialog from "../../../components/common/CustomDialog";
 import { toast } from "react-toastify";
@@ -80,19 +80,20 @@ const ChannelPartnerCode = () => {
             width: 120,
             renderCell: (params) => (
                 <>
+                <div className="w-full flex justify-end items-center">
+                    <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
+                        <button className={`mr-3 py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
+                            <Trash className="text-red-800 w-4 h-4" />
+                        </button>
+                    </Tooltip>
                     <Tooltip title="Edit">
-                        <Link to={`/channel-partners/code/edit/${params.id}`}>
-                            <button className="mr-2 p-2 bg-gray-100 cursor-pointer">
-                                <EditIcon className="text-gray-800 w-4 h-4" />
+                        <Link to={`/channel-partners/code/edit/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                            <button className=" py-2 px-3 bg-blue-50 cursor-pointer rounded-sm">
+                                <Pencil className="text-blue-800 w-4.5 h-4.5" />
                             </button>
                         </Link>
                     </Tooltip>
-
-                    <Tooltip title="Delete">
-                        <button className="mr-2 p-2 bg-gray-100 cursor-pointer" onClick={() => setConfirmationDialog(params.id)}>
-                            <Trash className="text-gray-800 w-4 h-4" />
-                        </button>
-                    </Tooltip>
+                </div>
                 </>
             ),
         }
@@ -174,7 +175,7 @@ const ChannelPartnerCode = () => {
                 page={pagination.page - 1}
                 pageSize={pagination.limit}
                 rowCount={channelPartnerCodes?.total}
-                style={{ height: "calc(100vh - 180px)" }}
+                style={{ height: "calc(100vh - 170px)" }}
             />
             <CustomDialog
                 open={confirmationDialog ? true : false}

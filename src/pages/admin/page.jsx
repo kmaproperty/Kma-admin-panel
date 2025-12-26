@@ -133,7 +133,7 @@ const AdminList = () => {
                 page={pagination.page - 1}
                 pageSize={pagination.limit}
                 rowCount={adminData?.total}
-                style={{ height: "calc(100vh - 180px)" }}
+                style={{ height: "calc(100vh - 170px)" }}
             />
         </MainWrapper>
     )

@@ -1,53 +1,80 @@
-import React from 'react';
-import { Dialog, DialogTitle } from '@mui/material';
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  IconButton
+} from "@mui/material";
+import { X } from "lucide-react";
 
 const CustomDialog = ({
-    open,
-    handleClose,
-    children,
-    heading,
-    className = '',
-    size, // sm, lg, xl
-    actions = [],
-    showCloseButton = true,
+  open,
+  handleClose,
+  children,
+  heading,
+  className = "",
+  size,
+  actions = [],
+  showCloseButton = true,
 }) => {
-    // Determine if the footer should be rendered
-    const hasActions = actions && actions.length > 0;
+  const hasActions = actions && actions.length > 0;
 
-    return (
-        <Dialog  
-        onClose={handleClose} 
-        open={open}
-            className={`${className}`} 
-            size={size}
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      className={className}
+      maxWidth={size || "sm"}
+      fullWidth
+    >
+      <div className="p-4">
+        {/* Header */}
+        <DialogTitle
+          sx={{
+            padding: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-            <div className='p-4'>
+          <span>{heading}</span>
 
-                <DialogTitle closeButton={showCloseButton} style={{padding: 0}}>
-                    {heading}
-                </DialogTitle>
+          {showCloseButton && (
+            <IconButton
+              aria-label="close"
+              onClick={handleClose}
+              size="small"
+            >
+              <X width={4} height={4} />
+            </IconButton>
+          )}
+        </DialogTitle>
 
-                <div className='py-3'>
-                    {children}
-                </div>
-                
-                {hasActions && (
-                    <div className='flex gap-2 pt-2 mt-2 border-t border-gray-200 justify-end'>
-                        {actions.map((action, index) => (
-                            <button
-                                key={index}
-                                variant={action.variant || 'secondary'}
-                                onClick={action.onClick}
-                                className={`px-4 py-2 text-white cursor-pointer rounded-md ${action.variant === "danger" ? "bg-red-500" : action.variant === "primary" ? "bg-blue-800" : "bg-gray-700"}`}
-                            >
-                                {action.label}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </Dialog>
-    );
+        {/* Body */}
+        <div className="py-3">{children}</div>
+
+        {/* Footer */}
+        {hasActions && (
+          <div className="flex gap-2 pt-2 mt-2 border-t border-gray-200 justify-end">
+            {actions.map((action, index) => (
+              <button
+                key={index}
+                onClick={action.onClick}
+                className={`px-4 py-2 text-white rounded-md cursor-pointer ${
+                  action.variant === "danger"
+                    ? "bg-red-500"
+                    : action.variant === "primary"
+                    ? "bg-blue-800"
+                    : "bg-gray-700"
+                }`}
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </Dialog>
+  );
 };
 
 export default CustomDialog;
