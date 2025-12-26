@@ -80,7 +80,7 @@ export const getPartnerApiHandler = async (id) => {
 
 export const editPartnerApiHandler = async ({ payload, id }) => {
   try {
-    const response = await axiosInstance.put(
+    const response = await axiosInstance.patch(
       `/admin/users/${id}`,
       payload // Match the variable name here
     );

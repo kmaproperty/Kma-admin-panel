@@ -15,8 +15,11 @@ import { getPartnerApiHandler } from '../../services/channelPartnerService';
 import DynamicSelectController from '../../components/common/select/controlledSelect';
 import ControlledDatePicker from '../../components/common/datePicker/ControlledDatePicker';
 import { getCityApiHandler } from '../../services/masterService';
+import { useCitySearch } from '../../hooks/useCitySearch';
+import DynamicAsyncAutocompleteController from '../../components/common/select/asyncControlledSelect';
 
 const AddEditOwner = () => {
+    const { loadCities } = useCitySearch('name');
     const params = useParams();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -26,9 +29,13 @@ const AddEditOwner = () => {
     const messageSchema = yup.object({
         name: yup.string().required('Please enter name'),
         email: yup.string().email('Invalid email format').required('Please enter email'),
-        firmName: yup.string().required('Please enter First name'),
-        cities: yup.array().min(1, 'Please select at least one city').required(),
-        aboutYourSelf: yup.string(),
+        // firmName: yup.string().required('Please enter First name'),
+        cities: yup.object({
+                label: yup.string().required(),
+                value: yup.string().required()
+            })
+            .required('Please select city'),
+        // aboutYourSelf: yup.string(),
         phoneVerified: yup.object().shape({
             label: yup.string().required(),
             value: yup.boolean().required()
@@ -44,7 +51,8 @@ const AddEditOwner = () => {
         control,
         setValue,
         reset,
-        watch
+        watch,
+        formState: { errors }
     } = useForm({
         resolver: yupResolver(messageSchema),
         defaultValues: {
@@ -56,7 +64,7 @@ const AddEditOwner = () => {
                 label: "Yes",
                 value: true
             }
-        }
+        },
     });
 
     const {
@@ -85,7 +93,7 @@ const AddEditOwner = () => {
     const { mutate: editPartner } = useMutation({
         mutationFn: editPartnerApiHandler,
         onSuccess: (res) => {
-            toast.success("Channel Partner Updated Successfully");
+            toast.success("Owner Updated Successfully");
             navigate("/owners");
         },
         onError: (error) => {
@@ -105,7 +113,7 @@ const AddEditOwner = () => {
             ...data,
             isActive: data.isActive.value,
             phoneVerified: data.phoneVerified.value,
-            cities: data.cities.map((city) => city.value).join(","),
+            cities: data.cities?.value,
             businessSince: data.businessSince ? format(data.businessSince, "yyyy-MM-dd") : null,
             // ...(params?.id && { id: params.id })
         };
@@ -120,15 +128,9 @@ const AddEditOwner = () => {
 
     useEffect(() => {
         if (channelPartnerData) {
-            const cities = channelPartnerData?.data?.cities?.split(",").map((city) => {
-                return { value: city, label: city }
-            })
-            setValue("cities", cities || [])
+            setValue("cities", {label: channelPartnerData.data.cities, value: channelPartnerData.data.cities})
             setValue("name", channelPartnerData.data.name || "")
             setValue("email", channelPartnerData.data.email || "")
-            setValue("firmName", channelPartnerData.data.firmName || "")
-            setValue("businessSince", channelPartnerData.data.businessSince ? new Date(channelPartnerData.data.businessSince) : null)
-            setValue("aboutYourSelf", channelPartnerData.data.aboutYourSelf || "")
             setValue("isActive", channelPartnerData.data.isActive ? {label: "Yes",value: true} : {label: "No",value: false} || true)
             setValue("phoneVerified", channelPartnerData.data.phoneVerified ? {label: "Yes",value: true} : {label: "No",value: false} || true)
         }
@@ -144,8 +146,8 @@ const AddEditOwner = () => {
     }, [citiesData])
 
     useEffect(() => {
-        console.log(watch("cities"))
-    }, [watch("cities")])
+        console.log('errors', watch('cities'))
+    }, [watch('cities')])
 
     return (
         <MainWrapper>
@@ -159,7 +161,7 @@ const AddEditOwner = () => {
                     : (
                         <>
                             <PageTitle title={`Edit Owner`} />
-                            <form onSubmit={handleSubmit(onSubmit)}>
+                            <form onSubmit={handleSubmit(onSubmit, (errors) => console.log("Submit blocked due to:", errors))}>
                                 <div className='bg-gray-50 w-[70%] px-5 py-4 rounded-lg space-y-3'>
                                     <div className='flex items-center gap-6'>
                                         <div className="mb-3 w-[48%]">
@@ -181,16 +183,16 @@ const AddEditOwner = () => {
                                         </div>
                                     </div>
                                     <div className='flex items-center gap-6'>
-                                        <div className="mb-3 w-[48%]">
+                                        {/* <div className="mb-3 w-[48%]">
                                             <TextField
                                                 control={control}
                                                 name="firmName"
                                                 label="First Name"
                                                 placeHolder="Enter firm name"
                                             />
-                                        </div>
+                                        </div> */}
                                         <div className="mb-3 w-[48%]">
-                                            <DynamicSelectController
+                                            {/* <DynamicSelectController
                                                 name="cities"
                                                 control={control}
                                                 options={cities}
@@ -198,29 +200,22 @@ const AddEditOwner = () => {
                                                 isMulti
                                                 placeholder="Select cities"
                                                 rules={{ required: "City is required" }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='flex items-center gap-6'>
-                                        <div className="mb-3 w-[48%]">
-                                            <ControlledDatePicker
-                                                name="businessSince"
+                                            /> */}
+                                             <label className="text-sm font-semibold text-gray-700">
+                                                Select cities
+                                            </label>
+                                            <DynamicAsyncAutocompleteController
+                                                name='cities'
                                                 control={control}
-                                                label="Business Since"
-                                                rules={{ required: "Business Since is required" }}
-                                                disableFuture
+                                                isMulti={false}
+                                                isError={false}
+                                                placeholder={"Search city"}
+                                                loadOptions={loadCities}
+                                                minHeight={"34px"}
+                                                changeStyle={true}
+                                                rules={{required: 'City is required!'}}
                                             />
                                         </div>
-                                        <div className="mb-3 w-[48%]">
-                                            <TextField
-                                                control={control}
-                                                name="aboutYourSelf"
-                                                label="About YourSelf"
-                                                placeHolder="Explain about yourself"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='flex items-center gap-6'>
                                         <div className="mb-3 w-[48%]">
                                             <DynamicSelectController
                                                 name="isActive"
@@ -238,6 +233,28 @@ const AddEditOwner = () => {
                                                 rules={{ required: "This field is required" }}
                                             />
                                         </div>
+                                    </div>
+                                    {/* <div className='flex items-center gap-6'>
+                                        <div className="mb-3 w-[48%]">
+                                            <ControlledDatePicker
+                                                name="businessSince"
+                                                control={control}
+                                                label="Business Since"
+                                                rules={{ required: "Business Since is required" }}
+                                                disableFuture
+                                            />
+                                        </div>
+                                        <div className="mb-3 w-[48%]">
+                                            <TextField
+                                                control={control}
+                                                name="aboutYourSelf"
+                                                label="About YourSelf"
+                                                placeHolder="Explain about yourself"
+                                            />
+                                        </div>
+                                    </div> */}
+                                    <div className='flex items-center gap-6'>
+                                        
                                         <div className="mb-3 w-[48%]">
                                             <DynamicSelectController
                                                 name="phoneVerified"

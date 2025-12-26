@@ -15,8 +15,11 @@ import { getPartnerApiHandler } from '../../services/channelPartnerService';
 import DynamicSelectController from '../../components/common/select/controlledSelect';
 import ControlledDatePicker from '../../components/common/datePicker/ControlledDatePicker';
 import { getCityApiHandler } from '../../services/masterService';
+import DynamicAsyncAutocompleteController from '../../components/common/select/asyncControlledSelect';
+import { useCitySearch } from '../../hooks/useCitySearch';
 
 const AddEditChannelPartner = () => {
+    const { loadCities } = useCitySearch('name');
     const params = useParams();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +126,7 @@ const AddEditChannelPartner = () => {
     useEffect(() => {
         if (channelPartnerData) {
             const cities = channelPartnerData?.data?.cities?.split(",").map((city) => {
-                return { value: city, label: city }
+                return { label: city.trim(), value: city.trim() }
             })
             setValue("cities", cities || [])
             setValue("name", channelPartnerData.data.name || "")
@@ -192,7 +195,7 @@ const AddEditChannelPartner = () => {
                                             />
                                         </div>
                                         <div className="mb-3 w-[48%]">
-                                            <DynamicSelectController
+                                            {/* <DynamicSelectController
                                                 name="cities"
                                                 control={control}
                                                 options={cities}
@@ -200,6 +203,20 @@ const AddEditChannelPartner = () => {
                                                 isMulti
                                                 placeholder="Select cities"
                                                 rules={{ required: "City is required" }}
+                                            /> */}
+                                            <label className="text-sm font-semibold text-gray-700">
+                                                Select cities
+                                            </label>
+                                            <DynamicAsyncAutocompleteController
+                                                name='cities'
+                                                control={control}
+                                                isMulti={true}
+                                                isError={false}
+                                                placeholder={"Search city"}
+                                                loadOptions={loadCities}
+                                                minHeight={"34px"}
+                                                changeStyle={true}
+                                                rules={{required: 'City is required!'}}
                                             />
                                         </div>
                                     </div>
