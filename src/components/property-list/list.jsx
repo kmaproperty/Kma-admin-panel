@@ -10,7 +10,7 @@ import {
   Tooltip,
   IconButton
 } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -18,24 +18,139 @@ import {
   XCircle,
   Pencil,
   Trash2,
-  Eye 
+  Eye,
+  OctagonMinusIcon
 } from "lucide-react";
 import ApproveRejectProperty from "../common/approveReject/approveRejectProperty";
 import { PROPERTY_STATUS } from "../../lib/enums";
 import { deletePropertyApiHandler } from "../../services/postProperty";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import CustomDataGrid from "../common/CustomDataGrid";
+import PageTitle from "../common/layout/PageTitle";
 
 
-export default function PropertiesTable({propertyList, propertyData, fetchPropertyList, pagination, setPagination}) {
-     console.log('sdfjsdfsd', propertyData,propertyList)
-     const [approvePopup, setApprovePopup] = useState(false)
-     const [popupType, setPopupType] = useState('')
-     const [propertyId, setPropertyId] = useState(null)
+export default function PropertiesTable({ propertyList, propertyData, fetchPropertyList, pagination, setPagination, isLoading }) {
 
- const handlePagination = (value) => {
-    setPagination((pre) => ({...pre, page: value}))
-  }
+  const [approvePopup, setApprovePopup] = useState(false)
+  const [popupType, setPopupType] = useState('')
+  const [propertyId, setPropertyId] = useState(null)
+
+  const columns = [
+    {
+      field: "img", headerName: "Image",
+      renderCell: (params) => {
+        return (
+          <img className='object-fit-cover' style={{ height: "50px", width: "60px" }} src={params.row.img} />
+        )
+      }
+    },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "category", headerName: "Category", flex: 1 },
+    { field: "carpetArea", headerName: "Carpet Area", flex: 1 },
+    { field: "city", headerName: "City", flex: 1 },
+    { field: "owner", headerName: "Owner", flex: 1 },
+    { field: "price", headerName: "Price", flex: 1 },
+    { field: "status", headerName: "Status", flex: 1 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 240,
+      renderCell: (params) => (
+        <>
+          <div className="w-full flex justify-end align-center">
+            {params.row.status != 'approved' && <Tooltip title="Approve">
+              <button className="h-fit mr-2 p-2 bg-green-100 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("approve", params.id)}>
+                <CheckCircle className="text-green-800 w-4.5 h-4.5" />
+              </button>
+            </Tooltip>}
+
+            {params.row.status != 'rejected' && <Tooltip title="Reject">
+              <button className="h-fit mr-2 p-2 bg-yellow-100 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("reject", params.id)}>
+                <XCircle className="text-yellow-800 w-4.5 h-4.5" />
+              </button>
+            </Tooltip>}
+
+            <Tooltip title="View">
+              <Link to={`/properties/${params.id}`}>
+                <button className="h-fit mr-2 p-2 bg-gray-100 cursor-pointer rounded-sm">
+                  <Eye className="text-gray-700 w-4.5 h-4.5" />
+                </button>
+              </Link>
+            </Tooltip>
+            <Tooltip title="Edit">
+              <Link to={`/properties/${params.id}`}>
+                <button className="h-fit mr-2 p-2 bg-blue-100 cursor-pointer rounded-sm">
+                  <Pencil className="text-blue-800 w-4.5 h-4.5" />
+                </button>
+              </Link>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 p-2 bg-red-100 cursor-pointer rounded-sm">
+                <Trash2 className="text-red-800 w-4.5 h-4.5" />
+              </button>
+            </Tooltip>
+
+          </div>
+          {/* {params.row.status != 'approved' && <Tooltip title="Approve">
+            <IconButton
+              onClick={() => handleOpenStatusPopup("approve", row.id)}
+            >
+              <CheckCircle size={18} />
+            </IconButton>
+          </Tooltip>}
+
+          {params.row.status != 'rejected' && <Tooltip title="Reject">
+            <IconButton
+              onClick={() => handleOpenStatusPopup("reject", params.id)}
+            >
+              <XCircle size={18} />
+            </IconButton>
+          </Tooltip>}
+
+          <Tooltip title="Edit">
+            <Link to={`/properties/${params.id}`}>
+              <IconButton>
+                <Pencil size={18} />
+              </IconButton>
+            </Link>
+          </Tooltip>
+          <Tooltip title="View">
+            <Link to={`/properties/view/${params.id}`}>
+              <IconButton>
+                <Eye size={18} />
+              </IconButton>
+            </Link>
+          </Tooltip>
+
+          <Tooltip title="Delete">
+            <IconButton
+              onClick={() => deleteProperty(params.id)}
+            >
+              <Trash2 size={18} />
+            </IconButton>
+          </Tooltip> */}
+        </>
+      ),
+    }
+  ];
+
+  const onPageChange = useCallback((uiPage) => {
+    const newPage = uiPage + 1;
+    setPagination((prev) => {
+      // Only update if it's genuinely different to prevent loops
+      if (prev.page === newPage) return prev;
+      console.log("Setting State to Page:", newPage);
+      return { ...prev, page: newPage };
+    });
+  }, []);
+
+  const onPageSizeChange = useCallback((newSize) => {
+    setPagination((prev) => {
+      if (prev.limit === newSize) return prev;
+      return { ...prev, limit: newSize, page: 1 };
+    });
+  }, []);
 
   const handleOpenStatusPopup = (type, id) => {
     setApprovePopup(true)
@@ -47,111 +162,69 @@ export default function PropertiesTable({propertyList, propertyData, fetchProper
     setApprovePopup(false)
     setPopupType('')
 
-    if(isRefetch){
-        fetchPropertyList()
+    if (isRefetch) {
+      fetchPropertyList()
     }
   }
 
-  const {mutate: deleteProperty, isPending: deleteLoader} = useMutation({
+  const { mutate: deleteProperty, isPending: deleteLoader } = useMutation({
     mutationFn: deletePropertyApiHandler,
     onSuccess: (res) => {
-        toast.success(res.message)
-        fetchPropertyList()
+      toast.success(res.message)
+      fetchPropertyList()
     },
     onError: (error) => {
-if(Array.isArray(error.message)){
+      if (Array.isArray(error.message)) {
         error.message.map((item) => {
           toast.error(item)
         })
-      }else{
+      } else {
         toast.error(error.message)
       }
     }
   })
 
+  useEffect(() => {
+    fetchPropertyList()
+  }, [pagination])
+
+  const rows = useMemo(() => {
+    if (!propertyList) return [];
+    return propertyList.map((item) => ({
+      id: item.id,
+      name: item.society?.name ?? '',
+      img: item?.photos?.length
+        ? `${import.meta.env.VITE_AWS_URL}${item.photos[0]?.fileKey}`
+        : '',
+      category: item?.category?.name ?? '',
+      price: item?.price ?? '',
+      carpetArea: item?.carpetArea ?? '',
+      city: item?.city?.name ?? '',
+      listingType: item?.listingType?.name ?? '',
+      owner: item?.owner?.name ?? '',
+      status: item?.status ?? '',
+    }));
+  }, [propertyList]);
+
   return (
-    <Paper sx={{ padding: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Properties List
-      </Typography>
+    <Paper sx={{ padding: 2, paddingTop: 0 }}>
+      <PageTitle
+        title="Property List"
+      />
 
-     <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <Table>
-          <TableHead>
-            <TableRow className="bg-gray-100">
-              {["#ID", "Name", "category", "Type", "Built Up Area", 'status', 'Action'].map(
-                (head) => (
-                  <TableCell
-                    key={head}
-                    className="font-semibold text-gray-700 whitespace-nowrap"
-                    {...{ align: head == "Action" ? "right" : "left" }}
-                  >
-                    {head}
-                  </TableCell>
-                )
-              )}
-            </TableRow>
-          </TableHead>
+      <CustomDataGrid
+        columns={columns}
+        rows={rows}
+        loading={isLoading}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        page={pagination.page - 1}
+        pageSize={pagination.limit}
+        rowCount={propertyData?.total || 0}
+        style={{ height: "calc(100vh - 240px)" }}
+      />
 
-          <TableBody>
-            {propertyList?.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>{row.society?.name ?? '-'}</TableCell>
-                <TableCell>{row.category?.name ?? '-'}</TableCell>
-                <TableCell>{row.listingType?.name}</TableCell>
-                <TableCell>{row.builtUpArea + ' ' + row.builtUpAreaUnit}</TableCell>
-                <TableCell>{PROPERTY_STATUS.find(item => item.value == row.status)?.name ?? '-'}</TableCell>
-                <TableCell className="flex gap-2">
-  {row.status != 'approved' && <Tooltip title="Approve">
-    <IconButton
-      onClick={() => handleOpenStatusPopup("approve", row.id)}
-    >
-      <CheckCircle size={18} />
-    </IconButton>
-  </Tooltip>}
-
-  {row.status != 'rejected' && <Tooltip title="Reject">
-    <IconButton
-      onClick={() => handleOpenStatusPopup("reject", row.id)}
-    >
-      <XCircle size={18} />
-    </IconButton>
-  </Tooltip>}
-
-  <Tooltip title="Edit">
-    <Link to={`/properties/${row.id}`}>
-      <IconButton>
-        <Pencil size={18} />
-      </IconButton>
-    </Link>
-  </Tooltip>
-  <Tooltip title="View">
-    <Link to={`/properties/view/${row.id}`}>
-      <IconButton>
-        <Eye size={18} />
-      </IconButton>
-    </Link>
-  </Tooltip>
-
-  <Tooltip title="Delete">  
-    <IconButton
-      onClick={() => deleteProperty(row.id)}
-    >
-      <Trash2 size={18} />
-    </IconButton>
-  </Tooltip>
-</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <Stack alignItems="center" sx={{ mt: 3 }}>
-        <CustomPagination page={pagination.page} totalPages={pagination.totalPage} onChange={(value) => handlePagination(value)}/>
-      </Stack>
-      <ApproveRejectProperty open={approvePopup} popupType={popupType} onClose={closePopup} propertyId={propertyId}/>
+      <ApproveRejectProperty open={approvePopup} popupType={popupType} onClose={closePopup} propertyId={propertyId} />
     </Paper>
   );
 }

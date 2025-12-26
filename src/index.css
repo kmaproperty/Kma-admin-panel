@@ -32,3 +32,6 @@
   opacity: 1;
   margin-top: 1px;
 }
+.MuiDataGrid-row .MuiDataGrid-cell:last-of-type{
+  justify-content: flex-end;
+}

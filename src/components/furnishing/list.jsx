@@ -6,17 +6,23 @@ import {
   TableBody,
   IconButton,
 } from "@mui/material";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
 import { toast } from "react-toastify";
 import FurnishingDialog from "./furnishingDialog";
 import { deleteFurnishing, fetchFurnishing } from "../../services/furnishing";
 import AddButton from "../common/addButton";
+import MainWrapper from "../common/layout/mainWrapper";
+import PageTitle from "../common/layout/PageTitle";
+import CustomDataGrid from "../common/CustomDataGrid";
+import { format, parseISO, set } from "date-fns";
+import CustomDialog from "../common/CustomDialog";
 
 export default function FurnishingList() {
   const [tableData, setTableData] = useState([])
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
@@ -25,18 +31,76 @@ export default function FurnishingList() {
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const { mutate: fetchLatestFurnisher } = useMutation({
+  const columns = [
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "sortOrder", headerName: "Sort Order", flex: 1 },
+    { field: "isActive", headerName: "Status", flex: 1 },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      renderCell: (params) => (
+        <>
+          <IconButton onClick={() => handleOpenPopup(params.id)}>
+            <Pencil size={18} />
+          </IconButton>
+          <IconButton
+            disabled={deleteLoader}
+            onClick={() => setConfirmationDialog(params.id)}
+          >
+            <Trash2 size={18} />
+          </IconButton>
+        </>
+      ),
+    }
+  ];
+
+  const handleDelete = async () => {
+    deleteFurnishing(confirmationDialog)
+  }
+  const handleClose = () => {
+    setConfirmationDialog(null);
+  }
+
+  const confirmationDialogActions = [
+    {
+      label: 'Delete',
+      variant: 'danger',
+      onClick: () => {
+        handleDelete()
+      }
+    },
+    {
+      label: 'Close',
+      variant: 'outline-secondary',
+      onClick: handleClose
+    },
+  ];
+
+
+  const buttons = [
+    {
+      label: 'Add',
+      icon: <PlusIcon className="w-4 h-4" />,
+      onClick: () => {
+        handleOpenPopup("")
+      }
+    },
+  ];
+
+  const { mutate: fetchLatestFurnisher, isLoading } = useMutation({
     mutationFn: fetchFurnishing,
     onSuccess: (data) => {
-      console.log('data', data)
       if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: Math.ceil(data.total / pagination.limit),
-        }));
+        setPagination((prev) => {
+          const newTotalPage = data.total;
+          if (prev.totalPage === newTotalPage) return prev;
+          return { ...prev, totalPage: newTotalPage };
+        });
       }
-      setTableData(data?.data ?? [])
 
+      setTableData(data?.data ?? []);
     },
     staleTime: 0,
     refetchOnMount: true,
@@ -47,7 +111,8 @@ export default function FurnishingList() {
       mutationFn: deleteFurnishing,
       onSuccess: () => {
         toast.success("Furnisher deleted successfully");
-        fetchLatestFurnisher({page: pagination.page, limit: pagination.limit, search: ''})
+        setConfirmationDialog(null)
+        fetchLatestFurnisher({ page: pagination.page, limit: pagination.limit, search: '' })
       },
       onError: (error) => {
         if (Array.isArray(error.message)) {
@@ -60,80 +125,69 @@ export default function FurnishingList() {
       },
     });
 
-  const handlePagination = (value) => {
-    setPagination((pre) => ({ ...pre, page: value }));
-    fetchLatestFurnisher({page: value, limit: pagination.limit, search: ''})
-  };
-
   const handleOpenPopup = (id) => {
     setOpenPopup(true);
     setEditId(id);
   };
 
-  useEffect(() => {
-    fetchLatestFurnisher({page: pagination.page, limit: pagination.limit, search: ''})
+  const onPageChange = useCallback((uiPage) => {
+    const newPage = uiPage + 1;
+    setPagination((prev) => {
+      // Only update if it's genuinely different to prevent loops
+      if (prev.page === newPage) return prev;
+      console.log("Setting State to Page:", newPage);
+      return { ...prev, page: newPage };
+    });
   }, []);
 
+  const onPageSizeChange = useCallback((newSize) => {
+    setPagination((prev) => {
+      if (prev.limit === newSize) return prev;
+      return { ...prev, limit: newSize, page: 1 };
+    });
+  }, []);
+
+  useEffect(() => {
+    fetchLatestFurnisher({ page: pagination.page, limit: pagination.limit, search: '' })
+  }, [pagination.page, pagination.limit]);
+
+  const rows = useMemo(() => {
+    if (!tableData) return [];
+    return tableData.map((item) => ({
+      id: item.id,
+      name: item.name,
+      code: item.code,
+      sortOrder: item.sortOrder,
+      isActive: item.isActive ? "Yes" : "No",
+      createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy')
+    }));
+  }, [tableData]);
+
   return (
-    <div className="px-6 pb-6 bg-white rounded">
-      <div className="flex items-center justify-between my-4 border-b pb-3">
-        <h1 className="text-xl font-semibold text-gray-800">Furnishers</h1>
-
-        <AddButton
-          handleClick={() => handleOpenPopup("")}
-          title="Add Furnisher"
-        />
-      </div>
-      <div className="overflow-x-auto border border-gray-200 rounded-lg">
-        <Table>
-          <TableHead>
-            <TableRow className="bg-gray-100">
-              {["Name", "Code", "Sort Order", "Status", "Action"].map(
-                (head) => (
-                  <TableCell
-                    key={head}
-                    className="font-semibold text-gray-700 whitespace-nowrap"
-                    {...{ align: head == "Action" ? "right" : "left" }}
-                  >
-                    {head}
-                  </TableCell>
-                )
-              )}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {tableData?.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.code}</TableCell>
-                <TableCell>{row.sortOrder}</TableCell>
-                <TableCell>{row.isActive ? "Active" : "Inactive"}</TableCell>
-                <TableCell align="right">
-                  <IconButton onClick={() => handleOpenPopup(row.id)}>
-                    <Pencil size={18} />
-                  </IconButton>
-                  <IconButton
-                    disabled={deleteLoader}
-                    onClick={() => handleDeleteFurnishing(row.id)}
-                  >
-                    <Trash2 size={18} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex justify-center mt-4">
-        <CustomPagination
-          page={pagination.page}
-          totalPages={pagination.totalPage}
-          onChange={(value) => handlePagination(value)}
-        />
-      </div>
-
+    <MainWrapper>
+      <PageTitle title={"Furnishing"} actions={buttons} />
+      <CustomDataGrid
+        columns={columns}
+        rows={rows}
+        loading={isLoading || deleteLoader}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        page={pagination.page - 1}
+        pageSize={pagination.limit}
+        rowCount={pagination.totalPage}
+        style={{ height: "calc(100vh - 170px)" }}
+      />
+      <CustomDialog
+        open={confirmationDialog ? true : false}
+        handleClose={handleClose}
+        heading={`Confirm delete furnishing`}
+        actions={confirmationDialogActions}
+        size='sm'
+      >
+        <div className="mb-3">
+          <p>Are you sure you want to delete this furnishing?</p>
+        </div>
+      </CustomDialog>
       {openPopup && (
         <FurnishingDialog
           open={openPopup}
@@ -142,11 +196,11 @@ export default function FurnishingList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestFurnisher({page: pagination.page, limit: pagination.limit, search: ''});
+              fetchLatestFurnisher({ page: pagination.page, limit: pagination.limit, search: '' });
             }
           }}
         />
       )}
-    </div>
+    </MainWrapper>
   );
 }

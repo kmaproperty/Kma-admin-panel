@@ -40,7 +40,8 @@ export default function ContentLayout() {
 
   const {
     data: propertyList,
-    refetch: fetchPropertyList
+    refetch: fetchPropertyList,
+    isLoading
   } = useQuery({
     queryKey: ["property-list", filters, pagination, sorting, search],
     queryFn: () => {
@@ -115,6 +116,7 @@ export default function ContentLayout() {
               propertyList={propertyList?.data ?? []}
               propertyData={propertyList}
               fetchPropertyList={fetchPropertyList}
+              isLoading={isLoading}
               // setSearch={setSearch}
               // setSorting={setSorting}
               // sorting={sorting}
