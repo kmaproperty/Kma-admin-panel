@@ -1,7 +1,7 @@
 import { useRef, useCallback, useEffect } from "react";
 import { getCitySearchApiHandler } from "../services/masterService";
 
-export const useCitySearch = () => {
+export const useCitySearch = (key) => {
   const debounceRef = useRef(null);
 
   const loadCities = useCallback((inputValue) => {
@@ -16,11 +16,14 @@ export const useCitySearch = () => {
 
           if (Array.isArray(cities)) {
             const modifiedData = cities.map((item) => {
-              return {
-                label: item.name,
-                value: item.id || item.name,
-                ...item,
-              };
+             
+                return {
+                  label: item.name,
+                  value: key =='name' ? item.name : item.id || item.name,
+                  ...item,
+                };
+              
+             
             });
 
             resolve(modifiedData);

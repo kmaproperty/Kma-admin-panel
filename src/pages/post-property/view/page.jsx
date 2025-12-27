@@ -28,7 +28,7 @@ export default function ViewProperty(){
 
             <div className="">
                 <p className="font-semibold text-xl text-text-black">
-                    {propertyDetails?.society?.name + " In " + propertyDetails?.city?.name}
+                    {propertyDetails?.society?.name ?? ""}  {propertyDetails?.society?.name ? ' In ' : ''} {propertyDetails?.city?.name}
                 </p>
                 {(propertyDetails?.flatNumber || propertyDetails?.plotNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber) && <span className="flex justify-start gap-2 items-center"> <MapPin size={18} /> {propertyDetails?.flatNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber} {propertyDetails?.locality?.name ? ", " : ''} {propertyDetails?.locality?.name ?? ''}</span>}
             </div>
