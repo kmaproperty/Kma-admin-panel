@@ -187,7 +187,7 @@ const AddEditChannelPartner = () => {
                                             <TextField
                                                 control={control}
                                                 name="firmName"
-                                                label="First Name"
+                                                label="Firm Name"
                                                 placeHolder="Enter firm name"
                                             />
                                         </div>

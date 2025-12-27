@@ -82,7 +82,7 @@ const CustomDataGrid = ({
           <button
             disabled={page === 0}
             onClick={() => onPageChange?.(page - 1)}
-            className="px-4 py-2 text-sm font-medium text-[#5d7186] hover:bg-gray-50 disabled:opacity-40 border-r border-[#e2e8f0]"
+            className="px-4 py-2 cursor-pointer text-sm font-medium text-[#5d7186] hover:bg-gray-50 disabled:opacity-40 border-r border-[#e2e8f0]"
           >
             Previous
           </button>
@@ -92,11 +92,11 @@ const CustomDataGrid = ({
               key={index}
               disabled={item === "..."}
               onClick={() => item !== "..." && onPageChange?.(item)}
-              className={`px-4 py-2 text-sm font-medium border-r border-[#e2e8f0] last:border-r-0 transition-colors ${
+              className={`px-4 py-2 cursor-pointer text-sm font-medium border-r border-[#e2e8f0] last:border-r-0 transition-colors ${
                 item === "..." 
                   ? "bg-white text-[#94a3b8] cursor-default" 
                   : page === item
-                    ? "bg-[#6366f1] text-white" 
+                    ? "bg-blue-950 text-white" 
                     : "bg-white text-[#5d7186] hover:bg-gray-50"
               }`}
               style={{ minWidth: "44px" }} // Ensures dots and numbers have same width
@@ -108,7 +108,7 @@ const CustomDataGrid = ({
           <button
             disabled={page >= totalPages - 1}
             onClick={() => onPageChange?.(page + 1)}
-            className="px-4 py-2 text-sm font-medium text-[#5d7186] hover:bg-gray-50 disabled:opacity-40"
+            className="px-4 py-2 cursor-pointer text-sm font-medium text-[#5d7186] hover:bg-gray-50 disabled:opacity-40"
           >
             Next
           </button>

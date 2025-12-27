@@ -58,78 +58,40 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
       width: 240,
       renderCell: (params) => (
         <>
-          <div className="w-full flex justify-end align-center">
+          <div className="w-full flex justify-end items-center h-full">
             {params.row.status != 'approved' && <Tooltip title="Approve">
-              <button className="h-fit mr-2 p-2 bg-green-100 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("approve", params.id)}>
+              <button className="h-fit mr-2 p-2 bg-green-50 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("approve", params.id)}>
                 <CheckCircle className="text-green-800 w-4.5 h-4.5" />
               </button>
             </Tooltip>}
 
             {params.row.status != 'rejected' && <Tooltip title="Reject">
-              <button className="h-fit mr-2 p-2 bg-yellow-100 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("reject", params.id)}>
+              <button className="h-fit mr-2 p-2 bg-yellow-50 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("reject", params.id)}>
                 <XCircle className="text-yellow-800 w-4.5 h-4.5" />
               </button>
             </Tooltip>}
 
             <Tooltip title="View">
-              <Link to={`/properties/${params.id}`}>
-                <button className="h-fit mr-2 p-2 bg-gray-100 cursor-pointer rounded-sm">
+              <Link to={`/properties/view/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                <button className="h-fit mr-2 p-2 bg-gray-50 cursor-pointer rounded-sm">
                   <Eye className="text-gray-700 w-4.5 h-4.5" />
                 </button>
               </Link>
             </Tooltip>
             <Tooltip title="Edit">
-              <Link to={`/properties/${params.id}`}>
-                <button className="h-fit mr-2 p-2 bg-blue-100 cursor-pointer rounded-sm">
+              <Link to={`/properties/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                <button className="h-fit mr-2 p-2 bg-blue-50 cursor-pointer rounded-sm">
                   <Pencil className="text-blue-800 w-4.5 h-4.5" />
                 </button>
               </Link>
             </Tooltip>
             <Tooltip title="Delete">
-              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 p-2 bg-red-100 cursor-pointer rounded-sm">
+              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 p-2 bg-red-50 cursor-pointer rounded-sm">
                 <Trash2 className="text-red-800 w-4.5 h-4.5" />
               </button>
             </Tooltip>
 
           </div>
-          {/* {params.row.status != 'approved' && <Tooltip title="Approve">
-            <IconButton
-              onClick={() => handleOpenStatusPopup("approve", row.id)}
-            >
-              <CheckCircle size={18} />
-            </IconButton>
-          </Tooltip>}
-
-          {params.row.status != 'rejected' && <Tooltip title="Reject">
-            <IconButton
-              onClick={() => handleOpenStatusPopup("reject", params.id)}
-            >
-              <XCircle size={18} />
-            </IconButton>
-          </Tooltip>}
-
-          <Tooltip title="Edit">
-            <Link to={`/properties/${params.id}`}>
-              <IconButton>
-                <Pencil size={18} />
-              </IconButton>
-            </Link>
-          </Tooltip>
-          <Tooltip title="View">
-            <Link to={`/properties/view/${params.id}`}>
-              <IconButton>
-                <Eye size={18} />
-              </IconButton>
-            </Link>
-          </Tooltip>
-
-          <Tooltip title="Delete">
-            <IconButton
-              onClick={() => deleteProperty(params.id)}
-            >
-              <Trash2 size={18} />
-            </IconButton>
-          </Tooltip> */}
         </>
       ),
     }

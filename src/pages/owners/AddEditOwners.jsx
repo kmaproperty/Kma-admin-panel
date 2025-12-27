@@ -185,7 +185,7 @@ const AddEditOwner = () => {
                                             <TextField
                                                 control={control}
                                                 name="firmName"
-                                                label="First Name"
+                                                label="Firn Name"
                                                 placeHolder="Enter firm name"
                                             />
                                         </div>

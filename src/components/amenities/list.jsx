@@ -5,8 +5,9 @@ import {
   TableCell,
   TableBody,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Pencil, PlusIcon, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash, Trash2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AmenityDialog from "./amenityDialog";
@@ -43,15 +44,18 @@ export default function AmenityList() {
       width: 120,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleOpenPopup(params.id)}>
-            <Pencil size={18} />
-          </IconButton>
-          <IconButton
-            disabled={deleteLoader}
-            onClick={() => setConfirmationDialog(params.id)}
-          >
-            <Trash2 size={18} />
-          </IconButton>
+          <div className="w-full flex justify-end items-center h-full">
+            <Tooltip title="Edit">
+                <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm" onClick={() => handleOpenPopup(params.id)}>
+                  <Pencil className="text-blue-800 w-4.5 h-4.5" />
+                </button>
+            </Tooltip>
+            <Tooltip title={"Delelte"}>
+              <button disabled={deleteLoader} className={` py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
+                <Trash className="text-red-800 w-4 h-4" />
+              </button>
+            </Tooltip>
+          </div>
         </>
       ),
     }
@@ -203,12 +207,12 @@ export default function AmenityList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestAmenity({page: pagination.page, limit: pagination.limit, search: ''});
+              fetchLatestAmenity({ page: pagination.page, limit: pagination.limit, search: '' });
             }
           }}
         />
       )}
     </MainWrapper>
-    
+
   );
 }

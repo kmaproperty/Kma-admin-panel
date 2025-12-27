@@ -5,8 +5,9 @@ import {
   TableCell,
   TableBody,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Pencil, PlusIcon, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash, Trash2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
@@ -74,12 +75,18 @@ export default function SocietyList() {
       width: 120,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleOpenPopup(params.id)}>
-            <Pencil className="w-4 h-4" />
-          </IconButton>
-          <IconButton onClick={() => setConfirmationDialog(params.id)}>
-            <Trash2 className="w-4 h-4" />
-          </IconButton>
+          <div className="w-full flex justify-end items-center h-full">
+            <Tooltip title="Edit">
+              <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm" onClick={() => handleOpenPopup(params.id)}>
+                <Pencil className="text-blue-800 w-4.5 h-4.5" />
+              </button>
+            </Tooltip>
+            <Tooltip title={"Delelte"}>
+              <button disabled={deleteLoader} className={` py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
+                <Trash className="text-red-800 w-4 h-4" />
+              </button>
+            </Tooltip>
+          </div>
         </>
       ),
     },
@@ -88,11 +95,11 @@ export default function SocietyList() {
   const { mutate: fetchLatestSociety, isPending } = useMutation({
     mutationFn: fetchSociety,
     onSuccess: (data) => {
-      
+
       if (data) {
-      setPagination((pre) => ({
-        ...pre,
-        totalPage: data.total,
+        setPagination((pre) => ({
+          ...pre,
+          totalPage: data.total,
         }));
       }
       setTableData(data?.data ?? [])
@@ -106,7 +113,7 @@ export default function SocietyList() {
     mutationFn: deleteSociety,
     onSuccess: () => {
       toast.success("Society deleted successfully");
-      fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''})
+      fetchLatestSociety({ page: pagination.page, limit: pagination.limit, search: '' })
       setConfirmationDialog(null);
     },
     onError: (error) => {
@@ -121,21 +128,21 @@ export default function SocietyList() {
   });
 
   const onPageChange = useCallback((uiPage) => {
-      const newPage = uiPage + 1;
-      setPagination((prev) => {
-        // Only update if it's genuinely different to prevent loops
-        if (prev.page === newPage) return prev;
-        console.log("Setting State to Page:", newPage);
-        return { ...prev, page: newPage };
-      });
-    }, []);
-  
-    const onPageSizeChange = useCallback((newSize) => {
-      setPagination((prev) => {
-        if (prev.limit === newSize) return prev;
-        return { ...prev, limit: newSize, page: 1 };
-      });
-    }, []);
+    const newPage = uiPage + 1;
+    setPagination((prev) => {
+      // Only update if it's genuinely different to prevent loops
+      if (prev.page === newPage) return prev;
+      console.log("Setting State to Page:", newPage);
+      return { ...prev, page: newPage };
+    });
+  }, []);
+
+  const onPageSizeChange = useCallback((newSize) => {
+    setPagination((prev) => {
+      if (prev.limit === newSize) return prev;
+      return { ...prev, limit: newSize, page: 1 };
+    });
+  }, []);
 
   const handleOpenPopup = (id) => {
     setOpenPopup(true);
@@ -143,20 +150,20 @@ export default function SocietyList() {
   };
 
   useEffect(() => {
-    fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''})
+    fetchLatestSociety({ page: pagination.page, limit: pagination.limit, search: '' })
   }, [pagination.page, pagination.limit]);
 
   const rows = useMemo(() => {
-        if (!tableData) return [];
-        return tableData.map((item) => ({
-          id: item.id,
-          name: item.name,
-          city: item.city.name,
-          address: item.address,
-          isVerfied: item.isVerfied ? "Yes" : "No",
-          localityName: item.localityName,
-        }));
-      }, [tableData]);
+    if (!tableData) return [];
+    return tableData.map((item) => ({
+      id: item.id,
+      name: item.name,
+      city: item.city.name,
+      address: item.address,
+      isVerfied: item.isVerfied ? "Yes" : "No",
+      localityName: item.localityName,
+    }));
+  }, [tableData]);
 
   return (
     <MainWrapper>
@@ -191,7 +198,7 @@ export default function SocietyList() {
             setEditId(null);
             setOpenPopup(false);
             if (isUpdate) {
-              fetchLatestSociety({page: pagination.page, limit: pagination.limit, search: ''});
+              fetchLatestSociety({ page: pagination.page, limit: pagination.limit, search: '' });
             }
           }}
         />
