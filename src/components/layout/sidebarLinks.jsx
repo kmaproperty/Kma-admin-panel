@@ -2,7 +2,7 @@ import { Binary, Building, ChartArea, CircleUserRound, Gauge, Home, Logs, Users,
 
 export const navLinks = [
     {
-        name: "Dashbaord",
+        name: "Dashboard",
         path: "/",
         icon: <Gauge className="w-5 h-5" />,
         children: [
