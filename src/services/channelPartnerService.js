@@ -106,3 +106,12 @@ export const unblockUserApi = async (id) => {
     throw error.response?.data ?? error;
   }
 };
+
+export const approveRejectProfilePhotoApi = async ({payload,id}) => {
+  try {
+    const response = await axiosInstance.post(`/admin/users/${id}/approve-live-photo`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
