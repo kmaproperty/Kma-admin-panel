@@ -5,8 +5,9 @@ import {
   TableCell,
   TableBody,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Pencil, PlusIcon, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash, Trash2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
@@ -20,6 +21,7 @@ import PageTitle from "../common/layout/PageTitle";
 import CustomDataGrid from "../common/CustomDataGrid";
 
 export default function LocalityList() {
+  const [search, setSearch] = useState("");
   const [tableData, setTableData] = useState([])
   const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
@@ -72,12 +74,19 @@ export default function LocalityList() {
       width: 120,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleOpenPopup(params.id)}>
-            <Pencil className="w-4 h-4" />
-          </IconButton>
-          <IconButton onClick={() => setConfirmationDialog(params.id)}>
-            <Trash2 className="w-4 h-4" />
-          </IconButton>
+          <div className="w-full flex justify-end items-center h-full">
+            <Tooltip title="Edit">
+              <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm" onClick={() => handleOpenPopup(params.id)}>
+                <Pencil className="text-blue-800 w-4.5 h-4.5" />
+              </button>
+            </Tooltip>
+            <Tooltip title={"Delelte"}>
+              <button disabled={deleteLoader} className={` py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
+                <Trash className="text-red-800 w-4 h-4" />
+              </button>
+            </Tooltip>
+          </div>
+
         </>
       ),
     },
@@ -143,8 +152,16 @@ export default function LocalityList() {
   };
 
   useEffect(() => {
-    fetchLatestLocality({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit]);
+    const delay = setTimeout(() => {
+      fetchLatestLocality({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const rows = useMemo(() => {
     if (!tableData) return [];
@@ -158,7 +175,7 @@ export default function LocalityList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Socities"} actions={buttons} />
+      <PageTitle title={"Localities"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}

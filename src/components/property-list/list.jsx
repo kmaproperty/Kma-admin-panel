@@ -32,16 +32,22 @@ import PageTitle from "../common/layout/PageTitle";
 
 export default function PropertiesTable({ propertyList, propertyData, fetchPropertyList, pagination, setPagination, isLoading }) {
 
-  const [approvePopup, setApprovePopup] = useState(false)
-  const [popupType, setPopupType] = useState('')
-  const [propertyId, setPropertyId] = useState(null)
-
   const columns = [
     {
       field: "img", headerName: "Image",
       renderCell: (params) => {
         return (
-          <img className='object-fit-cover' style={{ height: "50px", width: "60px" }} src={params.row.img} />
+          
+          <img
+          className="object-cover rounded-lg"
+          style={{ height: "44px", width: "50px" }}
+          src={params.row.img}
+          alt=""
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+          }}
+        />
         )
       }
     },
@@ -58,78 +64,28 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
       width: 240,
       renderCell: (params) => (
         <>
-          <div className="w-full flex justify-end align-center">
-            {params.row.status != 'approved' && <Tooltip title="Approve">
-              <button className="h-fit mr-2 p-2 bg-green-100 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("approve", params.id)}>
-                <CheckCircle className="text-green-800 w-4.5 h-4.5" />
-              </button>
-            </Tooltip>}
-
-            {params.row.status != 'rejected' && <Tooltip title="Reject">
-              <button className="h-fit mr-2 p-2 bg-yellow-100 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("reject", params.id)}>
-                <XCircle className="text-yellow-800 w-4.5 h-4.5" />
-              </button>
-            </Tooltip>}
-
+          <div className="w-full flex justify-end items-center h-full">
             <Tooltip title="View">
-              <Link to={`/properties/${params.id}`}>
-                <button className="h-fit mr-2 p-2 bg-gray-100 cursor-pointer rounded-sm">
+              <Link to={`/properties/view/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                <button className="h-fit mr-2 p-2 bg-gray-50 cursor-pointer rounded-sm">
                   <Eye className="text-gray-700 w-4.5 h-4.5" />
                 </button>
               </Link>
             </Tooltip>
             <Tooltip title="Edit">
-              <Link to={`/properties/${params.id}`}>
-                <button className="h-fit mr-2 p-2 bg-blue-100 cursor-pointer rounded-sm">
+              <Link to={`/properties/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                <button className="h-fit mr-2 p-2 bg-blue-50 cursor-pointer rounded-sm">
                   <Pencil className="text-blue-800 w-4.5 h-4.5" />
                 </button>
               </Link>
             </Tooltip>
             <Tooltip title="Delete">
-              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 p-2 bg-red-100 cursor-pointer rounded-sm">
+              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 p-2 bg-red-50 cursor-pointer rounded-sm">
                 <Trash2 className="text-red-800 w-4.5 h-4.5" />
               </button>
             </Tooltip>
 
           </div>
-          {/* {params.row.status != 'approved' && <Tooltip title="Approve">
-            <IconButton
-              onClick={() => handleOpenStatusPopup("approve", row.id)}
-            >
-              <CheckCircle size={18} />
-            </IconButton>
-          </Tooltip>}
-
-          {params.row.status != 'rejected' && <Tooltip title="Reject">
-            <IconButton
-              onClick={() => handleOpenStatusPopup("reject", params.id)}
-            >
-              <XCircle size={18} />
-            </IconButton>
-          </Tooltip>}
-
-          <Tooltip title="Edit">
-            <Link to={`/properties/${params.id}`}>
-              <IconButton>
-                <Pencil size={18} />
-              </IconButton>
-            </Link>
-          </Tooltip>
-          <Tooltip title="View">
-            <Link to={`/properties/view/${params.id}`}>
-              <IconButton>
-                <Eye size={18} />
-              </IconButton>
-            </Link>
-          </Tooltip>
-
-          <Tooltip title="Delete">
-            <IconButton
-              onClick={() => deleteProperty(params.id)}
-            >
-              <Trash2 size={18} />
-            </IconButton>
-          </Tooltip> */}
         </>
       ),
     }
@@ -152,20 +108,6 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
     });
   }, []);
 
-  const handleOpenStatusPopup = (type, id) => {
-    setApprovePopup(true)
-    setPopupType(type)
-    setPropertyId(id)
-  }
-
-  const closePopup = (isRefetch) => {
-    setApprovePopup(false)
-    setPopupType('')
-
-    if (isRefetch) {
-      fetchPropertyList()
-    }
-  }
 
   const { mutate: deleteProperty, isPending: deleteLoader } = useMutation({
     mutationFn: deletePropertyApiHandler,
@@ -223,8 +165,6 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
         rowCount={propertyData?.total || 0}
         style={{ height: "calc(100vh - 240px)" }}
       />
-
-      <ApproveRejectProperty open={approvePopup} popupType={popupType} onClose={closePopup} propertyId={propertyId} />
     </Paper>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
 import MainWrapper from "../../components/common/layout/mainWrapper"
 import PageTitle from "../../components/common/layout/PageTitle"
 import { decodeFilters } from "../../lib/helper";
@@ -34,7 +34,8 @@ const ChannelPartnerListing = () => {
         queryFn: () => channelPartnersListApiPayload({
             page: pagination.page,
             limit: pagination.limit,
-            role: "CHANNEL_PARTNER"
+            role: "CHANNEL_PARTNER",
+            search: search
         }),
         staleTime: 0,
     });
@@ -140,8 +141,16 @@ const ChannelPartnerListing = () => {
     }, [searchParams]);
 
     useEffect(() => {
-        fetchChannelPartners()
-    }, [pagination])
+    const delay = setTimeout(() => {
+      fetchChannelPartners({ page: pagination.page, limit: pagination.limit, search: search, role: "CHANNEL_PARTNER", })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
     const rows = useMemo(() => {
         if (!channelPartnerList?.data) return [];
@@ -160,7 +169,7 @@ const ChannelPartnerListing = () => {
 
     return (
         <MainWrapper>
-            <PageTitle title={"Channel Partners"} />
+            <PageTitle title={"Channel Partners"} isSearch searchValue={search} onSearchChange={handleSearch}/>
             <CustomDataGrid
                 columns={columns}
                 rows={rows}

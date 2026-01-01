@@ -36,6 +36,7 @@ const ChannelPartnerCode = () => {
             const payload = {
                 page: pagination.page,
                 limit: pagination.limit,
+                search
             };
 
             return channelPartnerCodesListApiPayload(payload);
@@ -67,9 +68,17 @@ const ChannelPartnerCode = () => {
         setConfirmationDialog(null);
     }
 
-    useEffect(() => {
-        fetchChannelPartnerCodes()
-    }, [pagination])
+useEffect(() => {
+    const delay = setTimeout(() => {
+      fetchChannelPartnerCodes({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
     const columns = [
         { field: "code", headerName: "Code", flex: 1 },
@@ -80,18 +89,18 @@ const ChannelPartnerCode = () => {
             width: 120,
             renderCell: (params) => (
                 <>
-                <div className="w-full flex justify-end items-center">
-                    <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
-                        <button className={`mr-3 py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
-                            <Trash className="text-red-800 w-4 h-4" />
-                        </button>
-                    </Tooltip>
+                <div className="w-full flex justify-end items-center h-full">
                     <Tooltip title="Edit">
                         <Link to={`/channel-partners/code/edit/${params.id}`} className="h-fit inline-block max-h-[50px]">
-                            <button className=" py-2 px-3 bg-blue-50 cursor-pointer rounded-sm">
+                            <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm">
                                 <Pencil className="text-blue-800 w-4.5 h-4.5" />
                             </button>
                         </Link>
+                    </Tooltip>
+                    <Tooltip title={"Delelte"}>
+                        <button className={`mr-3 py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
+                            <Trash className="text-red-800 w-4 h-4" />
+                        </button>
                     </Tooltip>
                 </div>
                 </>
@@ -165,7 +174,7 @@ const ChannelPartnerCode = () => {
 
     return (
         <MainWrapper>
-            <PageTitle title={"Channel Partner Codes"} actions={buttons} />
+            <PageTitle title={"Channel Partner Codes"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
             <CustomDataGrid
                 columns={columns}
                 rows={rows}

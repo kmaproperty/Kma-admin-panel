@@ -5,8 +5,9 @@ import {
   TableCell,
   TableBody,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Pencil, PlusIcon, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash, Trash2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
@@ -29,7 +30,7 @@ export default function BHKList() {
   });
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
-
+const [search, setSearch] = useState("");
 
   const handleDelete = async () => {
     handleDeleteBhk(confirmationDialog)
@@ -72,12 +73,18 @@ export default function BHKList() {
       width: 120,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleOpenPopup(params.id)}>
-            <Pencil className="w-4 h-4" />
-          </IconButton>
-          <IconButton onClick={() => setConfirmationDialog(params.id)}>
-            <Trash2 className="w-4 h-4" />
-          </IconButton>
+          <div className="w-full flex justify-end items-center h-full">
+            <Tooltip title="Edit">
+              <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm" onClick={() => handleOpenPopup(params.id)}>
+                <Pencil className="text-blue-800 w-4.5 h-4.5" />
+              </button>
+            </Tooltip>
+            <Tooltip title={"Delelte"}>
+              <button disabled={deleteLoader} className={` py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
+                <Trash className="text-red-800 w-4 h-4" />
+              </button>
+            </Tooltip>
+          </div>
         </>
       ),
     },
@@ -138,8 +145,16 @@ export default function BHKList() {
   };
 
   useEffect(() => {
-    fetchLatestBhk({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit]);
+    const delay = setTimeout(() => {
+      fetchLatestBhk({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const rows = useMemo(() => {
     if (!tableData) return [];
@@ -152,7 +167,7 @@ export default function BHKList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Socities"} actions={buttons} />
+      <PageTitle title={"BHK"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}

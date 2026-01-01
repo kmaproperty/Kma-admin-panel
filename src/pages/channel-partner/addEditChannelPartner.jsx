@@ -189,50 +189,50 @@ console.log('kycDetails?.step1_live_photo?.live_photo_url', kycDetails)
     setPopupType('')
   }
 
-  return (
-    <MainWrapper>
-      {isLoading ? (
-        <div
-          className="w-100 h-100 d-flex align-items-center justify-content-center"
-          style={{ background: "rgba(255,255,255,0.1)" }}
-        >
-          <CircularProgress />
-        </div>
-      ) : (
-        <>
-          <PageTitle title={`Edit Channel Partner`} />
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="bg-gray-50 w-[70%] px-5 py-4 rounded-lg space-y-3">
-              <div className="flex items-center gap-6">
-                <div className="mb-3 w-[48%]">
-                  <TextField
-                    control={control}
-                    name="name"
-                    label="Name"
-                    placeHolder="Enter name"
-                  />
-                </div>
-                <div className="mb-3 w-[48%]">
-                  <TextField
-                    control={control}
-                    name="email"
-                    label="Email"
-                    placeHolder="Enter email"
-                    type="email"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-6">
-                <div className="mb-3 w-[48%]">
-                  <TextField
-                    control={control}
-                    name="firmName"
-                    label="First Name"
-                    placeHolder="Enter firm name"
-                  />
-                </div>
-                <div className="mb-3 w-[48%]">
-                  {/* <DynamicSelectController
+    return (
+        <MainWrapper>
+            {
+                isLoading
+                    ? (
+                        <div className='w-100 h-100 d-flex align-items-center justify-content-center' style={{ background: "rgba(255,255,255,0.1)" }}>
+                            <CircularProgress />
+                        </div>
+                    )
+                    : (
+                        <>
+                            <PageTitle title={`Edit Channel Partner`} />
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <div className='bg-gray-50 w-[70%] px-5 py-4 rounded-lg space-y-3'>
+                                    <div className='flex items-center gap-6'>
+                                        <div className="mb-3 w-[48%]">
+                                            <TextField
+                                                control={control}
+                                                name="name"
+                                                label="Name"
+                                                placeHolder="Enter name"
+                                            />
+                                        </div>
+                                        <div className="mb-3 w-[48%]">
+                                            <TextField
+                                                control={control}
+                                                name="email"
+                                                label="Email"
+                                                placeHolder="Enter email"
+                                                type="email"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center gap-6'>
+                                        <div className="mb-3 w-[48%]">
+                                            <TextField
+                                                control={control}
+                                                name="firmName"
+                                                label="Firm Name"
+                                                placeHolder="Enter firm name"
+                                            />
+                                        </div>
+                                        <div className="mb-3 w-[48%]">
+                                            {/* <DynamicSelectController
                                                 name="cities"
                                                 control={control}
                                                 options={cities}
