@@ -148,7 +148,7 @@ export default function Sidebar() {
           })}
         </nav>
       </div>
-      <button onClick={logout} className="bg-gray-700 text-white w-full rounded-lg py-3 flex items-center justify-center gap-2 font-medium">
+      <button onClick={logout} className="bg-gray-700 cursor-pointer text-white w-full rounded-lg py-3 flex items-center justify-center gap-2 font-medium">
           <LogOut className="w-5 h-5" /> Logout
       </button>
     </div>

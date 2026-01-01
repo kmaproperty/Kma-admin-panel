@@ -117,7 +117,8 @@ const OwnersListingPage = () => {
             const payload = {
                 page: pagination.page,
                 limit: pagination.limit,
-                role: "OWNER"
+                role: "OWNER",
+                search
             };
 
             return channelPartnersListApiPayload(payload);
@@ -144,8 +145,16 @@ const OwnersListingPage = () => {
     }, []);
 
     useEffect(() => {
-        fetchOwners()
-    }, [pagination])
+    const delay = setTimeout(() => {
+      fetchOwners({ page: pagination.page, limit: pagination.limit, search: search, role: "OWNER", })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
     useEffect(() => {
         const query = searchParams.get("filters");
@@ -173,7 +182,7 @@ const OwnersListingPage = () => {
 
     return (
         <MainWrapper>
-            <PageTitle title={"Owners"} />
+            <PageTitle title={"Owners"} isSearch searchValue={search} onSearchChange={handleSearch} />
             <CustomDataGrid
                 columns={columns}
                 rows={rows}

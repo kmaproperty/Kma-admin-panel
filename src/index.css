@@ -35,3 +35,34 @@
 .MuiDataGrid-row .MuiDataGrid-cell:last-of-type{
   justify-content: flex-end;
 }
+.property-slider .swiper-button-next,
+.property-slider .swiper-button-prev {
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 9999px;
+  color: white;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.property-slider .swiper-button-next:hover,
+.property-slider .swiper-button-prev:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Change arrow icon size */
+.property-slider .swiper-button-next::after,
+.property-slider .swiper-button-prev::after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Position arrows inside */
+.property-slider .swiper-button-prev {
+  left: 10px;
+}
+
+.property-slider .swiper-button-next {
+  right: 10px;
+}

@@ -21,6 +21,7 @@ import CustomDataGrid from "../common/CustomDataGrid";
 import CustomDialog from "../common/CustomDialog";
 
 export default function CityList() {
+  const [search, setSearch] = useState("");
   const [tableData, setTableData] = useState([])
   const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
@@ -156,9 +157,17 @@ export default function CityList() {
       });
     }, []);
 
-  useEffect(() => {
-    fetchLatestCities({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit]);
+    useEffect(() => {
+    const delay = setTimeout(() => {
+      fetchLatestCities({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const rows = useMemo(() => {
       if (!tableData) return [];
@@ -175,7 +184,7 @@ export default function CityList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Aminities"} actions={buttons} />
+      <PageTitle title={"Cities"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}
@@ -212,83 +221,6 @@ export default function CityList() {
         />
       )}
     </MainWrapper>
-    // <div className="px-6 pb-6 bg-white rounded">
-    //   <div className="flex items-center justify-between my-4 border-b pb-3">
-    //     <h1 className="text-xl font-semibold text-gray-800">Cities</h1>
-
-    //     <AddButton handleClick={() => handleOpenPopup("")} title="Add City" />
-    //   </div>
-    //   <div className="overflow-x-auto border border-gray-200 rounded-lg">
-    //     <Table>
-    //       <TableHead>
-    //         <TableRow className="bg-gray-100">
-    //           {[
-    //             "Name",
-    //             "Code",
-    //             "State",
-    //             "Latitude",
-    //             "Longitude",
-    //             "Is Featured",
-    //             "Action",
-    //           ].map((head) => (
-    //             <TableCell
-    //               key={head}
-    //               className="font-semibold text-gray-700 whitespace-nowrap"
-    //               {...{ align: head == "Action" ? "right" : "left" }}
-    //             >
-    //               {head}
-    //             </TableCell>
-    //           ))}
-    //         </TableRow>
-    //       </TableHead>
-
-    //       <TableBody>
-    //         {tableData?.map((row) => (
-    //           <TableRow key={row.id}>
-    //             <TableCell>{row.name}</TableCell>
-    //             <TableCell>{row.code}</TableCell>
-    //             <TableCell>{row.state}</TableCell>
-    //             <TableCell>{row.latitude}</TableCell>
-    //             <TableCell>{row.longitude}</TableCell>
-    //             <TableCell>{row.isFeatured ? "Active" : "Inactive"}</TableCell>
-    //             <TableCell align="right">
-    //               <IconButton onClick={() => handleOpenPopup(row.id)}>
-    //                 <Pencil size={18} />
-    //               </IconButton>
-    //               <IconButton
-    //                 disabled={deleteLoader}
-    //                 onClick={() => handleDeleteCities(row.id)}
-    //               >
-    //                 <Trash2 size={18} />
-    //               </IconButton>
-    //             </TableCell>
-    //           </TableRow>
-    //         ))}
-    //       </TableBody>
-    //     </Table>
-    //   </div>
-
-    //   <div className="flex justify-center mt-4">
-    //     <CustomPagination
-    //       page={pagination.page}
-    //       totalPages={pagination.totalPage}
-    //       onChange={(value) => handlePagination(value)}
-    //     />
-    //   </div>
-
-    //   {openPopup && (
-    //     <CityDialog
-    //       open={openPopup}
-    //       cityID={editId}
-    //       onClose={(isUpdate) => {
-    //         setEditId(null);
-    //         setOpenPopup(false);
-    //         if (isUpdate) {
-    //           fetchLatestCities({page: pagination.page, limit: pagination.limit, search: ''});
-    //         }
-    //       }}
-    //     />
-    //   )}
-    // </div>
+    
   );
 }

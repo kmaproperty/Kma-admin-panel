@@ -22,6 +22,7 @@ import { format, parseISO, set } from "date-fns";
 import CustomDialog from "../common/CustomDialog";
 
 export default function FurnishingList() {
+  const [search, setSearch] = useState("");
   const [tableData, setTableData] = useState([])
   const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
@@ -33,6 +34,26 @@ export default function FurnishingList() {
   const [editId, setEditId] = useState(null);
 
   const columns = [
+    {
+      field: 'icon',
+      headerName: 'Icon',
+      width: 100,
+      renderCell: (params) => (
+        <div className="h-full flex items-center">
+            <img
+              className="object-cover rounded-lg"
+              style={{ height: "44px", width: "50px" }}
+              src={params.row.icon}
+              alt=""
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+              }}
+            />
+        </div>
+
+      )
+    },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "sortOrder", headerName: "Sort Order", flex: 1 },
     { field: "isActive", headerName: "Status", flex: 1 },
@@ -152,8 +173,16 @@ export default function FurnishingList() {
   }, []);
 
   useEffect(() => {
-    fetchLatestFurnisher({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit]);
+    const delay = setTimeout(() => {
+      fetchLatestFurnisher({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const rows = useMemo(() => {
     if (!tableData) return [];
@@ -161,6 +190,7 @@ export default function FurnishingList() {
       id: item.id,
       name: item.name,
       code: item.code,
+      icon: item.icon ? `${import.meta.env.VITE_AWS_URL}${item.icon}` : '',
       sortOrder: item.sortOrder,
       isActive: item.isActive ? "Yes" : "No",
       createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy')
@@ -169,7 +199,7 @@ export default function FurnishingList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Furnishing"} actions={buttons} />
+      <PageTitle title={"Furnishing"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}

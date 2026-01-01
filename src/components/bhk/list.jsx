@@ -30,7 +30,7 @@ export default function BHKList() {
   });
   const [openPopup, setOpenPopup] = useState(false);
   const [editId, setEditId] = useState(null);
-
+const [search, setSearch] = useState("");
 
   const handleDelete = async () => {
     handleDeleteBhk(confirmationDialog)
@@ -145,8 +145,16 @@ export default function BHKList() {
   };
 
   useEffect(() => {
-    fetchLatestBhk({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit]);
+    const delay = setTimeout(() => {
+      fetchLatestBhk({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const rows = useMemo(() => {
     if (!tableData) return [];
@@ -159,7 +167,7 @@ export default function BHKList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Socities"} actions={buttons} />
+      <PageTitle title={"BHK"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}

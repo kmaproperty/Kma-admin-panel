@@ -69,6 +69,7 @@ const CustomDataGrid = ({
               color: "#5d7186",
               fontSize: "14px",
               borderBottom: "1px solid #f1f5f9",
+              alignItems: "center"
             },
             "& .MuiDataGrid-columnSeparator": { display: "none" },
             "& .MuiDataGrid-row:hover": { backgroundColor: "#f1f5f9 !important" },

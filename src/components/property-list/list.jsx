@@ -32,16 +32,22 @@ import PageTitle from "../common/layout/PageTitle";
 
 export default function PropertiesTable({ propertyList, propertyData, fetchPropertyList, pagination, setPagination, isLoading }) {
 
-  const [approvePopup, setApprovePopup] = useState(false)
-  const [popupType, setPopupType] = useState('')
-  const [propertyId, setPropertyId] = useState(null)
-
   const columns = [
     {
       field: "img", headerName: "Image",
       renderCell: (params) => {
         return (
-          <img className='object-fit-cover' style={{ height: "50px", width: "60px" }} src={params.row.img} />
+          
+          <img
+          className="object-cover rounded-lg"
+          style={{ height: "44px", width: "50px" }}
+          src={params.row.img}
+          alt=""
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+          }}
+        />
         )
       }
     },
@@ -59,18 +65,6 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
       renderCell: (params) => (
         <>
           <div className="w-full flex justify-end items-center h-full">
-            {params.row.status != 'approved' && <Tooltip title="Approve">
-              <button className="h-fit mr-2 p-2 bg-green-50 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("approve", params.id)}>
-                <CheckCircle className="text-green-800 w-4.5 h-4.5" />
-              </button>
-            </Tooltip>}
-
-            {params.row.status != 'rejected' && <Tooltip title="Reject">
-              <button className="h-fit mr-2 p-2 bg-yellow-50 cursor-pointer rounded-sm" onClick={() => handleOpenStatusPopup("reject", params.id)}>
-                <XCircle className="text-yellow-800 w-4.5 h-4.5" />
-              </button>
-            </Tooltip>}
-
             <Tooltip title="View">
               <Link to={`/properties/view/${params.id}`} className="h-fit inline-block max-h-[50px]">
                 <button className="h-fit mr-2 p-2 bg-gray-50 cursor-pointer rounded-sm">
@@ -114,20 +108,6 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
     });
   }, []);
 
-  const handleOpenStatusPopup = (type, id) => {
-    setApprovePopup(true)
-    setPopupType(type)
-    setPropertyId(id)
-  }
-
-  const closePopup = (isRefetch) => {
-    setApprovePopup(false)
-    setPopupType('')
-
-    if (isRefetch) {
-      fetchPropertyList()
-    }
-  }
 
   const { mutate: deleteProperty, isPending: deleteLoader } = useMutation({
     mutationFn: deletePropertyApiHandler,
@@ -185,8 +165,6 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
         rowCount={propertyData?.total || 0}
         style={{ height: "calc(100vh - 240px)" }}
       />
-
-      <ApproveRejectProperty open={approvePopup} popupType={popupType} onClose={closePopup} propertyId={propertyId} />
     </Paper>
   );
 }

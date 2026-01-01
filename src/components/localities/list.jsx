@@ -21,6 +21,7 @@ import PageTitle from "../common/layout/PageTitle";
 import CustomDataGrid from "../common/CustomDataGrid";
 
 export default function LocalityList() {
+  const [search, setSearch] = useState("");
   const [tableData, setTableData] = useState([])
   const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
@@ -151,8 +152,16 @@ export default function LocalityList() {
   };
 
   useEffect(() => {
-    fetchLatestLocality({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit]);
+    const delay = setTimeout(() => {
+      fetchLatestLocality({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const rows = useMemo(() => {
     if (!tableData) return [];
@@ -166,7 +175,7 @@ export default function LocalityList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Socities"} actions={buttons} />
+      <PageTitle title={"Localities"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}

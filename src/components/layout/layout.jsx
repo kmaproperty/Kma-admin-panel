@@ -8,8 +8,8 @@ export default function Layout() {
       <Sidebar />
 
       {/* Main content */}
-      <div className="pr-5 pl-3 py-4 w-full h-full ">
-        <div className="flex flex-col flex-1 bg-white h-full rounded-2xl">
+      <div className="pr-5 pl-3 py-4 h-full " style={{width: "calc(100% - 304px)"}}>
+        <div className="flex flex-col flex-1 bg-white h-full rounded-2xl overflow-hidden">
             <main className="pr-6 overflow-y-auto flex-1">
             <Outlet />
             </main>

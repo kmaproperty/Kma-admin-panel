@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import MainWrapper from "../common/layout/mainWrapper";
 
 export default function AmenityList() {
+  const [search, setSearch] = useState("");
   const [tableData, setTableData] = useState([])
   const [confirmationDialog, setConfirmationDialog] = useState(false);
   const [pagination, setPagination] = useState({
@@ -34,6 +35,26 @@ export default function AmenityList() {
   const [editId, setEditId] = useState(null);
 
   const columns = [
+    {
+      field: 'icon',
+      headerName: 'Icon',
+      width: 100,
+      renderCell: (params) => (
+        <div className="h-full flex items-center">
+            <img
+              className="object-cover rounded-lg"
+              style={{ height: "44px", width: "50px" }}
+              src={params.row.icon}
+              alt=""
+              onError={(e) => {
+                e.currentTarget.src =
+                  "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+              }}
+            />
+        </div>
+
+      )
+    },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "sortOrder", headerName: "Sort Order", flex: 1 },
     { field: "isActive", headerName: "Is Active", flex: 1 },
@@ -46,9 +67,9 @@ export default function AmenityList() {
         <>
           <div className="w-full flex justify-end items-center h-full">
             <Tooltip title="Edit">
-                <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm" onClick={() => handleOpenPopup(params.id)}>
-                  <Pencil className="text-blue-800 w-4.5 h-4.5" />
-                </button>
+              <button className="mr-3 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm" onClick={() => handleOpenPopup(params.id)}>
+                <Pencil className="text-blue-800 w-4.5 h-4.5" />
+              </button>
             </Tooltip>
             <Tooltip title={"Delelte"}>
               <button disabled={deleteLoader} className={` py-2 px-3 bg-red-50 rounded-sm cursor-pointer `} onClick={() => setConfirmationDialog(params.id)}>
@@ -128,8 +149,17 @@ export default function AmenityList() {
   }, []);
 
   useEffect(() => {
-    fetchLatestAmenity({ page: pagination.page, limit: pagination.limit, search: '' })
-  }, [pagination.page, pagination.limit])
+    const delay = setTimeout(() => {
+      fetchLatestAmenity({
+        page: pagination.page,
+        limit: pagination.limit,
+        search,
+      });
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
 
   const { mutate: deleteAmenities, isPending: deleteLoader } = useMutation({
     mutationFn: deleteAmenity,
@@ -149,10 +179,9 @@ export default function AmenityList() {
     },
   });
 
-  const handlePagination = (value) => {
-    setPagination((pre) => ({ ...pre, page: value }));
-    fetchLatestAmenity({ page: value, limit: pagination.limit, search: '' })
-  };
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
   const handleOpenPopup = (id) => {
     setOpenPopup(true);
@@ -169,6 +198,7 @@ export default function AmenityList() {
       id: item.id,
       name: item.name,
       sortOrder: item.sortOrder,
+      icon: item.icon ? `${import.meta.env.VITE_AWS_URL}${item.icon}` : '',
       isActive: item.isActive ? "Yes" : "No",
       createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy')
     }));
@@ -176,7 +206,7 @@ export default function AmenityList() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Aminities"} actions={buttons} />
+      <PageTitle title={"Aminities"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
       <CustomDataGrid
         columns={columns}
         rows={rows}
@@ -186,7 +216,7 @@ export default function AmenityList() {
         page={pagination.page - 1}
         pageSize={pagination.limit}
         rowCount={pagination.totalPage}
-        style={{ height: "calc(100vh - 170px)" }}
+        style={{ height: "calc(100vh - 180px)" }}
       />
       <CustomDialog
         open={confirmationDialog ? true : false}

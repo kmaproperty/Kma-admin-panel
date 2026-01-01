@@ -36,6 +36,7 @@ const ChannelPartnerCode = () => {
             const payload = {
                 page: pagination.page,
                 limit: pagination.limit,
+                search
             };
 
             return channelPartnerCodesListApiPayload(payload);
@@ -67,9 +68,17 @@ const ChannelPartnerCode = () => {
         setConfirmationDialog(null);
     }
 
-    useEffect(() => {
-        fetchChannelPartnerCodes()
-    }, [pagination])
+useEffect(() => {
+    const delay = setTimeout(() => {
+      fetchChannelPartnerCodes({ page: pagination.page, limit: pagination.limit, search: search })
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, pagination.page, pagination.limit]);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
 
     const columns = [
         { field: "code", headerName: "Code", flex: 1 },
@@ -165,7 +174,7 @@ const ChannelPartnerCode = () => {
 
     return (
         <MainWrapper>
-            <PageTitle title={"Channel Partner Codes"} actions={buttons} />
+            <PageTitle title={"Channel Partner Codes"} actions={buttons} isSearch searchValue={search} onSearchChange={handleSearch} />
             <CustomDataGrid
                 columns={columns}
                 rows={rows}
