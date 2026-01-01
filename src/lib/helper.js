@@ -82,7 +82,7 @@ export const generateFloors = (count) => {
   const baseFloors = [
     { label: "-2", value: "-2" },
     { label: "-1", value: "-1" },
-    { label: "Ground", value: "Ground" },
+    { label: "Ground", value: "0" },
   ];
 
   if (!count) return baseFloors;
