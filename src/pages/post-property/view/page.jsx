@@ -144,7 +144,7 @@ export default function ViewProperty() {
 
                             </div>}
                         </div>
-                        <div className="my-3">
+                        <div className="my-3 ">
                             {Array.isArray(propertyDetails?.amenities) && propertyDetails?.amenities.length > 0 && <div >
                                 <p className="text-[18px] font-medium text-gray-800">Amenities :</p>
 

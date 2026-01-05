@@ -170,7 +170,7 @@ const AddEditChannelPartner = () => {
       })
     }
   }, [channelPartnerData]);
-console.log('kycDetails?.step1_live_photo?.live_photo_url', kycDetails)
+  console.log('kycDetails?.step1_live_photo?.live_photo_url', kycDetails)
   useEffect(() => {
     console.log(citiesData);
     if (citiesData?.data.length) {
@@ -189,218 +189,223 @@ console.log('kycDetails?.step1_live_photo?.live_photo_url', kycDetails)
     setPopupType('')
   }
 
-    return (
-        <MainWrapper>
-            {
-                isLoading
-                    ? (
-                        <div className='w-100 h-100 d-flex align-items-center justify-content-center' style={{ background: "rgba(255,255,255,0.1)" }}>
-                            <CircularProgress />
-                        </div>
-                    )
-                    : (
-                        <>
-                            <PageTitle title={`Edit Channel Partner`} />
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                <div className='bg-gray-50 w-[70%] px-5 py-4 rounded-lg space-y-3'>
-                                    <div className='flex items-center gap-6'>
-                                        <div className="mb-3 w-[48%]">
-                                            <TextField
-                                                control={control}
-                                                name="name"
-                                                label="Name"
-                                                placeHolder="Enter name"
-                                            />
-                                        </div>
-                                        <div className="mb-3 w-[48%]">
-                                            <TextField
-                                                control={control}
-                                                name="email"
-                                                label="Email"
-                                                placeHolder="Enter email"
-                                                type="email"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='flex items-center gap-6'>
-                                        <div className="mb-3 w-[48%]">
-                                            <TextField
-                                                control={control}
-                                                name="firmName"
-                                                label="Firm Name"
-                                                placeHolder="Enter firm name"
-                                            />
-                                        </div>
-                                        <div className="mb-3 w-[48%]">
-                                            {/* <DynamicSelectController
-                                                name="cities"
-                                                control={control}
-                                                options={cities}
-                                                label="Cities"
-                                                isMulti
-                                                placeholder="Select cities"
-                                                rules={{ required: "City is required" }}
-                                            /> */}
-                  <label className="text-sm font-semibold text-gray-700">
-                    Select cities
-                  </label>
-                  <DynamicAsyncAutocompleteController
-                    name="cities"
-                    control={control}
-                    isMulti={true}
-                    isError={false}
-                    placeholder={"Search city"}
-                    loadOptions={loadCities}
-                    minHeight={"34px"}
-                    changeStyle={true}
-                    rules={{ required: "City is required!" }}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-6">
-                <div className="mb-3 w-[48%]">
-                  <ControlledDatePicker
-                    name="businessSince"
-                    control={control}
-                    label="Business Since"
-                    rules={{ required: "Business Since is required" }}
-                    disableFuture
-                  />
-                </div>
-                <div className="mb-3 w-[48%]">
-                  <TextField
-                    control={control}
-                    name="aboutYourSelf"
-                    label="About YourSelf"
-                    placeHolder="Explain about yourself"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-6">
-                <div className="mb-3 w-[48%]">
-                  <DynamicSelectController
-                    name="isActive"
-                    control={control}
-                    options={[
-                      {
-                        label: "Yes",
-                        value: true,
-                      },
-                      {
-                        label: "No",
-                        value: false,
-                      },
-                    ]}
-                    label="Is Active"
-                    placeholder="Is Active"
-                    rules={{ required: "This field is required" }}
-                  />
-                </div>
-                <div className="mb-3 w-[48%]">
-                  <DynamicSelectController
-                    name="phoneVerified"
-                    control={control}
-                    options={[
-                      {
-                        label: "Yes",
-                        value: true,
-                      },
-                      {
-                        label: "No",
-                        value: false,
-                      },
-                    ]}
-                    label="Is Phone Verified"
-                    placeholder="Is Phone Verified"
-                    rules={{ required: "This field is required" }}
-                  />
-                </div>
-              </div>
-              <div className="mt-4 rounded flex gap-2 justify-end">
-                <button
-                  type="submit"
-                  className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-white rounded-md bg-gray-800"
-                  disabled={isSubmitting}
-                >
-                  Submit
-                </button>
-                <Link to="/channel-partners/">
-                  <button className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-gray-700 rounded-md bg-gray-300">
-                    Cancel
-                  </button>
-                </Link>
-              </div>
+  return (
+    <MainWrapper>
+      {
+        isLoading
+          ? (
+            <div className='w-100 h-100 d-flex align-items-center justify-content-center' style={{ background: "rgba(255,255,255,0.1)" }}>
+              <CircularProgress />
             </div>
-          </form>
-          {kycDetails?.step1_live_photo?.live_photo_url && <div className="mt-3">
-                <p className="text-base font-semibold">Profile Photo Approve</p>
+          )
+          : (
+            <>
+              <PageTitle title={`Edit Channel Partner`} />
+              <div className="flex gap-4 w-full">
+                <form onSubmit={handleSubmit(onSubmit)} className="w-[70%]">
+                  <div className='bg-gray-50 w-full px-5 py-4 rounded-lg space-y-3'>
+                    <div className='flex items-center gap-6'>
+                      <div className="mb-3 w-[48%]">
+                        <TextField
+                          control={control}
+                          name="name"
+                          label="Name"
+                          placeHolder="Enter name"
+                        />
+                      </div>
+                      <div className="mb-3 w-[48%]">
+                        <TextField
+                          control={control}
+                          name="email"
+                          label="Email"
+                          placeHolder="Enter email"
+                          type="email"
+                        />
+                      </div>
+                    </div>
+                    <div className='flex items-center gap-6'>
+                      <div className="mb-3 w-[48%]">
+                        <TextField
+                          control={control}
+                          name="firmName"
+                          label="Firm Name"
+                          placeHolder="Enter firm name"
+                        />
+                      </div>
+                      <div className="mb-3 w-[48%]">
+                        {/* <DynamicSelectController
+                                                  name="cities"
+                                                  control={control}
+                                                  options={cities}
+                                                  label="Cities"
+                                                  isMulti
+                                                  placeholder="Select cities"
+                                                  rules={{ required: "City is required" }}
+                                              /> */}
+                        <label className="text-sm font-semibold text-gray-700">
+                          Select cities
+                        </label>
+                        <DynamicAsyncAutocompleteController
+                          name="cities"
+                          control={control}
+                          isMulti={true}
+                          isError={false}
+                          placeholder={"Search city"}
+                          loadOptions={loadCities}
+                          minHeight={"34px"}
+                          changeStyle={true}
+                          rules={{ required: "City is required!" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="mb-3 w-[48%]">
+                        <ControlledDatePicker
+                          name="businessSince"
+                          control={control}
+                          label="Business Since"
+                          rules={{ required: "Business Since is required" }}
+                          disableFuture
+                        />
+                      </div>
+                      <div className="mb-3 w-[48%]">
+                        <TextField
+                          control={control}
+                          name="aboutYourSelf"
+                          label="About YourSelf"
+                          placeHolder="Explain about yourself"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="mb-3 w-[48%]">
+                        <DynamicSelectController
+                          name="isActive"
+                          control={control}
+                          options={[
+                            {
+                              label: "Yes",
+                              value: true,
+                            },
+                            {
+                              label: "No",
+                              value: false,
+                            },
+                          ]}
+                          label="Is Active"
+                          placeholder="Is Active"
+                          rules={{ required: "This field is required" }}
+                        />
+                      </div>
+                      <div className="mb-3 w-[48%]">
+                        <DynamicSelectController
+                          name="phoneVerified"
+                          control={control}
+                          options={[
+                            {
+                              label: "Yes",
+                              value: true,
+                            },
+                            {
+                              label: "No",
+                              value: false,
+                            },
+                          ]}
+                          label="Is Phone Verified"
+                          placeholder="Is Phone Verified"
+                          rules={{ required: "This field is required" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4 rounded flex gap-2 justify-end">
+                      <button
+                        type="submit"
+                        className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-white rounded-md bg-gray-800"
+                        disabled={isSubmitting}
+                      >
+                        Submit
+                      </button>
+                      <Link to="/channel-partners/">
+                        <button className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-gray-700 rounded-md bg-gray-300">
+                          Cancel
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </form>
+                <div className="bg-[#f6f6ff] p-4 rounded-2xl w-[30%]">
+                  {kycDetails?.step1_live_photo?.live_photo_url && <div className="mt-3">
+                    <p className="text-[18px] mb-5 font-semibold text-center text-gray-700">Profile Photo Approve</p>
 
-                <div className="flex flex-col items-center gap-3">
-                <img
-                    src={imageUrl + kycDetails?.step1_live_photo?.live_photo_url}
-                    alt="Preview"
-                    className="w-48 h-48 object-cover rounded-xl border"
-                />
-                </div>
-                <div className="mt-4 rounded flex gap-2 justify-end">
-                <button
-                    onClick={() => {
+                    <div className="flex flex-col items-center gap-3">
+                      <img
+                        src={imageUrl + kycDetails?.step1_live_photo?.live_photo_url}
+                        alt="Preview"
+                        className="w-48 h-48 object-cover rounded-xl border"
+                      />
+                    </div>
+                    <div className="mt-6 rounded flex gap-2 justify-center">
+                      <button
+                        onClick={() => {
+                          setApprovePopup(true)
+                          setPopupType('approve')
+                        }}
+                        type="button"
+                        className="px-4 flex gap-1 font-semibold text-sm items-center cursor-pointer py-2 text-white rounded-md bg-green-700"
+                        disabled={isSubmitting}
+                      >
+                        Approve
+                      </button>
+
+                      <button onClick={() => {
                         setApprovePopup(true)
-                        setPopupType('approve')
-                    }}
-                  type="button"
-                  className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-white rounded-md bg-gray-800"
-                  disabled={isSubmitting}
-                >
-                  Approve
-                </button>
-                
-                  <button onClick={() => {
-                    setApprovePopup(true)
                         setPopupType('reject')
-                  }} type="button" className="px-4 flex gap-1 font-semibold items-center cursor-pointer py-2 text-gray-700 rounded-md bg-gray-300">
-                    Reject  
-                  </button>
-                
-              </div>
-          </div>}
+                      }} type="button" className="px-4 flex gap-1 font-semibold text-sm items-center cursor-pointer py-2 text-white rounded-md bg-red-700">
+                        Reject
+                      </button>
 
-          {kycDetails?.bankDetails &&
-            <div className="mt-3">
-              <p className="text-base font-semibold">Bank Details</p>
+                    </div>
+                  </div>}
+                </div>
+              </div>
+              <div className="flex gap-6 mt-3">
+                {kycDetails?.bankDetails &&
+                  <div className="mt-3 w-[50%] shadow-lg bg-gray-50 px-5 py-4 rounded-lg">
+                    <p className="text-base font-semibold text-gray-700 mb-2">Bank Details</p>
 
-              <div className="flex  gap-3 py-2">
-                <p>Account Holder Name:</p>
-                <p>{kycDetails?.bankDetails?.account_holder_name}</p>
-              </div>
-              <div className="flex  gap-3 py-2">
-                <p>Account Number:</p>
-                <p>{kycDetails?.bankDetails?.account_number}</p>
-              </div>
-              <div className="flex  gap-3 py-2">
-                <p>Bank Name:</p>
-                <p>{kycDetails?.bankDetails?.bank_name}</p>
-              </div>
-              <div className="flex  gap-3 py-2">
-                <p>IFSC Number:</p>
-                <p>{kycDetails?.bankDetails?.ifsc_code}</p>
-              </div>
-            </div>
-          }
+                    <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Account Holder Name:</p>
+                      <p className="text-gray-500">{kycDetails?.bankDetails?.account_holder_name}</p>
+                    </div>
+                    <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Account Number:</p>
+                      <p className="text-gray-500">{kycDetails?.bankDetails?.account_number}</p>
+                    </div>
+                    <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Bank Name:</p>
+                      <p className="text-gray-500">{kycDetails?.bankDetails?.bank_name}</p>
+                    </div>
+                    <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">IFSC Number:</p>
+                      <p className="text-gray-500">{kycDetails?.bankDetails?.ifsc_code}</p>
+                    </div>
+                  </div>
+                }
 
-          {kycDetails?.step2_aadhaar?.aadhaar_verified &&
-            <div className="mt-3">
-              <p className="text-base font-semibold">Aadhar Details</p>
+                {kycDetails?.step2_aadhaar?.aadhaar_verified &&
+                  <div className="mt-3 w-[50%] shadow-lg bg-gray-50 px-5 py-4 rounded-lg ">
+                    <p className="text-base font-semibold text-gray-700 mb-2">Aadhar Details</p>
 
-              <div className="flex  gap-3 py-2">
-                <p>Aadhar Card Number:</p>
-                <p>{kycDetails?.step2_aadhaar?.aadhaar_number}</p>
+                    <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Aadhar Card Number:</p>
+                      <p className="text-gray-500">{kycDetails?.step2_aadhaar?.aadhaar_number}</p>
+                    </div>
+                  </div>
+                }
               </div>
-            </div>
-          }
-        </>
-      )}
-            <ApproveRejectProfilePhoto open={approvePopup} popupType={popupType} onClose={closePopup} userId={params.id} />
+            </>
+          )}
+      <ApproveRejectProfilePhoto open={approvePopup} popupType={popupType} onClose={closePopup} userId={params.id} />
     </MainWrapper>
   );
 };
