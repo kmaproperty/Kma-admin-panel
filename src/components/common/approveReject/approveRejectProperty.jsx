@@ -4,7 +4,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { Dialog, InputBase } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { approvePropertyApiHandler, rejectPropertyApiHandler } from "../../../services/postProperty";
+import { approvePropertyApiHandler, rejectPropertyApiHandler, verifyPropertyApiHandler } from "../../../services/postProperty";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -20,8 +20,8 @@ export default function ApproveRejectProperty({
   const [fieldValue, setFieldValue] = React.useState("");
   const [error, setError] = React.useState("");
 
-  const label = popupType == 'approve' ? 'Approve Property' : 'Reject Property'
-  const buttonLabel = popupType == 'approve' ? 'Approve' : 'Reject'
+  const label = popupType == 'approve' ? 'Approve Property' : popupType == 'reject' ? 'Reject Property' : 'Verify Property'
+  const buttonLabel = popupType == 'approve' ? 'Approve' : popupType == 'reject' ? 'Reject' : 'Verify'
 
   const handleClose = (event, reason) => {
     if (reason === "backdropClick" || reason === "escapeKeyDown") return;
@@ -63,6 +63,23 @@ if(Array.isArray(error.message)){
     }
   })
 
+  const {mutate: verifyProperty, isPending: verifyloader} = useMutation({
+    mutationFn: verifyPropertyApiHandler,
+    onSuccess: (res) => {
+        toast.success(res.message)
+        onClose(true)
+    },
+    onError: (error) => {
+if(Array.isArray(error.message)){
+        error.message.map((item) => {
+          toast.error(item)
+        })
+      }else{
+        toast.error(error.message)
+      }
+    }
+  })
+
   const handleSubmit = () => {
     if (!fieldValue.trim()) {
       setError(`comment is required`);
@@ -70,8 +87,10 @@ if(Array.isArray(error.message)){
     }
       if(popupType == 'approve'){
         approveProperty({id: propertyId, comment:fieldValue})
-      }else{
+      }else if(popupType == 'reject'){
         rejectProperty({id: propertyId, comment:fieldValue})
+      }else{
+        verifyProperty({id: propertyId, comment:fieldValue})
       }
     
   };
@@ -136,7 +155,7 @@ if(Array.isArray(error.message)){
               </div>
               <div className="pt-4 flex justify-start flex-col md:flex-row gap-4 items-center w-full">
                 <button
-                  disabled={rejectLoader || approveLoader}
+                  disabled={rejectLoader || approveLoader || verifyloader}
                   onClick={handleSubmit}
                   className="w-full animated-button px-12 py-3 border border-blue text-center cursor-pointer"
                 >

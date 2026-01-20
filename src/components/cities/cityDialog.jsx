@@ -13,7 +13,8 @@ import {
   fetchCitiesById,
   updateCities,
 } from "../../services/cities";
-import { X } from "lucide-react";
+import { UploadCloud, X } from "lucide-react";
+import { getFileUploadUrlApiHandler, uploadFileToS3ApiHandler } from "../../services/masterService";
 
 export default function CityDialog({ open, onClose, cityID }) {
   const [form, setForm] = useState({
@@ -23,9 +24,77 @@ export default function CityDialog({ open, onClose, cityID }) {
     latitude: "",
     longitude: "",
     isFeatured: true,
+    icon: null,
   });
 
+  const [preview, setPreview] = useState(null);
+
   const isEdit = Boolean(cityID);
+
+  const handleFile = (file) => {
+      if (!file) return;
+      setForm((p) => ({ ...p, icon: file }));
+      setPreview(URL.createObjectURL(file));
+    };
+
+   const handleDrop = (e) => {
+    e.preventDefault();
+    handleFile(e.dataTransfer.files[0]);
+  };
+
+  const handleRemove = () => {
+    setForm((p) => ({ ...p, icon: null }));
+    setPreview(null);
+  };
+
+  const { mutate: handleFileUpload } = useMutation({
+      mutationFn: async (payload) => {
+        return await uploadFileToS3ApiHandler(payload);
+      },
+      onSuccess: (response) => {},
+      onError: (error) => {
+        console.log("file upload s3 api", error);
+        if (Array.isArray(error.message)) {
+          error.message.map((item) => {
+            toast.error(item);
+          });
+        } else {
+          toast.error(error.message);
+        }
+      },
+    });
+  
+    const { mutate: handleGetFileUrl, isPending: ownerLoader } = useMutation({
+      mutationFn: async (payload) => {
+        return await getFileUploadUrlApiHandler(payload);
+      },
+      onSuccess: (response) => {
+        if (response.success) {
+          handleFileUpload({ url: response.data.url, file: form.icon });
+        }
+  
+        let payload = {
+          name: form.name,
+          code: form.code,
+          state: form.state,
+          longitude: form.longitude,
+          latitude: form.latitude,
+          isFeatured: form.isFeatured,
+          icon: response.data.key
+        };
+      submitFurnishing(payload);
+      },
+      onError: (error) => {
+        console.log("get file url api", error);
+        if (Array.isArray(error.message)) {
+          error.message.map((item) => {
+            toast.error(item);
+          });
+        } else {
+          toast.error(error.message);
+        }
+      },
+    });
 
   const { data: citiesData } = useQuery({
     queryKey: ["city-details", cityID],
@@ -61,20 +130,30 @@ export default function CityDialog({ open, onClose, cityID }) {
   const handleChange = (key, value) => setForm((p) => ({ ...p, [key]: value }));
 
   const handleSubmit = () => {
-    let payload = {
+    if(form.icon && form.icon instanceof File){
+      handleGetFileUrl({
+        contentType: form.icon.type,
+        filename: form.icon.name,
+        expiresIn: 3600,
+        folder: import.meta.env.VITE_AWS_FOLDER,
+      })
+    }else{
+      let payload = {
       name: form.name,
       code: form.code,
       state: form.state,
       longitude: form.longitude,
       latitude: form.latitude,
       isFeatured: form.isFeatured,
+      icon: form.icon
     };
     submitFurnishing(payload);
+    }
+    
   };
 
   useEffect(() => {
     if (citiesData) {
-      console.log("citiesData", citiesData);
       setForm((pre) => ({
         ...pre,
         code: citiesData.data.code,
@@ -83,7 +162,14 @@ export default function CityDialog({ open, onClose, cityID }) {
         latitude: citiesData.data.latitude,
         longitude: citiesData.data.longitude,
         isFeatured: citiesData.data.isFeatured,
+        icon: citiesData.data.icon
       }));
+
+      if(citiesData.data.icon){
+        setPreview(
+          `${import.meta.env.VITE_AWS_URL}${citiesData.data.icon}`
+        );
+      }
     }
   }, [citiesData]);
 
@@ -163,6 +249,44 @@ export default function CityDialog({ open, onClose, cityID }) {
             value={form.longitude}
             onChange={(e) => handleChange("longitude", e.target.value)}
           />
+
+          <label
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            className="group border-2 border-dashed border-gray-300
+                     rounded-xl p-6 flex flex-col items-center
+                     cursor-pointer text-center
+                     hover:border-indigo-500 hover:bg-indigo-50
+                     transition"
+          >
+            <UploadCloud className="text-gray-400 group-hover:text-indigo-600" />
+            <span className="text-sm text-gray-600 mt-2">
+              Drag & drop or click to upload
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => handleFile(e.target.files[0])}
+            />
+          </label>
+
+          {preview && (
+            <div className="relative w-24 h-24 mx-auto">
+              <img
+                src={preview}
+                alt="preview"
+                className="w-full h-full object-cover rounded-lg rounded"
+              />
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
 
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">

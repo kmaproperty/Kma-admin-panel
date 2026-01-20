@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
-import { getPropertyDetailsApiHandler } from "../../../services/postProperty";
-import { useQuery } from "@tanstack/react-query";
+import { getPropertyDetailsApiHandler, markTopPropertiesApiHandler, removeTopPropertiesApiHandler } from "../../../services/postProperty";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { MapPin, Sofa, Bath, Grid2x2, CircleCheck, Wallet, IndianRupee, SquareArrowOutUpRight, Instagram, Mail, Phone, CheckCircle, XCircle } from 'lucide-react'
 import PageTitle from "../../../components/common/layout/PageTitle";
 import PropertyMediaSlider from "./propertyMediaSlider";
@@ -8,6 +8,7 @@ import { Avatar } from "@mui/material";
 import { deepOrange, indigo } from '@mui/material/colors';
 import ApproveRejectProperty from "../../../components/common/approveReject/approveRejectProperty";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 
 export default function ViewProperty() {
@@ -23,13 +24,66 @@ export default function ViewProperty() {
         setPropertyId(id)
     }
 
+    
+const {mutate: markAstopProperty, isPending: topPropertyLaoder} = useMutation({
+    mutationFn: markTopPropertiesApiHandler,
+    onSuccess: (res) => {
+        toast.success(res.message)
+        refetchDetails()
+    },
+    onError: (error) => {
+        if(Array.isArray(error.message)){
+        error.message.map((item) => {
+          toast.error(item)
+        })
+      }else{
+        toast.error(error.message)
+      }
+    }
+  })
+
+  const {mutate: removeFromTopProperty, isPending: removeTopPropertyLaoder} = useMutation({
+    mutationFn: removeTopPropertiesApiHandler,
+    onSuccess: (res) => {
+        toast.success(res.message)
+        refetchDetails()
+    },
+    onError: (error) => {
+        if(Array.isArray(error.message)){
+        error.message.map((item) => {
+          toast.error(item)
+        })
+      }else{
+        toast.error(error.message)
+      }
+    }
+  })
+    
+
+    const { data: propertyDetails, refetch: refetchDetails } = useQuery({
+        queryKey: ["property-details", params?.propertyId],
+        queryFn: async () => {
+            return getPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
+        },
+        select: (resposne) => {
+            console.log('property details', resposne)
+            return resposne.data
+        },
+        enabled: params?.propertyId ? true : false,
+        staleTime: 0,
+        refetchOnMount: true
+    });
+
     const closePopup = (isRefetch) => {
+        if(isRefetch){
+            refetchDetails()
+        }
         setApprovePopup(false)
         setPopupType('')
         setPropertyId(null)
     }
 
-    const buttons = [
+    let buttons = [
         {
             label: 'Approve',
             type: "success",
@@ -48,20 +102,38 @@ export default function ViewProperty() {
         },
     ];
 
-    const { data: propertyDetails } = useQuery({
-        queryKey: ["property-details", params?.propertyId],
-        queryFn: async () => {
-            return getPropertyDetailsApiHandler(String(params?.propertyId ?? ''));
-        },
-        select: (resposne) => {
-            console.log('property details', resposne)
-            return resposne.data
-        },
-        enabled: params?.propertyId ? true : false,
-        staleTime: 0,
-        refetchOnMount: true
-    });
+    if(propertyDetails?.status == 'active'){
+        buttons = [...buttons , {
+                label: 'Verify',
+                type: 'success',
+                icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
+                onClick: () => {
+                    handleOpenStatusPopup('verify', params.propertyId);
+                    markAstopProperty()
 
+                },
+                }]
+    }
+
+    if(propertyDetails?.isTop){
+        buttons = [...buttons , {
+                label: 'Remove form top properties',
+                type: 'danger',
+                icon: <XCircle className="text-red-700 w-4.5 h-4.5" />,
+                onClick: () => {
+                    removeFromTopProperty({id: params.propertyId})
+                },
+                }]
+    }else{
+        buttons = [...buttons , {
+                label: 'Add to top properties',
+                type: 'success',
+                icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
+                onClick: () => {
+                    markAstopProperty({id: params.propertyId})
+                },
+                }]
+    }
 
     return (
         <div className="pl-6 py-3 pb-8 flex justify-start gap-3 flex-col ">

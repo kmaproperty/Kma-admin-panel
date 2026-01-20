@@ -109,7 +109,7 @@ export const unblockUserApi = async (id) => {
 
 export const approveRejectProfilePhotoApi = async ({payload,id}) => {
   try {
-    const response = await axiosInstance.post(`/admin/users/${id}/approve-live-photo`, payload);
+    const response = await axiosInstance.post(`/admin/users/${id}/approve-kyc`, payload);
     return response.data;
   } catch (error) {
     throw error.response?.data ?? error;

@@ -21,6 +21,7 @@ import AdminList from "../pages/admin/page.jsx";
 import PermissionList from "../pages/permissions/page.jsx";
 import AddEditAdmin from "../pages/admin/AddEditAdmin.jsx";
 import ViewProperty from "../pages/post-property/view/page.jsx";
+import AboutUSConfiguration from "../pages/masterConfiguration/index.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
           { path: '/socities', element: <Socities /> },
           { path: '/localities', element: <Localities /> },
           { path: '/bhk', element: <BHk /> },
+          { path: '/aboutus-configuration', element: <AboutUSConfiguration /> },
         ],
       },
     ],
