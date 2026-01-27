@@ -109,8 +109,6 @@ const {mutate: markAstopProperty, isPending: topPropertyLaoder} = useMutation({
                 icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
                 onClick: () => {
                     handleOpenStatusPopup('verify', params.propertyId);
-                    markAstopProperty()
-
                 },
                 }]
     }

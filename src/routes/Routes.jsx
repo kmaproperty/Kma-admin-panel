@@ -23,6 +23,8 @@ import AddEditAdmin from "../pages/admin/AddEditAdmin.jsx";
 import ViewProperty from "../pages/post-property/view/page.jsx";
 import AboutUSConfiguration from "../pages/masterConfiguration/index.jsx";
 import PropertyPhotoType from "../pages/propertyPhotoType/index.jsx";
+import VerifyPropertyList from "../pages/propety-verify/index.jsx";
+import ViewVerifyProperty from "../pages/propety-verify/view/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -38,7 +40,9 @@ export const router = createBrowserRouter([
         children: [
           { path: "/", element: <Dashbaord /> },
           { path: '/properties', element: <PropertyList /> },
+          { path: '/verify-property', element: <VerifyPropertyList /> },
           { path: '/properties/:propertyId', element: <PostProperty /> },
+          { path: '/verify-property/:propertyId', element: <ViewVerifyProperty /> },
           { path: '/properties/view/:propertyId', element: <ViewProperty /> },
           { path: '/channel-partners', element: <ChannelPartnerListing /> },
           { path: '/channel-partners/edit/:id', element: <AddEditChannelPartner /> },

@@ -44,7 +44,7 @@ const CustomDialog = ({
               onClick={handleClose}
               size="small"
             >
-              <X width={4} height={4} />
+              <X width={20} height={20} />
             </IconButton>
           )}
         </DialogTitle>
