@@ -99,6 +99,11 @@ export default function AboutUsData() {
       </div>
 
       <div className="flex gap-3 items-center">
+        <p className="text-sm text-text-black">Email Address:</p>
+        <p className="text-sm text-blue">{aboutusData?.email ?? '-'}</p>
+      </div>
+
+      <div className="flex gap-3 items-center">
         <p className="text-sm text-text-black">Latitude:</p>
         <p className="text-sm text-blue">{aboutusData?.latitude ?? '-'}</p>
       </div>

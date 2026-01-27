@@ -23,6 +23,7 @@ export default function AboutsusDialog({ open, onClose, aboutusId }) {
     mobileAppAvailable: false,
     description: '',
     phoneNumber: "",
+    email: '',
     address: '',
     latitude: "",
     longitude: "",
@@ -75,6 +76,7 @@ export default function AboutsusDialog({ open, onClose, aboutusId }) {
        mobileAppAvailable: form.mobileAppAvailable,
       description: form.description,
       phoneNumber: form.phoneNumber,
+      email: form.email,
       address: form.address,
       latitude: form.latitude,
       longitude: form.longitude,
@@ -94,6 +96,7 @@ export default function AboutsusDialog({ open, onClose, aboutusId }) {
         mobileAppAvailable: aboutsUdData.mobileAppAvailable,
         description: aboutsUdData.description,
         phoneNumber: aboutsUdData.phoneNumber,
+        email: aboutsUdData.email,
         address: aboutsUdData.address,
         latitude: aboutsUdData.latitude,
         longitude: aboutsUdData.longitude,
@@ -143,6 +146,18 @@ export default function AboutsusDialog({ open, onClose, aboutusId }) {
                      transition"
             value={form.phoneNumber}
             onChange={(e) => handleChange("phoneNumber", e.target.value)}
+          />
+
+          <label className="text-sm font-semibold text-gray-700">
+            Email
+          </label>
+          <InputBase
+            placeholder="Email"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 mt-1
+                     focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200
+                     transition"
+            value={form.email}
+            onChange={(e) => handleChange("email", e.target.value)}
           />
 
             <label className="text-sm font-semibold text-gray-700">

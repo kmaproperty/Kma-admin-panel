@@ -22,6 +22,7 @@ import PermissionList from "../pages/permissions/page.jsx";
 import AddEditAdmin from "../pages/admin/AddEditAdmin.jsx";
 import ViewProperty from "../pages/post-property/view/page.jsx";
 import AboutUSConfiguration from "../pages/masterConfiguration/index.jsx";
+import PropertyPhotoType from "../pages/propertyPhotoType/index.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
           { path: '/localities', element: <Localities /> },
           { path: '/bhk', element: <BHk /> },
           { path: '/aboutus-configuration', element: <AboutUSConfiguration /> },
+          { path: '/property-photo-type', element: <PropertyPhotoType /> },
         ],
       },
     ],

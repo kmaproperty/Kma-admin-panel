@@ -21,6 +21,7 @@ export const navLinks = [
             { name: "Socities List", path: "/socities", icon: <Logs className="w-5 h-5" /> },
             { name: "Localities List", path: "/localities", icon: <Logs className="w-5 h-5" /> },
             { name: "BHK List", path: "/bhk", icon: <Logs className="w-5 h-5" /> },
+            { name: "Property Photo/Video Type List", path: "/property-photo-type", icon: <Logs className="w-5 h-5" /> },
         ],
     },
     {
