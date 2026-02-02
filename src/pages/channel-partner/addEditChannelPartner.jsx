@@ -400,6 +400,22 @@ const AddEditChannelPartner = () => {
                       <p className="text-gray-700 font-medium">Aadhar Card Number:</p>
                       <p className="text-gray-500">{kycDetails?.step2_aadhaar?.aadhaar_number}</p>
                     </div>
+                     <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Name:</p>
+                      <p className="text-gray-500">{kycDetails?.step2_aadhaar?.digilocker_metadata?.name}</p>
+                    </div>
+                     <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Mobile Number:</p>
+                      <p className="text-gray-500">{kycDetails?.step2_aadhaar?.digilocker_metadata?.mobile_number}</p>
+                    </div>
+                     <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Gender:</p>
+                      <p className="text-gray-500">{kycDetails?.step2_aadhaar?.digilocker_metadata?.gender}</p>
+                    </div>
+                     <div className="flex  gap-3 py-2 text-[15px]">
+                      <p className="text-gray-700 font-medium">Date Of Birth:</p>
+                      <p className="text-gray-500">{kycDetails?.step2_aadhaar?.digilocker_metadata?.dob}</p>
+                    </div>
                   </div>
                 }
               </div>
