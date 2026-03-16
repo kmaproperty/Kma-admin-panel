@@ -25,6 +25,7 @@ import AboutUSConfiguration from "../pages/masterConfiguration/index.jsx";
 import PropertyPhotoType from "../pages/propertyPhotoType/index.jsx";
 import VerifyPropertyList from "../pages/propety-verify/index.jsx";
 import ViewVerifyProperty from "../pages/propety-verify/view/page.jsx";
+import ContactUsList from "../pages/contact-us/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
           { path: '/bhk', element: <BHk /> },
           { path: '/aboutus-configuration', element: <AboutUSConfiguration /> },
           { path: '/property-photo-type', element: <PropertyPhotoType /> },
+          { path: '/contact-us', element: <ContactUsList /> },
         ],
       },
     ],
