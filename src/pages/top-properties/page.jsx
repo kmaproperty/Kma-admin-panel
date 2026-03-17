@@ -184,14 +184,25 @@ export default function TopProperties() {
 
   const rows = useMemo(() => {
     if (!tableData) return [];
-    return tableData.map((item) => ({
-      id: item.id,
-      propertyName: item.propertyName || item.title || "-",
-      address: item.address || "-",
-      price: formatPrice(item.price),
-      status: item.status || "-",
-      isTop: item.isTop,
-    }));
+    return tableData.map((item) => {
+      const society = item.society?.name || "";
+      const locality = item.locality?.name || "";
+      const city = item.city?.name || "";
+      const propertyType = item.propertyType?.name || "";
+      const bhk = item.bhkType?.name || "";
+      const name = [bhk, propertyType, society].filter(Boolean).join(" - ") || item.propertyName || "-";
+      const address = [society, locality, city].filter(Boolean).join(", ") || "-";
+      const price = item.price || item.monthlyRent;
+
+      return {
+        id: item.id,
+        propertyName: name,
+        address,
+        price: price ? formatPrice(price) + (item.monthlyRent && !item.price ? "/mo" : "") : "-",
+        status: item.status || "-",
+        isTop: item.isTop,
+      };
+    });
   }, [tableData]);
 
   return (
