@@ -39,7 +39,7 @@ export default function TopProperties() {
           totalPage: data.total,
         }));
       }
-      setTableData(data?.properties ?? []);
+      setTableData(data?.data ?? data?.properties ?? []);
     },
     onError: () => {
       toast.error("Failed to load properties");
