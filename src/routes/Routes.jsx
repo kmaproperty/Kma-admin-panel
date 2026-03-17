@@ -26,6 +26,8 @@ import PropertyPhotoType from "../pages/propertyPhotoType/index.jsx";
 import VerifyPropertyList from "../pages/propety-verify/index.jsx";
 import ViewVerifyProperty from "../pages/propety-verify/view/page.jsx";
 import ContactUsList from "../pages/contact-us/page.jsx";
+import AboutUsPage from "../pages/about-us/page.jsx";
+import TopPropertiesPage from "../pages/top-properties/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -65,6 +67,8 @@ export const router = createBrowserRouter([
           { path: '/aboutus-configuration', element: <AboutUSConfiguration /> },
           { path: '/property-photo-type', element: <PropertyPhotoType /> },
           { path: '/contact-us', element: <ContactUsList /> },
+          { path: '/about-us', element: <AboutUsPage /> },
+          { path: '/top-properties', element: <TopPropertiesPage /> },
         ],
       },
     ],
