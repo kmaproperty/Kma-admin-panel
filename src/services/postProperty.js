@@ -136,9 +136,7 @@ export const resetPostPropertyApiHandler = async (paylaod) => {
 export const propertyEditAsAdminAPiPayload = async (paylaod) => {
     try{
         const response = await axiosInstance.patch(
-      "admin/properties/" + paylaod.id, {
-        data: paylaod.data
-      });
+      "admin/properties/" + paylaod.id, paylaod.data);
     return response.data;
     }catch(error){
         throw error.response?.data ?? error;
