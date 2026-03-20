@@ -64,15 +64,15 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-76 px-5 py-8 h-full flex flex-col bg-gray-900 justify-between">
-      <div className="w-full flex flex-col">
+    <div className="w-76 pl-5 pr-2 py-8 flex flex-col bg-gray-900 justify-between h-full gap-5 ">
+      <div className="w-full flex flex-col max-h-full overflow-y-auto scroll">
         <div className="text-2xl font-bold">
           <img src="/assets/KMALogo.svg" alt="logo" className="w-26" />
         </div>
 
         <p className="text-gray-500 text-xs mt-8 font-bold uppercase">Menu</p>
 
-        <nav className="flex-1 py-4 space-y-3">
+        <nav className="flex-1 py-4 space-y-3 pr-3">
           {navLinks.map((link) => {
             const hasChildren = Array.isArray(link.children);
             const activeParent = hasChildren && isChildActive(link.children);

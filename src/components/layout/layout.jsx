@@ -9,8 +9,8 @@ export default function Layout() {
 
       {/* Main content */}
       <div className="pr-5 pl-3 py-4 h-full " style={{width: "calc(100% - 304px)"}}>
-        <div className="flex flex-col flex-1 bg-white h-full rounded-2xl overflow-hidden">
-            <main className="pr-6 overflow-y-auto flex-1">
+        <div className="flex flex-col flex-1 bg-[#F9F9F9] h-full rounded-2xl overflow-hidden">
+            <main className="pr-5 overflow-y-auto flex-1">
             <Outlet />
             </main>
         </div>

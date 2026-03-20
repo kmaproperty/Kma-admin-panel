@@ -28,6 +28,7 @@ import ViewVerifyProperty from "../pages/propety-verify/view/page.jsx";
 import ContactUsList from "../pages/contact-us/page.jsx";
 import AboutUsPage from "../pages/about-us/page.jsx";
 import TopPropertiesPage from "../pages/top-properties/page.jsx";
+import ViewChannelPartner from "../pages/channel-partner/viewChannelPartner.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
           { path: '/properties/view/:propertyId', element: <ViewProperty /> },
           { path: '/channel-partners', element: <ChannelPartnerListing /> },
           { path: '/channel-partners/edit/:id', element: <AddEditChannelPartner /> },
+          { path: '/channel-partners/view/:id', element: <ViewChannelPartner /> },
           { path: '/channel-partners/code', element: <ChannelPartnerCode /> },
           { path: '/channel-partners/code/add', element: <AddEditChannelPartnerCodes /> },
           { path: '/channel-partners/code/edit/:id', element: <AddEditChannelPartnerCodes /> },

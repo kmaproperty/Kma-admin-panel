@@ -8,7 +8,8 @@ import {
   Stack,
   Typography,
   Tooltip,
-  IconButton
+  IconButton,
+  Box
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CustomPagination from "../common/pagination";
@@ -19,7 +20,8 @@ import {
   Pencil,
   Trash2,
   Eye,
-  OctagonMinusIcon
+  OctagonMinusIcon,
+  ListFilter
 } from "lucide-react";
 import ApproveRejectProperty from "../common/approveReject/approveRejectProperty";
 import { PROPERTY_STATUS } from "../../lib/enums";
@@ -30,24 +32,24 @@ import CustomDataGrid from "../common/CustomDataGrid";
 import PageTitle from "../common/layout/PageTitle";
 
 
-export default function PropertiesTable({ propertyList, propertyData, fetchPropertyList, pagination, setPagination, isLoading }) {
+export default function PropertiesTable({ propertyList, propertyData, openFilterPopup, fetchPropertyList, pagination, setPagination, isLoading }) {
 
   const columns = [
     {
       field: "img", headerName: "Image",
       renderCell: (params) => {
         return (
-          
+
           <img
-          className="object-cover rounded-lg"
-          style={{ height: "44px", width: "50px" }}
-          src={params.row.img}
-          alt=""
-          onError={(e) => {
-            e.currentTarget.src =
-              "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
-          }}
-        />
+            className="object-cover rounded-lg"
+            style={{ height: "44px", width: "50px" }}
+            src={params.row.img}
+            alt=""
+            onError={(e) => {
+              e.currentTarget.src =
+                "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+            }}
+          />
         )
       }
     },
@@ -150,9 +152,15 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
 
   return (
     <Paper sx={{ padding: 2, paddingTop: 0 }}>
-      <PageTitle
-        title="Property List"
-      />
+      <Box className="flex justify-between items-center">
+        <PageTitle
+          title="Property List"
+        />
+        <button className={`px-5 flex gap-2 items-center cursor-pointer py-2 border border-gray-300  rounded-md bg-gray-100 text-sm font-medium`} onClick={openFilterPopup}>
+          <ListFilter className="w-3.5 h-3.5"/>
+          Filter
+        </button>
+      </Box>
 
       <CustomDataGrid
         columns={columns}
@@ -163,7 +171,7 @@ export default function PropertiesTable({ propertyList, propertyData, fetchPrope
         page={pagination.page - 1}
         pageSize={pagination.limit}
         rowCount={propertyData?.total || 0}
-        style={{ height: "calc(100vh - 240px)" }}
+        style={{ height: "calc(100vh - 280px)" }}
       />
     </Paper>
   );
