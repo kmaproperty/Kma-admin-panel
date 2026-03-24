@@ -15,9 +15,32 @@ export const channelPartnersListApiPayload = async (paylaod) => {
 export const channelPartnersDetailsApiHandler = async (id) => {
     try{
         const response = await axiosInstance.get(
-      "end-user/channel-partners/{id}" + id);
+      "admin/users/" + id);
     return response.data;
     }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getCPPropertiesApiHandler = async ({ id, page = 1, limit = 10 }) => {
+    try {
+        const response = await axiosInstance.get("admin/properties", {
+            params: { page, limit, userId: id }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getCPReviewsApiHandler = async (id) => {
+    try {
+        const response = await axiosInstance.get(
+            `end-user/channel-partners/${id}/reviews`, {
+                params: { page: 1, limit: 50, sortBy: 'newest' }
+            });
+        return response.data;
+    } catch (error) {
         throw error.response?.data ?? error;
     }
 }
