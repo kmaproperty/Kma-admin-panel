@@ -3,6 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageTitle from '../../components/common/layout/PageTitle';
 import { FormControl, MenuItem, Select } from '@mui/material';
 import { channelPartnerStats, customerStats, ownerStats, propertyStats } from './dummyData.jsx';
+import TotalPropertiesChart from '../../components/dashboard/TotalPropertiesChart.jsx';
+import ChannelPartnerChart from '../../components/dashboard/ChannelPartnerChart.jsx';
+import OwnerChart from '../../components/dashboard/OwnerChart.jsx';
+import CustomerChart from '../../components/dashboard/CustomerChart.jsx';
 
 const Dashbaord = () => {
   const [showAnalyticsOf, setShowAnalyticsOf] = useState('property');
@@ -67,6 +71,14 @@ const Dashbaord = () => {
             ))
           }
         </div>
+      </div>
+      <div>
+        {
+          showAnalyticsOf === 'property' ? <TotalPropertiesChart/>
+          : showAnalyticsOf === 'channelPartner' ? <ChannelPartnerChart/>
+          : showAnalyticsOf === 'owner' ? <OwnerChart/>
+          : <CustomerChart/>
+        }
       </div>
     </div>
   )

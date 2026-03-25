@@ -1,0 +1,26 @@
+{
+  "monthly": [
+    { "category": "Jan", "value": 43 },
+    { "category": "Feb", "value": 55 },
+    { "category": "Mar", "value": 40 },
+    { "category": "Apr", "value": 36 },
+    { "category": "May", "value": 22 },
+    { "category": "Jun", "value": 43 },
+    { "category": "Jul", "value": 21 },
+    { "category": "Aug", "value": 33 },
+    { "category": "Sep", "value": 55 },
+    { "category": "Oct", "value": 44 },
+    { "category": "Nov", "value": 57 },
+    { "category": "Dec", "value": 40 }
+  ],
+  "weekly": [
+    { "category": "Week 1", "value": 18 },
+    { "category": "Week 2", "value": 24 },
+    { "category": "Week 3", "value": 15 },
+    { "category": "Week 4", "value": 12 },
+    { "category": "Week 5", "value": 8 },
+    { "category": "Week 6", "value": 17 },
+    { "category": "Week 7", "value": 7 },
+    { "category": "Week 8", "value": 13 }
+  ]
+}
