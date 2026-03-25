@@ -52,7 +52,7 @@ const ChannelPartnerListing = () => {
     }
 
     const { data: channelPartnerList, isLoading, refetch: fetchChannelPartners } = useQuery({
-        // queryKey: ["partner-list", pagination.page, pagination.limit],
+        queryKey: ["partner-list", pagination.page, pagination.limit, search],
         queryFn: () => channelPartnersListApiPayload({
             page: pagination.page,
             limit: pagination.limit,

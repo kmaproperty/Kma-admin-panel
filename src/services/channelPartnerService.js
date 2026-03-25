@@ -15,9 +15,32 @@ export const channelPartnersListApiPayload = async (paylaod) => {
 export const channelPartnersDetailsApiHandler = async (id) => {
     try{
         const response = await axiosInstance.get(
-      "end-user/channel-partners/" + id);
+      "admin/users/" + id);
     return response.data;
     }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getCPPropertiesApiHandler = async ({ id, page = 1, limit = 10 }) => {
+    try {
+        const response = await axiosInstance.get("admin/properties", {
+            params: { page, limit, userId: id }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data ?? error;
+    }
+}
+
+export const getCPReviewsApiHandler = async (id) => {
+    try {
+        const response = await axiosInstance.get(
+            `end-user/channel-partners/${id}/reviews`, {
+                params: { page: 1, limit: 50, sortBy: 'newest' }
+            });
+        return response.data;
+    } catch (error) {
         throw error.response?.data ?? error;
     }
 }
@@ -120,6 +143,33 @@ export const unblockUserApi = async (id) => {
 export const approveRejectProfilePhotoApi = async ({payload,id}) => {
   try {
     const response = await axiosInstance.post(`/admin/users/${id}/approve-kyc`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
+export const approveLivePhotoApi = async ({payload, id}) => {
+  try {
+    const response = await axiosInstance.post(`/admin/users/${id}/approve-live-photo`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
+export const approveBankDetailsApi = async ({payload, id}) => {
+  try {
+    const response = await axiosInstance.post(`/admin/users/${id}/approve-bank-details`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
+export const approveAadhaarApi = async ({payload, id}) => {
+  try {
+    const response = await axiosInstance.post(`/admin/users/${id}/approve-aadhaar`, payload);
     return response.data;
   } catch (error) {
     throw error.response?.data ?? error;

@@ -141,9 +141,9 @@ export default function ViewProperty() {
                 <div className="w-[30%] bg-[#f6f6ff] p-4 rounded-2xl h-fit">
                     <h3 className='text-md font-semibold text-gray-600'>Property Owner Details</h3>
                     <div className="flex flex-col items-center py-6">
-                        <Avatar sx={{ width: 80, height: 80, bgcolor: indigo[800], fontSize: '1.75rem' }}>{propertyDetails?.owner.name.charAt(0) + propertyDetails?.owner.name.charAt(1)}</Avatar>
-                        <p className='text-md font-medium text-gray-600 mt-3'>{propertyDetails?.owner.name}</p>
-                        <p className='text-md text-gray-500 mt-1'>(Owner)</p>
+                        <Avatar sx={{ width: 80, height: 80, bgcolor: indigo[800], fontSize: '1.75rem' }}>{(propertyDetails?.owner?.name || 'NA').slice(0, 2).toUpperCase()}</Avatar>
+                        <p className='text-md font-medium text-gray-600 mt-3'>{propertyDetails?.owner?.name || '-'}</p>
+                        <p className='text-md text-gray-500 mt-1'>({propertyDetails?.owner?.role || 'Owner'})</p>
                         <div className="flex gap-3 py-4">
                             {
                                 propertyDetails?.owner.email ?
