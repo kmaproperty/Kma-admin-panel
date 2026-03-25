@@ -15,7 +15,7 @@ export const channelPartnersListApiPayload = async (paylaod) => {
 export const channelPartnersDetailsApiHandler = async (id) => {
     try{
         const response = await axiosInstance.get(
-      "end-user/channel-partners/{id}" + id);
+      "end-user/channel-partners/" + id);
     return response.data;
     }catch(error){
         throw error.response?.data ?? error;

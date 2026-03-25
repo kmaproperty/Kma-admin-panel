@@ -1,12 +1,12 @@
 import React from 'react'
 import PageTitle from '../../components/common/layout/PageTitle'
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { channelPartnersDetailsApiHandler } from '../../services/channelPartnerService';
 import { useParams } from 'react-router-dom';
 
 const ViewChannelPartner = () => {
     const params = useParams()
-    const { data: channelPartnerDetails, refetch: refetchDetails } = useQueryClient({
+    const { data: channelPartnerDetails, refetch: refetchDetails } = useQuery({
         queryKey: ["partner-details", params?.id],
         queryFn: async () => {
             return channelPartnersDetailsApiHandler(String(params?.id ?? ''));
@@ -15,7 +15,7 @@ const ViewChannelPartner = () => {
             console.log('partner details', resposne)
             return resposne.data
         },
-        enabled: params?.propertyId ? true : false,
+        enabled: params?.id ? true : false,
         staleTime: 0,
         refetchOnMount: true
     });

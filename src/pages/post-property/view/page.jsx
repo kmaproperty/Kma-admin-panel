@@ -24,41 +24,41 @@ export default function ViewProperty() {
         setPropertyId(id)
     }
 
-    
-const {mutate: markAstopProperty, isPending: topPropertyLaoder} = useMutation({
-    mutationFn: markTopPropertiesApiHandler,
-    onSuccess: (res) => {
-        toast.success(res.message)
-        refetchDetails()
-    },
-    onError: (error) => {
-        if(Array.isArray(error.message)){
-        error.message.map((item) => {
-          toast.error(item)
-        })
-      }else{
-        toast.error(error.message)
-      }
-    }
-  })
 
-  const {mutate: removeFromTopProperty, isPending: removeTopPropertyLaoder} = useMutation({
-    mutationFn: removeTopPropertiesApiHandler,
-    onSuccess: (res) => {
-        toast.success(res.message)
-        refetchDetails()
-    },
-    onError: (error) => {
-        if(Array.isArray(error.message)){
-        error.message.map((item) => {
-          toast.error(item)
-        })
-      }else{
-        toast.error(error.message)
-      }
-    }
-  })
-    
+    const { mutate: markAstopProperty, isPending: topPropertyLaoder } = useMutation({
+        mutationFn: markTopPropertiesApiHandler,
+        onSuccess: (res) => {
+            toast.success(res.message)
+            refetchDetails()
+        },
+        onError: (error) => {
+            if (Array.isArray(error.message)) {
+                error.message.map((item) => {
+                    toast.error(item)
+                })
+            } else {
+                toast.error(error.message)
+            }
+        }
+    })
+
+    const { mutate: removeFromTopProperty, isPending: removeTopPropertyLaoder } = useMutation({
+        mutationFn: removeTopPropertiesApiHandler,
+        onSuccess: (res) => {
+            toast.success(res.message)
+            refetchDetails()
+        },
+        onError: (error) => {
+            if (Array.isArray(error.message)) {
+                error.message.map((item) => {
+                    toast.error(item)
+                })
+            } else {
+                toast.error(error.message)
+            }
+        }
+    })
+
 
     const { data: propertyDetails, refetch: refetchDetails } = useQuery({
         queryKey: ["property-details", params?.propertyId],
@@ -75,7 +75,7 @@ const {mutate: markAstopProperty, isPending: topPropertyLaoder} = useMutation({
     });
 
     const closePopup = (isRefetch) => {
-        if(isRefetch){
+        if (isRefetch) {
             refetchDetails()
         }
         setApprovePopup(false)
@@ -102,35 +102,35 @@ const {mutate: markAstopProperty, isPending: topPropertyLaoder} = useMutation({
         },
     ];
 
-    if(propertyDetails?.status == 'active'){
-        buttons = [...buttons , {
-                label: 'Verify',
-                type: 'success',
-                icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
-                onClick: () => {
-                    handleOpenStatusPopup('verify', params.propertyId);
-                },
-                }]
+    if (propertyDetails?.status == 'active') {
+        buttons = [...buttons, {
+            label: 'Verify',
+            type: 'success',
+            icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
+            onClick: () => {
+                handleOpenStatusPopup('verify', params.propertyId);
+            },
+        }]
     }
 
-    if(propertyDetails?.isTop){
-        buttons = [...buttons , {
-                label: 'Remove form top properties',
-                type: 'danger',
-                icon: <XCircle className="text-red-700 w-4.5 h-4.5" />,
-                onClick: () => {
-                    removeFromTopProperty({id: params.propertyId})
-                },
-                }]
-    }else{
-        buttons = [...buttons , {
-                label: 'Add to top properties',
-                type: 'success',
-                icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
-                onClick: () => {
-                    markAstopProperty({id: params.propertyId})
-                },
-                }]
+    if (propertyDetails?.isTop) {
+        buttons = [...buttons, {
+            label: 'Remove form top properties',
+            type: 'danger',
+            icon: <XCircle className="text-red-700 w-4.5 h-4.5" />,
+            onClick: () => {
+                removeFromTopProperty({ id: params.propertyId })
+            },
+        }]
+    } else {
+        buttons = [...buttons, {
+            label: 'Add to top properties',
+            type: 'success',
+            icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
+            onClick: () => {
+                markAstopProperty({ id: params.propertyId })
+            },
+        }]
     }
 
     return (

@@ -128,7 +128,7 @@ export default function ContentLayout() {
   }
 
   useEffect(() => {
-    if (propertyList.summary) {
+    if (propertyList?.summary) {
       const stats = [
         {
           title: "Total Properties",
