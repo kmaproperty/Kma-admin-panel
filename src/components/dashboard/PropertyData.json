@@ -1,0 +1,28 @@
+{
+  "monthly": [
+    { "category": "Apt", "value": 43 },
+    { "category": "Villa", "value": 55 },
+    { "category": "Office", "value": 40 },
+    { "category": "Shop", "value": 36 },
+    { "category": "Whouse", "value": 22 },
+    { "category": "Land", "value": 43 },
+    { "category": "Other", "value": 21 },
+    { "category": "P-house", "value": 33 },
+    { "category": "Studio", "value": 55 },
+    { "category": "Co-work", "value": 44 },
+    { "category": "Retail", "value": 57 }
+  ],
+  "weekly": [
+    { "category": "Apt", "value": 18 },
+    { "category": "Villa", "value": 24 },
+    { "category": "Office", "value": 15 },
+    { "category": "Shop", "value": 12 },
+    { "category": "Whouse", "value": 8 },
+    { "category": "Land", "value": 17 },
+    { "category": "Other", "value": 7 },
+    { "category": "P-house", "value": 13 },
+    { "category": "Studio", "value": 22 },
+    { "category": "Co-work", "value": 19 },
+    { "category": "Retail", "value": 25 }
+  ]
+}
