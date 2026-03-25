@@ -29,6 +29,8 @@ import ContactUsList from "../pages/contact-us/page.jsx";
 import AboutUsPage from "../pages/about-us/page.jsx";
 import TopPropertiesPage from "../pages/top-properties/page.jsx";
 import ViewChannelPartner from "../pages/channel-partner/viewChannelPartner.jsx";
+import CustomersListingPage from "../pages/customers/page.js";
+import EditCustomer from "../pages/customers/editCustomer.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +58,8 @@ export const router = createBrowserRouter([
           { path: '/channel-partners/code/edit/:id', element: <AddEditChannelPartnerCodes /> },
           { path: '/owners', element: <OwnersListingPage /> },
           { path: '/owners/edit/:id', element: <AddEditOwner /> },
+          { path: '/customers/edit/:id', element: <EditCustomer  /> },
+          { path: '/customers', element: <CustomersListingPage /> },
           { path: '/admins', element: <AdminList /> },
           { path: '/admins/add', element: <AddEditAdmin /> },
           { path: '/permissions', element: <PermissionList /> },

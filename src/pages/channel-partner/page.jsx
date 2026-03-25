@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from 'date-fns';
 import { Tooltip } from "@mui/material";
-import { Building2, EditIcon, Eye, Flag, MonitorCheck, OctagonMinus, OctagonMinusIcon, Pencil, ShieldCheck, ShieldQuestionMark } from "lucide-react";
+import { Building2, CircleUserRound, EditIcon, Eye, Flag, MonitorCheck, OctagonMinus, OctagonMinusIcon, Pencil, ShieldCheck, ShieldQuestionMark } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
@@ -21,7 +21,7 @@ const ChannelPartnerListing = () => {
         {
             title: "Total Partners",
             count: 2000,
-            icon: <Building2 className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
+            icon: <CircleUserRound className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
         },
         {
             title: "Active Partners",
@@ -234,7 +234,7 @@ const ChannelPartnerListing = () => {
                 {
                     title: "Total Partners",
                     count: channelPartnerList.summary.totalPartners,
-                    icon: <Building2 className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
+                    icon: <CircleUserRound className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
                 },
                 {
                     title: "Active Partners",
