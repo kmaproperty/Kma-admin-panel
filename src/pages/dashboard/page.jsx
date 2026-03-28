@@ -59,7 +59,7 @@ const Dashbaord = () => {
         <div className="flex gap-5">
           {
             stats.map((stat) => (
-              <div className="bg-white rounded-lg shadow-md py-4 px-6 flex-1 flex items-center gap-2">
+              <div className="bg-white rounded-lg shadow-md py-4 px-6 flex-1 max-w-90 flex items-center gap-2">
                 <div className="flex items-center justify-center min-w-16 h-16 rounded-full bg-violet-50 mb-2">
                   {stat.icon}
                 </div>
