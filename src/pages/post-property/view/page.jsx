@@ -4,8 +4,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { MapPin, Sofa, Bath, Grid2x2, CircleCheck, Wallet, IndianRupee, SquareArrowOutUpRight, Instagram, Mail, Phone, CheckCircle, XCircle } from 'lucide-react'
 import PageTitle from "../../../components/common/layout/PageTitle";
 import PropertyMediaSlider from "./propertyMediaSlider";
-import { Avatar } from "@mui/material";
-import { deepOrange, indigo } from '@mui/material/colors';
+import { Avatar, Chip } from "@mui/material";
+import { deepOrange, green, indigo, orange } from '@mui/material/colors';
 import ApproveRejectProperty from "../../../components/common/approveReject/approveRejectProperty";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -83,32 +83,50 @@ export default function ViewProperty() {
         setPropertyId(null)
     }
 
-    let buttons = [
-        {
-            label: 'Approve',
-            type: "success",
-            icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
-            onClick: () => {
-                handleOpenStatusPopup("approve", params.propertyId)
-            }
-        },
-        {
-            label: 'Reject',
-            type: "danger",
-            icon: <XCircle className="text-red-700 w-4.5 h-4.5" />,
-            onClick: () => {
-                handleOpenStatusPopup("reject", params.propertyId)
-            }
-        },
-    ];
-
+    let buttons = [];
     if (propertyDetails?.status == 'active') {
+        buttons = [
+            ...buttons,
+            {
+                label: 'Reject',
+                type: "danger",
+                icon: <XCircle className="text-red-700 w-4.5 h-4.5" />,
+                onClick: () => {
+                    handleOpenStatusPopup("reject", params.propertyId)
+                }
+            },
+        ]
+    } else {
+        buttons = [
+            ...buttons,
+            {
+                label: 'Approve',
+                type: "success",
+                icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
+                onClick: () => {
+                    handleOpenStatusPopup("approve", params.propertyId)
+                }
+            },
+
+        ];
+    }
+
+    if (propertyDetails?.status == 'active' && propertyDetails.isVerified === "unverified") {
         buttons = [...buttons, {
             label: 'Verify',
             type: 'success',
             icon: <CheckCircle className="text-green-800 w-4.5 h-4.5" />,
             onClick: () => {
                 handleOpenStatusPopup('verify', params.propertyId);
+            },
+        }]
+    } else if(propertyDetails?.status == 'active') {
+        buttons = [...buttons, {
+            label: 'Unverify',
+            type: 'danger',
+            icon: <XCircle className="text-red-700 w-4.5 h-4.5" />,
+            onClick: () => {
+                handleOpenStatusPopup('unverify', params.propertyId);
             },
         }]
     }
@@ -138,7 +156,7 @@ export default function ViewProperty() {
             <PageTitle title="Property Overview" actions={buttons} />
 
             <div className="flex gap-5">
-                <div className="w-[30%] bg-[#f6f6ff] p-4 rounded-2xl h-fit">
+                <div className="w-[30%] bg-[#fff] shadow-lg p-4 rounded-2xl h-fit">
                     <h3 className='text-md font-semibold text-gray-600'>Property Owner Details</h3>
                     <div className="flex flex-col items-center py-6">
                         <Avatar sx={{ width: 80, height: 80, bgcolor: indigo[800], fontSize: '1.75rem' }}>{(propertyDetails?.owner?.name || 'NA').slice(0, 2).toUpperCase()}</Avatar>
@@ -161,7 +179,7 @@ export default function ViewProperty() {
                         </div>
                     </div>
                 </div>
-                <div className="bg-[#f6f6ff] w-[70%] p-4 rounded-2xl">
+                <div className="bg-[#fff] w-[70%] shadow-lg p-4 rounded-2xl">
                     <div className="w-full">
                         <PropertyMediaSlider
                             propertyDetails={propertyDetails}
@@ -173,13 +191,26 @@ export default function ViewProperty() {
 
                         <div className="flex justify-between items-center my-4">
                             <div className="flex flex-col gap-1.5">
-                                <p className="font-semibold text-xl text-gray-700">
+                                <p className="font-semibold items-center flex gap-2 text-xl text-gray-700">
                                     {propertyDetails?.society?.name ?? ""}  {propertyDetails?.society?.name ? ' In ' : ''} {propertyDetails?.city?.name}
+                                    <Chip
+                                        label={propertyDetails.status}
+                                        size="small"
+                                        sx={{
+                                            fontSize: "14px",
+                                            height: 20,
+                                            fontWeight: '500',
+                                            padding: '12px 4px !important',
+                                            textTransform: 'capitalize',
+                                            bgcolor: propertyDetails.status === "active" ? green[50] : orange[50],
+                                            color: propertyDetails.status === "active" ? green[700] : orange[700],
+                                        }}
+                                    />
                                 </p>
-                                {(propertyDetails?.flatNumber || propertyDetails?.plotNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber) && <span className="flex justify-start gap-2 items-center text-gray-500"> <MapPin size={18} /> {propertyDetails?.flatNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber} {propertyDetails?.locality?.name ? ", " : ''} {propertyDetails?.locality?.name ?? ''}</span>}
+                                {(propertyDetails?.flatNumber || propertyDetails?.city.name || propertyDetails?.plotNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber) && <span className="flex justify-start gap-2 items-center  text-gray-500"> <MapPin size={18} /> {propertyDetails?.flatNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber} {propertyDetails?.locality?.name ? `${propertyDetails?.locality?.name}, ` : ''} {propertyDetails?.city.name ? `${propertyDetails?.city.name}, ` : ''} {propertyDetails?.city?.state ?? ''}</span>}
                             </div>
                             <div>
-                                <div className="flex justify-start gap-3 items-center"><div className="p-1.5 bg-green-100 rounded-lg"><img src="/assets/wallet.svg" /></div> <p className="flex items-center font-medium text-[22px] text-gray-700"><IndianRupee size={22} />{propertyDetails?.monthlyRent || propertyDetails?.plotPrice || propertyDetails?.price}</p></div>
+                                <div className="flex justify-start gap-3 items-center"><div className="p-1.5 bg-green-100 rounded-lg"><img src="/assets/wallet.svg" /></div> <p className="flex items-center font-bold text-[22px] text-gray-700"><IndianRupee size={22} />{propertyDetails?.monthlyRent || propertyDetails?.plotPrice || propertyDetails?.price}</p></div>
                             </div>
                         </div>
                         <div>
@@ -234,6 +265,10 @@ export default function ViewProperty() {
                         <div className="my-4">
                             <p className="text-[18px] font-medium text-gray-800">Property Description</p>
                             <div className="text-gray-500  text-[14px] mt-2" dangerouslySetInnerHTML={{ __html: propertyDetails?.propertyDescription }}></div>
+                        </div>
+                        <div className="my-4 flex gap-2 items-center">
+                            <p className="text-[18px] font-medium text-gray-800">Category: </p>
+                            <p className="text-[14px] font-medium text-gray-600">{propertyDetails.category.name}</p>
                         </div>
                     </div>
                 </div>
