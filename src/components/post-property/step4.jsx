@@ -266,7 +266,6 @@ const handleUploadFileToS3 = async (files, type) => {
       };
     });
     return {
-      propertyId: String(params?.propertyId),
       photos: photos,
       videos: videos,
     };
