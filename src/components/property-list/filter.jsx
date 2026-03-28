@@ -26,7 +26,6 @@ export default function ListFilter({ filters, setFilters, statusData }) {
 
   const resetFilters = () => {
     setFilters(defaultFilters);
-    navigate("/my-listing");
   };
 
   const { data: propertyTypeList } = useQuery({
@@ -49,7 +48,6 @@ export default function ListFilter({ filters, setFilters, statusData }) {
       data.propertyTypes.map((i) => ({ id: i.id, name: i.name })),
   });
 
-  // ---------- Toggle Chip Helper ----------
   const toggleFilterArray = (key, id) => {
     const exists = filters[key].includes(id);
     const newArr = exists
@@ -61,42 +59,36 @@ export default function ListFilter({ filters, setFilters, statusData }) {
   const generateActiveTags = () => {
     const tags = [];
 
-    // Service / propertyTypeIds
     propertyTypeList?.forEach((item) => {
       if (filters.propertyTypeIds.includes(item.id)) {
         tags.push({ key: "propertyTypeIds", id: item.id, label: item.name });
       }
     });
 
-    // Building Type / categoryIds
     propertyCategoryList?.forEach((item) => {
       if (filters.categoryIds.includes(item.id)) {
         tags.push({ key: "categoryIds", id: item.id, label: item.name });
       }
     });
 
-    // Property Type / listingTypeIds
     propertyList?.forEach((item) => {
       if (filters.listingTypeIds.includes(item.id)) {
         tags.push({ key: "listingTypeIds", id: item.id, label: item.name });
       }
     });
 
-    // Furnishing Types
     FURNISH_TYPE.forEach((item) => {
       if (filters.furnishingTypes.includes(item.value)) {
         tags.push({ key: "furnishingTypes", id: item.value, label: item.name });
       }
     });
 
-    // Property Status
     PROPERTY_STATUS.forEach((item) => {
       if (filters.statuses.includes(item.value)) {
         tags.push({ key: "statuses", id: item.value, label: item.name });
       }
     });
 
-    // Price Range
     if (filters.minPrice != 0 || filters.maxPrice != 10000000) {
       tags.push({
         key: "price",

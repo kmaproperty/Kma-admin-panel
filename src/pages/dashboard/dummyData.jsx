@@ -39,11 +39,11 @@ export const ownerStats = [
         count: 200,
         icon: <ShieldQuestionMark className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
     },
-    {
-        title: "Verified Owners",
-        count: 1500,
-        icon: <ShieldCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
-    },
+    // {
+    //     title: "Verified Owners",
+    //     count: 1500,
+    //     icon: <ShieldCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
+    // },
 ]
 
 export const customerStats = [
@@ -62,11 +62,11 @@ export const customerStats = [
         count: 200,
         icon: <ShieldQuestionMark className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
     },
-    {
-        title: "Verified Customer",
-        count: 1500,
-        icon: <ShieldCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
-    },
+    // {
+    //     title: "Verified Customer",
+    //     count: 1500,
+    //     icon: <ShieldCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} />,
+    // },
 ]
 
 export const propertyStats = [
