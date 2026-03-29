@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query';
 import PageTitle from '../../components/common/layout/PageTitle';
 import { FormControl, MenuItem, Select } from '@mui/material';
+import { Building, Building2, CircleUserRound, MonitorCheck, ShieldCheck, ShieldQuestionMark } from "lucide-react";
 import { channelPartnerStats, customerStats, ownerStats, propertyStats } from './dummyData.jsx';
 import TotalPropertiesChart from '../../components/dashboard/TotalPropertiesChart.jsx';
 import ChannelPartnerChart from '../../components/dashboard/ChannelPartnerChart.jsx';
@@ -9,39 +10,34 @@ import OwnerChart from '../../components/dashboard/OwnerChart.jsx';
 import CustomerChart from '../../components/dashboard/CustomerChart.jsx';
 import { fetchDashboardStats } from '../../services/dashboardService.js';
 
+const iconStyle = "w-9 h-9 text-[#604AE3]";
+
 const buildStatsFromApi = (data) => {
   if (!data) return null;
 
-  const propIcons = propertyStats.map((s) => s.icon);
-  const cpIcons = channelPartnerStats.map((s) => s.icon);
-  const ownerIcons = ownerStats.map((s) => s.icon);
-  const custIcons = customerStats.map((s) => s.icon);
-
   return {
     property: [
-      { title: 'Properties For Rent', count: data.properties.forRent, icon: propIcons[0] },
-      { title: 'Properties For Sale', count: data.properties.forSale, icon: propIcons[1] },
-      { title: 'Active Properties', count: data.properties.active, icon: propIcons[2] },
-      { title: 'Pending Properties', count: data.properties.pending, icon: propIcons[3] },
-      { title: 'Verified Properties', count: data.properties.verified, icon: propIcons[4] },
+      { title: 'Properties For Rent', count: data.properties.forRent, icon: <Building2 className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Properties For Sale', count: data.properties.forSale, icon: <Building className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Active Properties', count: data.properties.active, icon: <MonitorCheck className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Pending Properties', count: data.properties.pending, icon: <ShieldQuestionMark className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Verified Properties', count: data.properties.verified, icon: <ShieldCheck className={iconStyle} strokeWidth={1.5} /> },
     ],
     channelPartner: [
-      { title: 'Total Partners', count: data.channelPartners.total, icon: cpIcons[0] },
-      { title: 'Active Partners', count: data.channelPartners.active, icon: cpIcons[1] },
-      { title: 'Verified Partners', count: data.channelPartners.verified, icon: cpIcons[2] },
-      { title: 'Partners with KYC verification', count: data.channelPartners.kycCompleted, icon: cpIcons[3] },
+      { title: 'Total Partners', count: data.channelPartners.total, icon: <CircleUserRound className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Active Partners', count: data.channelPartners.active, icon: <MonitorCheck className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Verified Partners', count: data.channelPartners.verified, icon: <ShieldQuestionMark className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Partners with KYC verification', count: data.channelPartners.kycCompleted, icon: <ShieldCheck className={iconStyle} strokeWidth={1.5} /> },
     ],
     owner: [
-      { title: 'Total Owners', count: data.owners.total, icon: ownerIcons[0] },
-      { title: 'Active Owners', count: data.owners.active, icon: ownerIcons[1] },
-      { title: 'Pending Owners', count: data.owners.pending, icon: ownerIcons[2] },
-      { title: 'Verified Owners', count: data.owners.verified, icon: ownerIcons[3] },
+      { title: 'Total Owners', count: data.owners.total, icon: <CircleUserRound className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Active Owners', count: data.owners.active, icon: <MonitorCheck className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Pending Owners', count: data.owners.pending, icon: <ShieldQuestionMark className={iconStyle} strokeWidth={1.5} /> },
     ],
     customer: [
-      { title: 'Total Customer', count: data.customers.total, icon: custIcons[0] },
-      { title: 'Active Customer', count: data.customers.active, icon: custIcons[1] },
-      { title: 'Pending Customer', count: data.customers.pending, icon: custIcons[2] },
-      { title: 'Verified Customer', count: data.customers.verified, icon: custIcons[3] },
+      { title: 'Total Customer', count: data.customers.total, icon: <CircleUserRound className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Active Customer', count: data.customers.active, icon: <MonitorCheck className={iconStyle} strokeWidth={1.5} /> },
+      { title: 'Pending Customer', count: data.customers.pending, icon: <ShieldQuestionMark className={iconStyle} strokeWidth={1.5} /> },
     ],
   };
 };
@@ -56,14 +52,15 @@ const dummyStatsMap = {
 const Dashbaord = () => {
   const [showAnalyticsOf, setShowAnalyticsOf] = useState('property');
 
-  const { data: apiData, isLoading } = useQuery({
+  const { data: apiData, isLoading, isError } = useQuery({
     queryKey: ['dashboardStats'],
     queryFn: fetchDashboardStats,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
   const liveStatsMap = buildStatsFromApi(apiData);
-  const stats = liveStatsMap ? liveStatsMap[showAnalyticsOf] : dummyStatsMap[showAnalyticsOf];
+  const stats = (liveStatsMap && !isError) ? liveStatsMap[showAnalyticsOf] : dummyStatsMap[showAnalyticsOf];
 
   const options = [
     { value: 'property', label: 'Property' },
