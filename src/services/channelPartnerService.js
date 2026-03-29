@@ -175,3 +175,33 @@ export const approveAadhaarApi = async ({payload, id}) => {
     throw error.response?.data ?? error;
   }
 };
+
+export const viewAgreementApi = async (userId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/admin/users/${userId}/agreement`,
+      {
+        params: { action: "view" },
+        responseType: "blob",
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
+export const downloadAgreementApi = async (userId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/admin/users/${userId}/agreement`,
+      {
+        params: { action: "download" },
+        responseType: "blob",
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};

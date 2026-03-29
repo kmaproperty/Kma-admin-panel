@@ -73,26 +73,18 @@ export default function ContentLayout() {
       const payload = {
         page: pagination.page,
         limit: pagination.limit,
-        // ...(filters.propertyTypeIds.length > 0 && {
-        //   propertyTypeIds: filters.propertyTypeIds.join(",")
-        // }),
-        // ...(filters.listingTypeIds.length > 0 && {
-        //   listingTypeIds: filters.listingTypeIds.join(",")
-        // }),
-        // ...(filters.furnishingTypes.length > 0 && {
-        //   furnishingTypes: filters.furnishingTypes.join(",")
-        // }),
-        // ...(filters.projectStatuses.length > 0 && {
-        //   projectStatuses: filters.projectStatuses.join(",")
-        // }),
+        ...(filters.listingTypeIds.length > 0 && {
+          listingTypeIds: filters.listingTypeIds.join(",")
+        }),
+        ...(filters.categoryIds.length > 0 && {
+          categoryIds: filters.categoryIds.join(",")
+        }),
+        ...(filters.furnishingTypes.length > 0 && {
+          furnishingTypes: filters.furnishingTypes.join(",")
+        }),
         ...(filters.statuses.length > 0 && {
           statuses: filters.statuses.join(",")
         }),
-        // minPrice: String(filters.minPrice),
-        // maxPrice: String(filters.maxPrice),
-        // search,
-        // sortOrder: sorting.order,
-        // sortBy: sorting.fieldName
       };
 
       return propertyListApiPayload(payload);

@@ -28,6 +28,8 @@ import {
   getCPReviewsApiHandler,
   approveLivePhotoApi,
   approveBankDetailsApi,
+  viewAgreementApi,
+  downloadAgreementApi,
   approveAadhaarApi,
 } from "../../services/channelPartnerService";
 import { propertyListApiPayload } from "../../services/postProperty";
@@ -343,10 +345,38 @@ export default function ViewChannelPartner() {
 
             {kycStatus?.step4_docusign_agreement?.docusign_agreement_signed && (
               <div className="mt-4 flex gap-3">
-                <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 cursor-pointer flex items-center gap-1.5">
+                <button
+                  onClick={async () => {
+                    try {
+                      const blob = await viewAgreementApi(id);
+                      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+                      window.open(url, "_blank");
+                    } catch (err) {
+                      toast.error(err?.message || "Failed to load agreement");
+                    }
+                  }}
+                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 cursor-pointer flex items-center gap-1.5"
+                >
                   <Eye size={14} /> View Agreement
                 </button>
-                <button className="px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 cursor-pointer flex items-center gap-1.5">
+                <button
+                  onClick={async () => {
+                    try {
+                      const blob = await downloadAgreementApi(id);
+                      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.download = `agreement-${id}.pdf`;
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
+                      URL.revokeObjectURL(url);
+                    } catch (err) {
+                      toast.error(err?.message || "Failed to download agreement");
+                    }
+                  }}
+                  className="px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 cursor-pointer flex items-center gap-1.5"
+                >
                   <Download size={14} /> Download Agreement
                 </button>
               </div>
