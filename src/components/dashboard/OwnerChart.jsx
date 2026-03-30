@@ -1,14 +1,14 @@
 import React from "react";
 import BarChart from "../common/BarChart";
-import ChannelPartnerData  from "./ChannelPartnerData.json";
+import ChannelPartnerData from "./ChannelPartnerData.json";
 
 
-const OwnerChart = () => {
+const OwnerChart = ({ data }) => {
   return (
     <BarChart
       title="Owner Chart"
       subtitle="Insight into Owner distribution."
-      data={ChannelPartnerData}
+      data={data || ChannelPartnerData}
       tabs={["monthly", "weekly"]}
       color="#7C3AED"
       seriesName="Owners"
