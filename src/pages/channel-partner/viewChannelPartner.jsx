@@ -292,7 +292,7 @@ export default function ViewChannelPartner() {
                   <p className="text-sm text-gray-500 mb-4">
                     Review the live photo submitted by the channel partner. Approve if the photo is clear and matches the partner's identity.
                   </p>
-                  {!kycStatus?.step1_live_photo?.live_photo_approved && (
+                  {!kycStatus?.step1_live_photo?.live_photo_approved ? (
                     <div className="flex gap-3">
                       <button
                         onClick={() => openApproveDialog("photo", "Profile Photo")}
@@ -300,6 +300,12 @@ export default function ViewChannelPartner() {
                       >
                         <Check size={14} /> Approve
                       </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm text-green-600 font-medium flex items-center gap-1.5">
+                        <ShieldCheck size={16} /> Photo has been approved
+                      </p>
                       <button
                         onClick={() => openRejectDialog("photo", "Profile Photo")}
                         className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 cursor-pointer flex items-center gap-1.5"
@@ -307,11 +313,6 @@ export default function ViewChannelPartner() {
                         <X size={14} /> Reject
                       </button>
                     </div>
-                  )}
-                  {kycStatus?.step1_live_photo?.live_photo_approved && (
-                    <p className="text-sm text-green-600 font-medium flex items-center gap-1.5">
-                      <ShieldCheck size={16} /> Photo has been approved
-                    </p>
                   )}
                 </div>
               </div>
@@ -409,18 +410,21 @@ export default function ViewChannelPartner() {
                 )}
 
                 <div className="mt-4 flex gap-3">
-                  <button
-                    onClick={() => openApproveDialog("bank", "Bank Details")}
-                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Check size={14} /> {cp.bank_details_approved === true ? "Re-Approve" : "Approve"}
-                  </button>
-                  <button
-                    onClick={() => openRejectDialog("bank", "Bank Details")}
-                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 cursor-pointer flex items-center gap-1.5"
-                  >
-                    <X size={14} /> Reject
-                  </button>
+                  {!cp.bank_details_approved ? (
+                    <button
+                      onClick={() => openApproveDialog("bank", "Bank Details")}
+                      className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Check size={14} /> Approve
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => openRejectDialog("bank", "Bank Details")}
+                      className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <X size={14} /> Reject
+                    </button>
+                  )}
                 </div>
               </>
             ) : (
@@ -458,18 +462,21 @@ export default function ViewChannelPartner() {
                 )}
 
                 <div className="mt-4 flex gap-3">
-                  <button
-                    onClick={() => openApproveDialog("aadhaar", "Aadhaar Details")}
-                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 cursor-pointer flex items-center gap-1.5"
-                  >
-                    <Check size={14} /> {cp.aadhaar_admin_approved === true ? "Re-Approve" : "Approve"}
-                  </button>
-                  <button
-                    onClick={() => openRejectDialog("aadhaar", "Aadhaar Details")}
-                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 cursor-pointer flex items-center gap-1.5"
-                  >
-                    <X size={14} /> Reject
-                  </button>
+                  {!cp.aadhaar_admin_approved ? (
+                    <button
+                      onClick={() => openApproveDialog("aadhaar", "Aadhaar Details")}
+                      className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Check size={14} /> Approve
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => openRejectDialog("aadhaar", "Aadhaar Details")}
+                      className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <X size={14} /> Reject
+                    </button>
+                  )}
                 </div>
               </>
             ) : (

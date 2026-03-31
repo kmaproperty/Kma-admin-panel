@@ -8,7 +8,7 @@ import TotalPropertiesChart from '../../components/dashboard/TotalPropertiesChar
 import ChannelPartnerChart from '../../components/dashboard/ChannelPartnerChart.jsx';
 import OwnerChart from '../../components/dashboard/OwnerChart.jsx';
 import CustomerChart from '../../components/dashboard/CustomerChart.jsx';
-import { fetchDashboardStats } from '../../services/dashboardService.js';
+import { fetchDashboardStats, fetchDashboardCharts } from '../../services/dashboardService.js';
 
 const iconStyle = "w-9 h-9 text-[#604AE3]";
 
@@ -55,6 +55,13 @@ const Dashbaord = () => {
   const { data: apiData, isLoading, isError } = useQuery({
     queryKey: ['dashboardStats'],
     queryFn: fetchDashboardStats,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  const { data: chartData } = useQuery({
+    queryKey: ['dashboardCharts'],
+    queryFn: fetchDashboardCharts,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
@@ -121,10 +128,10 @@ const Dashbaord = () => {
       </div>
       <div>
         {
-          showAnalyticsOf === 'property' ? <TotalPropertiesChart/>
-          : showAnalyticsOf === 'channelPartner' ? <ChannelPartnerChart/>
-          : showAnalyticsOf === 'owner' ? <OwnerChart/>
-          : <CustomerChart/>
+          showAnalyticsOf === 'property' ? <TotalPropertiesChart data={chartData?.properties} />
+          : showAnalyticsOf === 'channelPartner' ? <ChannelPartnerChart data={chartData?.channelPartners} />
+          : showAnalyticsOf === 'owner' ? <OwnerChart data={chartData?.owners} />
+          : <CustomerChart data={chartData?.customers} />
         }
       </div>
     </div>

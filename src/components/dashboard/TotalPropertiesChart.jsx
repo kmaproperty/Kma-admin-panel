@@ -1,14 +1,14 @@
 import React from "react";
 import BarChart from "../common/BarChart";
-import propertyData  from "./PropertyData.json";
+import propertyData from "./PropertyData.json";
 
 
-const TotalPropertiesChart = () => {
+const TotalPropertiesChart = ({ data }) => {
   return (
     <BarChart
       title="Total Properties"
       subtitle="Insight into your total property portfolio distribution."
-      data={propertyData}
+      data={data || propertyData}
       tabs={["monthly", "weekly"]}
       color="#7C3AED"
       seriesName="Properties"
