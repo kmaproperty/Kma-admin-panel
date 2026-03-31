@@ -28,6 +28,7 @@ import ViewVerifyProperty from "../pages/propety-verify/view/page.jsx";
 import ContactUsList from "../pages/contact-us/page.jsx";
 import AboutUsPage from "../pages/about-us/page.jsx";
 import TopPropertiesPage from "../pages/top-properties/page.jsx";
+import FeaturedPropertiesPage from "../pages/featured-properties/page.jsx";
 import ViewChannelPartner from "../pages/channel-partner/viewChannelPartner.jsx";
 import CustomersListingPage from "../pages/customers/page.js";
 import EditCustomer from "../pages/customers/editCustomer.jsx";
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
           { path: '/contact-us', element: <ContactUsList /> },
           { path: '/about-us', element: <AboutUsPage /> },
           { path: '/top-properties', element: <TopPropertiesPage /> },
+          { path: '/featured-properties', element: <FeaturedPropertiesPage /> },
         ],
       },
     ],

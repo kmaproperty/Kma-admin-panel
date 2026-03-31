@@ -66,6 +66,7 @@ export const navLinks = [
         icon: <Star className="w-5 h-5" />,
         children: [
             { name: "Manage Top Properties", path: "/top-properties", icon: <Star className="w-5 h-5" /> },
+            { name: "Featured Properties", path: "/featured-properties", icon: <Star className="w-5 h-5" /> },
         ],
     },
     {
