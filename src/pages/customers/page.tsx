@@ -7,11 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { Tooltip } from "@mui/material";
-import { Flag, OctagonMinusIcon, Pencil, Trash2 } from "lucide-react";
+import { Eye, Flag, OctagonMinusIcon, Pencil, Trash2 } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
 import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import ViewOwnerDialoge from "../owners/viewOwnerDialogue";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,7 @@ const CustomersListingPage = () => {
     const [filters, setFilters] = useState<Record<string, unknown> | undefined>();
     const [confirmationDialog, setConfirmationDialog] = useState<ConfirmationDialog | false>(false);
     const [blockLoading, setBlockLoading] = useState(false);
+    const [showDetailsPopup, setShowDetailsPopup] = useState<string | number | null>(null);
 
     const [pagination, setPagination] = useState<Pagination>({
         limit: 10,
@@ -65,9 +67,14 @@ const CustomersListingPage = () => {
         {
             field: "actions",
             headerName: "Actions",
-            width: 120,
+            width: 160,
             renderCell: (params: GridRenderCellParams) => (
                 <div className="w-full flex justify-end items-center">
+                    <Tooltip title={"View"}>
+                        <button className="h-fit mr-2 py-2 px-3 bg-gray-50 cursor-pointer rounded-sm" onClick={() => setShowDetailsPopup(params.id)}>
+                            <Eye className="text-gray-700 w-4.5 h-4.5" />
+                        </button>
+                    </Tooltip>
                     <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
                         <button className={`mr-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isBlocked ? "bg-green-50" : "bg-yellow-100"}`} onClick={() => setConfirmationDialog({ id: String(params.id), isBlocked: params.row.isBlocked })}>
                             {
@@ -243,6 +250,11 @@ const CustomersListingPage = () => {
                     </p>
                 </div>
             </CustomDialog>
+            <ViewOwnerDialoge
+                open={showDetailsPopup}
+                type="customer"
+                onClose={() => setShowDetailsPopup(null)}
+            />
         </MainWrapper>
     );
 };

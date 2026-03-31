@@ -7,16 +7,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from 'date-fns';
 import { Tooltip } from "@mui/material";
-import { EditIcon, Flag, OctagonMinusIcon, Pencil } from "lucide-react";
+import { EditIcon, Eye, Flag, OctagonMinusIcon, Pencil } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
+import ViewOwnerDialoge from "./viewOwnerDialogue";
 
 const OwnersListingPage = () => {
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState();
     const [confirmationDialog, setConfirmationDialog] = useState(false);
+    const [showDetailsPopup, setShowDetailsPopup] = useState(null);
 
     const [pagination, setPagination] = useState({
         limit: 10,
@@ -30,30 +32,30 @@ const OwnersListingPage = () => {
     }
 
     const blockUnblockUser = async () => {
-    setLoading(true);
-    try {
-        const res = confirmationDialog.isBlocked 
-            ? await unblockUserApi(confirmationDialog.id) 
-            : await blockUserApi(confirmationDialog.id);
+        setLoading(true);
+        try {
+            const res = confirmationDialog.isBlocked
+                ? await unblockUserApi(confirmationDialog.id)
+                : await blockUserApi(confirmationDialog.id);
 
-        // Check if the API response actually uses the key "success"
-        if (res && res.success) {
-            console.log(1);
-            fetchOwners();
-            setConfirmationDialog(null);
-            toast.success(res.message);
-        } else {
-            // This runs if the request worked but success was false
-            toast.error(res?.message || "Operation failed");
+            // Check if the API response actually uses the key "success"
+            if (res && res.success) {
+                console.log(1);
+                fetchOwners();
+                setConfirmationDialog(null);
+                toast.success(res.message);
+            } else {
+                // This runs if the request worked but success was false
+                toast.error(res?.message || "Operation failed");
+            }
+        } catch (error) {
+            // This runs if the API returned a 400/500 error
+            console.error("API Error:", error);
+            toast.error(error?.message || "An unexpected error occurred");
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        // This runs if the API returned a 400/500 error
-        console.error("API Error:", error);
-        toast.error(error?.message || "An unexpected error occurred");
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     const confirmationDialogActions = [
         {
@@ -79,9 +81,14 @@ const OwnersListingPage = () => {
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 120,
+            width: 160,
             renderCell: (params) => (
                 <div className="w-full flex justify-end items-center">
+                    <Tooltip title={"View"}>
+                        <button className="h-fit mr-2 py-2 px-3 bg-gray-50 cursor-pointer rounded-sm" onClick={() =>setShowDetailsPopup(params.id)}>
+                            <Eye className="text-gray-700 w-4.5 h-4.5" />
+                        </button>
+                    </Tooltip>
                     <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
                         <button className={`mr-2.5 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isBlocked ? "bg-green-50" : "bg-yellow-100"}`} onClick={() => setConfirmationDialog({ id: params.id, isBlocked: params.row.isBlocked })}>
                             {
@@ -90,7 +97,7 @@ const OwnersListingPage = () => {
                         </button>
                     </Tooltip>
                     <Tooltip title="Edit">
-                        <Link to={`/owners/edit/${params.id}`} className="h-fit inline-block max-h-[50px]">
+                        <Link to={`/owners/edit/${params.id}`} className="h-fit inline-block max-h-12.5">
                             <button className="py-2 px-3 bg-blue-50 cursor-pointer rounded-sm">
                                 <Pencil className="text-blue-800 w-4.5 h-4.5" />
                             </button>
@@ -145,16 +152,16 @@ const OwnersListingPage = () => {
     }, []);
 
     useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchOwners({ page: pagination.page, limit: pagination.limit, search: search, role: "OWNER", })
-    }, 500);
+        const delay = setTimeout(() => {
+            fetchOwners({ page: pagination.page, limit: pagination.limit, search: search, role: "OWNER", })
+        }, 500);
 
-    return () => clearTimeout(delay);
-  }, [search, pagination.page, pagination.limit]);
+        return () => clearTimeout(delay);
+    }, [search, pagination.page, pagination.limit]);
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  }
+    const handleSearch = (e) => {
+        setSearch(e.target.value);
+    }
 
     useEffect(() => {
         const query = searchParams.get("filters");
@@ -172,7 +179,7 @@ const OwnersListingPage = () => {
             name: item.name || "-",
             intent: item.intent,
             isActive: item.isActive ? "Yes" : "No",
-            isBlocked: item.isBlocked ,
+            isBlocked: item.isBlocked,
             createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy'),
             email: item.email,
             businessSince: item.businessSince,
@@ -205,6 +212,10 @@ const OwnersListingPage = () => {
                     <p>Are you sure you want to {confirmationDialog?.isBlocked ? "unblock" : "block"} this Channel Partner?</p>
                 </div>
             </CustomDialog>
+            <ViewOwnerDialoge
+                open={showDetailsPopup}
+                onClose={() => setShowDetailsPopup(null)}
+            />
         </MainWrapper>
     )
 }
