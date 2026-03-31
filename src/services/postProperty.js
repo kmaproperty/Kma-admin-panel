@@ -239,3 +239,29 @@ export const removeTopPropertiesApiHandler = async (payload) => {
         throw error.response?.data ?? error;
     }
 }
+
+export const markFeaturedPropertiesApiHandler = async (payload) => {
+    try{
+        const response = await axiosInstance.post(
+      `admin/properties/${payload.id}/mark-featured`, {
+        id: payload.id
+      });
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
+
+export const removeFeaturedPropertiesApiHandler = async (payload) => {
+    try{
+        const response = await axiosInstance.post(
+      `admin/properties/${payload.id}/remove-featured`, {
+        id: payload.id
+      });
+
+    return response.data;
+    }catch(error){
+        throw error.response?.data ?? error;
+    }
+}
