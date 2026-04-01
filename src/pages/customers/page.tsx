@@ -7,13 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { Tooltip } from "@mui/material";
-import { Flag, OctagonMinusIcon, Pencil, Trash2 } from "lucide-react";
+import { Eye, Flag, OctagonMinusIcon, Pencil, Trash2 } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
 import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import ViewOwnerDialoge from "../owners/viewOwnerDialogue";
 
 interface Pagination {
     limit: number;
@@ -38,13 +37,12 @@ interface CustomerRow {
     phone: string;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 const CustomersListingPage = () => {
     const [searchParams] = useSearchParams();
     const [filters, setFilters] = useState<Record<string, unknown> | undefined>();
     const [confirmationDialog, setConfirmationDialog] = useState<ConfirmationDialog | false>(false);
     const [blockLoading, setBlockLoading] = useState(false);
+    const [showDetailsPopup, setShowDetailsPopup] = useState<string | number | null>(null);
 
     const [pagination, setPagination] = useState<Pagination>({
         limit: 10,
@@ -54,9 +52,25 @@ const CustomersListingPage = () => {
 
     const [search, setSearch] = useState("");
 
-    // ─── Columns ───────────────────────────────────────────────────────────────
 
     const columns: GridColDef[] = [
+        {
+            field: "img", headerName: "Image",
+            renderCell: (params) => {
+                return (
+                    <img
+                        className="object-cover rounded-lg"
+                        style={{ height: "44px", width: "50px" }}
+                        src={params.row.img || "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png"}
+                        alt=""
+                        onError={(e) => {
+                            e.currentTarget.src =
+                                "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+                        }}
+                    />
+                )
+            }
+        },
         { field: "name", headerName: "Name", flex: 1 },
         { field: "email", headerName: "Email", flex: 1 },
         { field: "phone", headerName: "Phone", flex: 1 },
@@ -65,9 +79,14 @@ const CustomersListingPage = () => {
         {
             field: "actions",
             headerName: "Actions",
-            width: 120,
+            width: 160,
             renderCell: (params: GridRenderCellParams) => (
                 <div className="w-full flex justify-end items-center">
+                    <Tooltip title={"View"}>
+                        <button className="h-fit mr-2 py-2 px-3 bg-gray-50 cursor-pointer rounded-sm" onClick={() => setShowDetailsPopup(params.id)}>
+                            <Eye className="text-gray-700 w-4.5 h-4.5" />
+                        </button>
+                    </Tooltip>
                     <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
                         <button className={`mr-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isBlocked ? "bg-green-50" : "bg-yellow-100"}`} onClick={() => setConfirmationDialog({ id: String(params.id), isBlocked: params.row.isBlocked })}>
                             {
@@ -90,7 +109,6 @@ const CustomersListingPage = () => {
         },
     ];
 
-    // ─── Query ─────────────────────────────────────────────────────────────────
 
     const {
         data: customerData,
@@ -109,7 +127,6 @@ const CustomersListingPage = () => {
         refetchOnMount: true,
     });
 
-    // ─── Pagination handlers ───────────────────────────────────────────────────
 
     const onPageChange = useCallback((uiPage: number) => {
         const newPage = uiPage + 1;
@@ -126,7 +143,6 @@ const CustomersListingPage = () => {
         });
     }, []);
 
-    // ─── Search with debounce ──────────────────────────────────────────────────
     // NOTE: queryKey already includes search + pagination so useQuery will
     // automatically refetch. The manual refetch below is kept for compatibility
     // but queryKey-based refetch is the primary trigger.
@@ -143,7 +159,6 @@ const CustomersListingPage = () => {
         setPagination((prev) => ({ ...prev, page: 1 }));
     };
 
-    // ─── Filters from URL ──────────────────────────────────────────────────────
 
     useEffect(() => {
         const query = searchParams.get("filters");
@@ -153,7 +168,6 @@ const CustomersListingPage = () => {
         }
     }, [searchParams]);
 
-    // ─── Block / Unblock ───────────────────────────────────────────────────────
 
     const handleClose = () => setConfirmationDialog(false);
 
@@ -191,7 +205,6 @@ const CustomersListingPage = () => {
         },
     ];
 
-    // ─── Rows ──────────────────────────────────────────────────────────────────
 
     const rows: CustomerRow[] = useMemo(() => {
         if (!customerData?.data) return [];
@@ -205,10 +218,12 @@ const CustomersListingPage = () => {
             email: item.email,
             businessSince: item.businessSince,
             phone: item.phone,
+            img: item?.profileImage?.length
+                ? `${import.meta.env.VITE_AWS_URL}${item.profileImage}`
+                : '',
         }));
     }, [customerData]);
 
-    // ─── Render ────────────────────────────────────────────────────────────────
 
     return (
         <MainWrapper>
@@ -243,6 +258,11 @@ const CustomersListingPage = () => {
                     </p>
                 </div>
             </CustomDialog>
+            <ViewOwnerDialoge
+                open={showDetailsPopup}
+                type="customer"
+                onClose={() => setShowDetailsPopup(null)}
+            />
         </MainWrapper>
     );
 };

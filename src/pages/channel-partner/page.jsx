@@ -108,11 +108,10 @@ const ChannelPartnerListing = () => {
             field: "img", headerName: "Image",
             renderCell: (params) => {
                 return (
-
                     <img
                         className="object-cover rounded-lg"
                         style={{ height: "44px", width: "50px" }}
-                        src={params.row.img}
+                        src={params.row.img || "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png"}
                         alt=""
                         onError={(e) => {
                             e.currentTarget.src =
