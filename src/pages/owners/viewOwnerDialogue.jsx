@@ -22,9 +22,6 @@ export default function ViewOwnerDialoge({ open: id, onClose, type }) {
         queryFn: () => getPartnerApiHandler(id),
         enabled: !!id,
     });
-    useEffect(() => {
-        console.log(ownerData)
-    }, [ownerData])
     return (
         <Dialog open={id ? true : false} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
             <DialogContent className="p-0">
@@ -85,6 +82,23 @@ export default function ViewOwnerDialoge({ open: id, onClose, type }) {
                                     : ''
                             }
                         </div>
+                        {
+                            type !== "customer" &&
+                            <div className="flex items-center gap-3 w-full">
+                                <div className="flex-1 bg-white shadow-lg rounded-lg p-5 flex flex-col items-center gap-4">
+                                    <h4 className="text-sm text-gray-500 text-center">Total Properties</h4>
+                                    <p className="text-5xl font-semibold text-gray-400">{ownerData?.data.totalProperties}</p>
+                                </div>
+                                <div className="flex-1 bg-white shadow-lg rounded-lg p-5 flex flex-col items-center gap-4">
+                                    <h4 className="text-sm text-gray-500 text-center">Properties for sale</h4>
+                                    <p className="text-5xl font-semibold text-gray-400">{ownerData?.data.saleProperties}</p>
+                                </div>
+                                <div className="flex-1 bg-white shadow-lg rounded-lg p-5 flex flex-col items-center gap-4">
+                                    <h4 className="text-sm text-gray-500 text-center">Properties for rent</h4>
+                                    <p className="text-5xl font-semibold text-gray-400">{ownerData?.data.rentedProperties}</p>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </DialogContent>
