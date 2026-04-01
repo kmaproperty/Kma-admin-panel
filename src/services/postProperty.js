@@ -265,3 +265,40 @@ export const removeFeaturedPropertiesApiHandler = async (payload) => {
         throw error.response?.data ?? error;
     }
 }
+
+export const approveMediaApiHandler = async (payload) => {
+    try {
+        const response = await axiosInstance.post(
+            `admin/properties/${payload.propertyId}/media/approve`, {
+                fileKey: payload.fileKey
+            });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data ?? error;
+    }
+}
+
+export const rejectMediaApiHandler = async (payload) => {
+    try {
+        const response = await axiosInstance.post(
+            `admin/properties/${payload.propertyId}/media/reject`, {
+                fileKey: payload.fileKey,
+                reason: payload.reason
+            });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data ?? error;
+    }
+}
+
+export const bulkApproveMediaApiHandler = async (payload) => {
+    try {
+        const response = await axiosInstance.post(
+            `admin/properties/${payload.propertyId}/media/bulk-approve`, {
+                fileKeys: payload.fileKeys
+            });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data ?? error;
+    }
+}

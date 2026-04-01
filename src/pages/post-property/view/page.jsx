@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { MapPin, Sofa, Bath, Grid2x2, CircleCheck, Wallet, IndianRupee, SquareArrowOutUpRight, Instagram, Mail, Phone, CheckCircle, XCircle } from 'lucide-react'
 import PageTitle from "../../../components/common/layout/PageTitle";
 import PropertyMediaSlider from "./propertyMediaSlider";
+import MediaApprovalSection from "../../../components/common/mediaApproval";
 import { Avatar, Chip } from "@mui/material";
 import { deepOrange, green, indigo, orange } from '@mui/material/colors';
 import ApproveRejectProperty from "../../../components/common/approveReject/approveRejectProperty";
@@ -368,6 +369,17 @@ export default function ViewProperty() {
                     </div>
                 </div>
             </div>
+            {/* Media Approval Section */}
+            {(propertyDetails?.photos?.length > 0 || propertyDetails?.videos?.length > 0) && (
+                <MediaApprovalSection
+                    propertyId={params?.propertyId}
+                    photos={propertyDetails?.photos}
+                    videos={propertyDetails?.videos}
+                    imageBaseUrl={imageBaseUrl}
+                    onUpdate={refetchDetails}
+                />
+            )}
+
             <ApproveRejectProperty open={approvePopup} popupType={popupType} onClose={closePopup} propertyId={propertyId} />
         </div>
     )
