@@ -13,6 +13,7 @@ const ChannelPartnerChart = ({ data }) => {
       color="#7C3AED"
       seriesName="Channel Partners"
       tooltipSuffix="partners"
+      height={440}
     />
   );
 };

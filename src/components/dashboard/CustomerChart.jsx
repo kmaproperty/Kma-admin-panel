@@ -13,6 +13,7 @@ const CustomerChart = ({ data }) => {
       color="#7C3AED"
       seriesName="Customers"
       tooltipSuffix="customers"
+      height={440}
     />
   );
 };

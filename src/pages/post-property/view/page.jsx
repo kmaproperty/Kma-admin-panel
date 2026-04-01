@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import { getPropertyDetailsApiHandler, markTopPropertiesApiHandler, removeTopPropertiesApiHandler } from "../../../services/postProperty";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { MapPin, Sofa, Bath, Grid2x2, CircleCheck, Wallet, IndianRupee, SquareArrowOutUpRight, Instagram, Mail, Phone, CheckCircle, XCircle } from 'lucide-react'
+import { MapPin, Sofa, Bath, Grid2x2, CircleCheck, Wallet, IndianRupee, SquareArrowOutUpRight, Instagram, Mail, Phone, CheckCircle, XCircle, Star } from 'lucide-react'
 import PageTitle from "../../../components/common/layout/PageTitle";
 import PropertyMediaSlider from "./propertyMediaSlider";
 import { Avatar, Chip } from "@mui/material";
@@ -269,8 +269,8 @@ export default function ViewProperty() {
                     <div className="px-2">
 
                         <div className="flex justify-between items-center my-4">
-                            <div className="flex flex-col gap-1.5">
-                                <p className="font-semibold items-center flex gap-2 text-xl text-gray-700">
+                            <div className="flex flex-col gap-2">
+                                <p className="font-semibold items-center flex gap-3 text-xl text-gray-700">
                                     {propertyDetails?.society?.name ?? ""}  {propertyDetails?.society?.name ? ' In ' : ''} {propertyDetails?.city?.name}
                                     <Chip
                                         label={propertyDetails?.status}
@@ -279,12 +279,16 @@ export default function ViewProperty() {
                                             fontSize: "14px",
                                             height: 20,
                                             fontWeight: '500',
-                                            padding: '12px 4px !important',
+                                            padding: '14px 8px !important',
                                             textTransform: 'capitalize',
                                             bgcolor: propertyDetails?.status === "active" ? green[50] : orange[50],
                                             color: propertyDetails?.status === "active" ? green[700] : orange[700],
                                         }}
                                     />
+                                    <div className="flex gap-1 items-center bg-amber-50 px-2 py-1 rounded-lg">
+                                        <img src="/assets/star.svg" className="text-yellow-400 w-6 h-6"/>
+                                        <p className="text-base text-gray-700">{propertyDetails.ratingDetails.summary.averageOverallRating}/5 <span className="text-sm text-gray-400">({propertyDetails.ratingDetails.summary.totalReviews})</span></p>
+                                    </div>
                                 </p>
                                 {(propertyDetails?.flatNumber || propertyDetails?.city.name || propertyDetails?.plotNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber) && <span className="flex justify-start gap-2 items-center  text-gray-500"> <MapPin size={18} /> {propertyDetails?.flatNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber} {propertyDetails?.locality?.name ? `${propertyDetails?.locality?.name}, ` : ''} {propertyDetails?.city.name ? `${propertyDetails?.city.name}, ` : ''} {propertyDetails?.city?.state ?? ''}</span>}
                             </div>

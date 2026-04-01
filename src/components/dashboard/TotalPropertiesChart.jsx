@@ -13,6 +13,7 @@ const TotalPropertiesChart = ({ data }) => {
       color="#7C3AED"
       seriesName="Properties"
       tooltipSuffix="properties"
+      height={440}
     />
   );
 };

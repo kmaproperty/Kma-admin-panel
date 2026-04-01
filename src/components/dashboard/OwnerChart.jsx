@@ -13,6 +13,7 @@ const OwnerChart = ({ data }) => {
       color="#7C3AED"
       seriesName="Owners"
       tooltipSuffix="owners"
+      height={440}
     />
   );
 };
