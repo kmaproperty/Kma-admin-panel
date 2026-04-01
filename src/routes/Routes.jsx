@@ -32,6 +32,8 @@ import FeaturedPropertiesPage from "../pages/featured-properties/page.jsx";
 import ViewChannelPartner from "../pages/channel-partner/viewChannelPartner.jsx";
 import CustomersListingPage from "../pages/customers/page.js";
 import EditCustomer from "../pages/customers/editCustomer.jsx";
+import ViewOwner from "../pages/owners/ViewOwner.jsx";
+import ViewCustomer from "../pages/customers/ViewCustomer.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -58,9 +60,11 @@ export const router = createBrowserRouter([
           { path: '/channel-partners/code/add', element: <AddEditChannelPartnerCodes /> },
           { path: '/channel-partners/code/edit/:id', element: <AddEditChannelPartnerCodes /> },
           { path: '/owners', element: <OwnersListingPage /> },
+          { path: '/owners/view/:id', element: <ViewOwner /> },
           { path: '/owners/edit/:id', element: <AddEditOwner /> },
-          { path: '/customers/edit/:id', element: <EditCustomer  /> },
           { path: '/customers', element: <CustomersListingPage /> },
+          { path: '/customers/view/:id', element: <ViewCustomer /> },
+          { path: '/customers/edit/:id', element: <EditCustomer  /> },
           { path: '/admins', element: <AdminList /> },
           { path: '/admins/add', element: <AddEditAdmin /> },
           { path: '/permissions', element: <PermissionList /> },

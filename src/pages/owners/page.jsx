@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from 'date-fns';
 import { Tooltip } from "@mui/material";
-import { EditIcon, Eye, Flag, OctagonMinusIcon, Pencil } from "lucide-react";
+import { Eye, Flag, OctagonMinusIcon, Pencil } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
@@ -120,12 +120,6 @@ const OwnersListingPage = () => {
                             </button>
                         </Link>
                     </Tooltip>
-
-                    {/* <Tooltip title="Delete">
-            <Button variant="soft-danger" size="sm" onClick={() => setConfirmationDialog(params.id)}>
-              <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
-            </Button>
-          </Tooltip> */}
                 </div>
             ),
         }

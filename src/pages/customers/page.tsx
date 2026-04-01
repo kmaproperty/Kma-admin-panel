@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { Tooltip } from "@mui/material";
-import { Eye, Flag, OctagonMinusIcon, Pencil, Trash2 } from "lucide-react";
+import { Eye, Flag, OctagonMinusIcon, Pencil } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
@@ -88,7 +88,7 @@ const CustomersListingPage = () => {
                         </button>
                     </Tooltip>
                     <Tooltip title={params.row.isBlocked ? "Unblock" : "Block"}>
-                        <button className={`mr-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isBlocked ? "bg-green-50" : "bg-yellow-100"}`} onClick={() => setConfirmationDialog({ id: String(params.id), isBlocked: params.row.isBlocked })}>
+                        <button className={`mr-2 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isBlocked ? "bg-green-50" : "bg-yellow-100"}`} onClick={() => setConfirmationDialog({ id: String(params.id), isBlocked: params.row.isBlocked })}>
                             {
                                 params.row.isBlocked ? <Flag className="text-green-800 w-4.5 h-4.5" /> : <OctagonMinusIcon className="text-yellow-800 w-4.5 h-4.5" />
                             }
