@@ -14,8 +14,6 @@ import { toast } from "react-toastify";
 import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import ViewOwnerDialoge from "../owners/viewOwnerDialogue";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface Pagination {
     limit: number;
     page: number;
@@ -39,8 +37,6 @@ interface CustomerRow {
     phone: string;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 const CustomersListingPage = () => {
     const [searchParams] = useSearchParams();
     const [filters, setFilters] = useState<Record<string, unknown> | undefined>();
@@ -56,9 +52,25 @@ const CustomersListingPage = () => {
 
     const [search, setSearch] = useState("");
 
-    // ─── Columns ───────────────────────────────────────────────────────────────
 
     const columns: GridColDef[] = [
+        {
+            field: "img", headerName: "Image",
+            renderCell: (params) => {
+                return (
+                    <img
+                        className="object-cover rounded-lg"
+                        style={{ height: "44px", width: "50px" }}
+                        src={params.row.img || "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png"}
+                        alt=""
+                        onError={(e) => {
+                            e.currentTarget.src =
+                                "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+                        }}
+                    />
+                )
+            }
+        },
         { field: "name", headerName: "Name", flex: 1 },
         { field: "email", headerName: "Email", flex: 1 },
         { field: "phone", headerName: "Phone", flex: 1 },
@@ -97,7 +109,6 @@ const CustomersListingPage = () => {
         },
     ];
 
-    // ─── Query ─────────────────────────────────────────────────────────────────
 
     const {
         data: customerData,
@@ -116,7 +127,6 @@ const CustomersListingPage = () => {
         refetchOnMount: true,
     });
 
-    // ─── Pagination handlers ───────────────────────────────────────────────────
 
     const onPageChange = useCallback((uiPage: number) => {
         const newPage = uiPage + 1;
@@ -133,7 +143,6 @@ const CustomersListingPage = () => {
         });
     }, []);
 
-    // ─── Search with debounce ──────────────────────────────────────────────────
     // NOTE: queryKey already includes search + pagination so useQuery will
     // automatically refetch. The manual refetch below is kept for compatibility
     // but queryKey-based refetch is the primary trigger.
@@ -150,7 +159,6 @@ const CustomersListingPage = () => {
         setPagination((prev) => ({ ...prev, page: 1 }));
     };
 
-    // ─── Filters from URL ──────────────────────────────────────────────────────
 
     useEffect(() => {
         const query = searchParams.get("filters");
@@ -160,7 +168,6 @@ const CustomersListingPage = () => {
         }
     }, [searchParams]);
 
-    // ─── Block / Unblock ───────────────────────────────────────────────────────
 
     const handleClose = () => setConfirmationDialog(false);
 
@@ -198,7 +205,6 @@ const CustomersListingPage = () => {
         },
     ];
 
-    // ─── Rows ──────────────────────────────────────────────────────────────────
 
     const rows: CustomerRow[] = useMemo(() => {
         if (!customerData?.data) return [];
@@ -212,10 +218,12 @@ const CustomersListingPage = () => {
             email: item.email,
             businessSince: item.businessSince,
             phone: item.phone,
+            img: item?.profileImage?.length
+                ? `${import.meta.env.VITE_AWS_URL}${item.profileImage}`
+                : '',
         }));
     }, [customerData]);
 
-    // ─── Render ────────────────────────────────────────────────────────────────
 
     return (
         <MainWrapper>

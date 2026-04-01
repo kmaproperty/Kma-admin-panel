@@ -73,6 +73,23 @@ const OwnersListingPage = () => {
     ];
 
     const columns = [
+        {
+            field: "img", headerName: "Image",
+            renderCell: (params) => {
+                return (
+                    <img
+                        className="object-cover rounded-lg"
+                        style={{ height: "44px", width: "50px" }}
+                        src={params.row.img || "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png"}
+                        alt=""
+                        onError={(e) => {
+                            e.currentTarget.src =
+                                "https://www.rootinc.com/wp-content/uploads/2022/11/placeholder-1.png";
+                        }}
+                    />
+                )
+            }
+        },
         { field: "name", headerName: "Name", flex: 1 },
         { field: "email", headerName: "Email", flex: 1 },
         { field: "phone", headerName: "Phone", flex: 1 },
@@ -85,7 +102,7 @@ const OwnersListingPage = () => {
             renderCell: (params) => (
                 <div className="w-full flex justify-end items-center">
                     <Tooltip title={"View"}>
-                        <button className="h-fit mr-2 py-2 px-3 bg-gray-50 cursor-pointer rounded-sm" onClick={() =>setShowDetailsPopup(params.id)}>
+                        <button className="h-fit mr-2 py-2 px-3 bg-gray-50 cursor-pointer rounded-sm" onClick={() => setShowDetailsPopup(params.id)}>
                             <Eye className="text-gray-700 w-4.5 h-4.5" />
                         </button>
                     </Tooltip>
@@ -183,7 +200,10 @@ const OwnersListingPage = () => {
             createdAt: format(parseISO(item.createdAt), 'dd/MM/yyyy'),
             email: item.email,
             businessSince: item.businessSince,
-            phone: item.phone
+            phone: item.phone,
+            img: item?.profileImage?.length
+                ? `${import.meta.env.VITE_AWS_URL}${item.profileImage}`
+                : '',
         }));
     }, [ownersData]);
 

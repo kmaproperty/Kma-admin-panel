@@ -63,26 +63,26 @@ export default function PropertiesTable({ propertyList, propertyData, openFilter
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 240,
+      width: 170,
       renderCell: (params) => (
         <>
           <div className="w-full flex justify-end items-center h-full">
             <Tooltip title="View">
               <Link to={`/properties/view/${params.id}`} className="h-fit inline-block max-h-[50px]">
-                <button className="h-fit mr-2 p-2 bg-gray-50 cursor-pointer rounded-sm">
+                <button className="h-fit mr-2 py-2 px-3 bg-gray-50 cursor-pointer rounded-sm">
                   <Eye className="text-gray-700 w-4.5 h-4.5" />
                 </button>
               </Link>
             </Tooltip>
             <Tooltip title="Edit">
               <Link to={`/properties/${params.id}`} className="h-fit inline-block max-h-[50px]">
-                <button className="h-fit mr-2 p-2 bg-blue-50 cursor-pointer rounded-sm">
+                <button className="h-fit mr-2 py-2 px-3 bg-blue-50 cursor-pointer rounded-sm">
                   <Pencil className="text-blue-800 w-4.5 h-4.5" />
                 </button>
               </Link>
             </Tooltip>
             <Tooltip title="Delete">
-              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 p-2 bg-red-50 cursor-pointer rounded-sm">
+              <button onClick={() => deleteProperty(params.id)} className="h-fit mr-2 py-2 px-3 bg-red-50 cursor-pointer rounded-sm">
                 <Trash2 className="text-red-800 w-4.5 h-4.5" />
               </button>
             </Tooltip>
