@@ -76,111 +76,112 @@ export default function AboutUsData() {
 
   return (
     <MainWrapper>
-      <PageTitle title={"Master Configuration"} />
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Mobile Application Available:</p>
-        <p className="text-sm text-blue">{aboutusData?.mobileAppAvailable ? 'Yes' : 'No'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Address:</p>
-        <p className="text-sm text-blue">{aboutusData?.address ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Description:</p>
-        <p className="text-sm text-blue">{aboutusData?.description ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Phone Number:</p>
-        <p className="text-sm text-blue">{aboutusData?.phoneNumber ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Email Address:</p>
-        <p className="text-sm text-blue">{aboutusData?.email ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Latitude:</p>
-        <p className="text-sm text-blue">{aboutusData?.latitude ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Longitude:</p>
-        <p className="text-sm text-blue">{aboutusData?.longitude ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Instagram Link:</p>
-        <p className="text-sm text-blue">{aboutusData?.instagramLink ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Facebook Link:</p>
-        <p className="text-sm text-blue">{aboutusData?.fbLink ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Twitter Link:</p>
-        <p className="text-sm text-blue">{aboutusData?.twitterLink ?? '-'}</p>
-      </div>
-
-      <div className="flex gap-3 items-center">
-        <p className="text-sm text-text-black">Youtube Link:</p>
-        <p className="text-sm text-blue">{aboutusData?.youtubeLink ?? '-'}</p>
-      </div>
-      
-      <div className="mt-4 flex items-center gap-3">
-        <button onClick={() => {
-          setConfirmationDialog(aboutusData?.id)
-        }} type="button" className="w-fit px-6 bg-red-600 text-white py-2
-                     rounded-lg font-medium cursor-pointer
-                     hover:bg-red-700
-                     disabled:opacity-60
-                     transition">Delete</button>
-       <button
-        onClick={() => {
-          setOpenPopup(true)
-          setEditId(aboutusData?.id)
-        }}
-            type="button"
-            className="w-fit px-6 bg-indigo-600 text-white py-2
-                     rounded-lg font-medium cursor-pointer
-                     hover:bg-indigo-700
-                     disabled:opacity-60
-                     transition"
-          >
-            {aboutusData?.id ? 'Edit' : 'Create'}
-          </button>
-
-      </div>
-      <CustomDialog
-        open={confirmationDialog ? true : false}
-        handleClose={handleClose}
-        heading={`Confirm delete Society`}
-        actions={confirmationDialogActions}
-        size='sm'
-      >
-        <div className="mb-3">
-          <p>Are you sure you want to delete this Society?</p>
+      <div className="p-6 w-fit rounded-2xl">
+        <PageTitle title={"Master Configuration"} />
+        <div className="flex gap-6 py-3 border-b border-gray-300 justify-between items-center">
+          <p className="text-sm font-semibold text-gray-500">Mobile Application Available:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.mobileAppAvailable ? 'Yes' : 'No'}</p>
         </div>
-      </CustomDialog>
-      {openPopup && (
-        <AboutsusDialog
-          open={openPopup}
-          aboutusId={editId}
-          onClose={(isUpdate) => {
-            setEditId(null);
-            setOpenPopup(false);
-            if (isUpdate) {
-              fetchAboutusData();
-            }
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Address:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.address ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Description:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.description ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Phone Number:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.phoneNumber ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Email Address:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.email ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Latitude:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.latitude ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Longitude:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.longitude ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Instagram Link:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.instagramLink ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Facebook Link:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.fbLink ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Twitter Link:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.twitterLink ?? '-'}</p>
+        </div>
+
+        <div className="flex gap-6 items-center py-3 border-b border-gray-300 justify-between">
+          <p className="text-sm font-semibold text-gray-500">Youtube Link:</p>
+          <p className="text-sm text-gray-800">{aboutusData?.youtubeLink ?? '-'}</p>
+        </div>
+        
+        <div className="mt-4 flex items-center py-3 gap-6">
+          <button onClick={() => {
+            setConfirmationDialog(aboutusData?.id)
+          }} type="button" className="w-fit px-6 bg-red-600 text-white py-2
+                      rounded-lg font-medium cursor-pointer
+                      hover:bg-red-700
+                      disabled:opacity-60
+                      transition">Delete</button>
+        <button
+          onClick={() => {
+            setOpenPopup(true)
+            setEditId(aboutusData?.id)
           }}
-        />
-      )}
+              type="button"
+              className="w-fit px-6 bg-indigo-600 text-white py-2
+                      rounded-lg font-medium cursor-pointer
+                      hover:bg-indigo-700
+                      disabled:opacity-60
+                      transition"
+            >
+              {aboutusData?.id ? 'Edit' : 'Create'}
+            </button>
+
+        </div>
+        <CustomDialog
+          open={confirmationDialog ? true : false}
+          handleClose={handleClose}
+          heading={`Confirm delete Society`}
+          actions={confirmationDialogActions}
+          size='sm'
+        >
+          <div className="mb-3">
+            <p>Are you sure you want to delete this Society?</p>
+          </div>
+        </CustomDialog>
+        {openPopup && (
+          <AboutsusDialog
+            open={openPopup}
+            aboutusId={editId}
+            onClose={(isUpdate) => {
+              setEditId(null);
+              setOpenPopup(false);
+              if (isUpdate) {
+                fetchAboutusData();
+              }
+            }}
+          />
+        )}
+      </div>
     </MainWrapper>
   );
 }
