@@ -57,7 +57,16 @@ export default function PropertiesTable({ propertyList, propertyData, openFilter
     { field: "category", headerName: "Category", flex: 1 },
     { field: "carpetArea", headerName: "Carpet Area", flex: 1 },
     { field: "city", headerName: "City", flex: 1 },
-    { field: "owner", headerName: "Owner", flex: 1 },
+    { field: "postedBy", headerName: "Posted By", flex: 1 },
+    {
+      field: "role", headerName: "Role", flex: 1,
+      renderCell: (params) => {
+        const role = params.value;
+        if (role === 'CHANNEL_PARTNER') return <span className="text-blue-600 font-medium">Channel Partner</span>;
+        if (role === 'OWNER') return <span className="text-green-600 font-medium">Owner</span>;
+        return role || '';
+      }
+    },
     { field: "price", headerName: "Price", flex: 1 },
     { field: "status", headerName: "Status", flex: 1 },
     {
@@ -145,7 +154,8 @@ export default function PropertiesTable({ propertyList, propertyData, openFilter
       carpetArea: item?.carpetArea ?? '',
       city: item?.city?.name ?? '',
       listingType: item?.listingType?.name ?? '',
-      owner: item?.owner?.name ?? '',
+      postedBy: item?.owner?.name ?? '',
+      role: item?.owner?.role ?? '',
       status: item?.status ?? '',
     }));
   }, [propertyList]);
