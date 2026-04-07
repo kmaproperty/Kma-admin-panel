@@ -237,21 +237,21 @@ export default function ViewProperty() {
                         <p className='text-md text-gray-500 mt-1'>({propertyDetails?.owner?.role || 'Owner'})</p>
                         <div className="flex flex-col py-4 w-full">
                             {
-                                propertyDetails?.owner.email ?
+                                propertyDetails?.owner?.email ?
                                     <div className="flex justify-between w-full py-3 px-1 border-t border-b border-gray-200">
                                         <p className="text-gray-500">Email:</p>
-                                        <a href={`mailto:${propertyDetails?.owner.email}`} className="text-gray-600 font-medium">
-                                            {propertyDetails?.owner.email}
+                                        <a href={`mailto:${propertyDetails?.owner?.email}`} className="text-gray-600 font-medium">
+                                            {propertyDetails?.owner?.email}
                                         </a>
                                     </div>
                                     : ''
                             }
                             {
-                                propertyDetails?.owner.phone ?
+                                propertyDetails?.owner?.phone ?
                                     <div className="flex justify-between w-full py-3 px-1 border-t border-b border-gray-200">
                                         <p className="text-gray-500">Phone:</p>
-                                        <a href={`tel:${propertyDetails?.owner.phone}`} className="text-gray-600 font-medium">
-                                            {propertyDetails?.owner.phone}
+                                        <a href={`tel:${propertyDetails?.owner?.phone}`} className="text-gray-600 font-medium">
+                                            {propertyDetails?.owner?.phone}
                                         </a>
                                     </div>
                                     : ''
@@ -288,7 +288,7 @@ export default function ViewProperty() {
                                     />
                                     <div className="flex gap-1 items-center bg-amber-50 px-2 py-1 rounded-lg">
                                         <img src="/assets/star.svg" className="text-yellow-400 w-6 h-6"/>
-                                        <p className="text-base text-gray-700">{propertyDetails.ratingDetails.summary.averageOverallRating}/5 <span className="text-sm text-gray-400">({propertyDetails.ratingDetails.summary.totalReviews})</span></p>
+                                        <p className="text-base text-gray-700">{propertyDetails?.ratingDetails?.summary.averageOverallRating}/5 <span className="text-sm text-gray-400">({propertyDetails?.ratingDetails.summary.totalReviews})</span></p>
                                     </div>
                                 </p>
                                 {(propertyDetails?.flatNumber || propertyDetails?.city.name || propertyDetails?.plotNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber) && <span className="flex justify-start gap-2 items-center  text-gray-500"> <MapPin size={18} /> {propertyDetails?.flatNumber || propertyDetails?.houseNumber || propertyDetails?.villaNumber} {propertyDetails?.locality?.name ? `${propertyDetails?.locality?.name}, ` : ''} {propertyDetails?.city.name ? `${propertyDetails?.city.name}, ` : ''} {propertyDetails?.city?.state ?? ''}</span>}
