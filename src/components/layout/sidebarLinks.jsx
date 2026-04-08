@@ -1,4 +1,4 @@
-import { Binary, Building, ChartArea, CircleUserRound, Gauge, Cog , Logs, Users, UserStar, BookUser, MessageSquare, Star, Info, User  } from "lucide-react";
+import { Binary, Building, ChartArea, CircleUserRound, Gauge, Cog , Logs, Users, UserStar, BookUser, MessageSquare, Star, Info, User, CircleStar  } from "lucide-react";
 
 export const navLinks = [
     {
@@ -63,10 +63,10 @@ export const navLinks = [
     {
         name: "Top Properties",
         path: "/top-properties",
-        icon: <Star className="w-5 h-5" />,
+        icon: <CircleStar className="w-5 h-5" />,
         children: [
-            { name: "Manage Top Properties", path: "/top-properties", icon: <Star className="w-5 h-5" /> },
-            { name: "Featured Properties", path: "/featured-properties", icon: <Star className="w-5 h-5" /> },
+            { name: "Manage Top Properties", path: "/top-properties", icon: <CircleStar className="w-5 h-5" /> },
+            { name: "Featured Properties", path: "/featured-properties", icon: <CircleStar className="w-5 h-5" /> },
         ],
     },
     {
@@ -83,6 +83,14 @@ export const navLinks = [
         icon: <MessageSquare className="w-5 h-5" />,
         children: [
             { name: "Contact Us Queries", path: "/contact-us", icon: <Logs className="w-5 h-5" /> },
+        ],
+    },
+    {
+        name: "User Reviews",
+        path: "/reviews",
+        icon: <Star className="w-5 h-5" />,
+        children: [
+            { name: "Reviews Listing", path: "/reviews", icon: <Star className="w-5 h-5" /> },
         ],
     },
     {

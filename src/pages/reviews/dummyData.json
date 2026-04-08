@@ -1,0 +1,12 @@
+[
+  { "id": 1, "username": "alice_wonder", "createdAt": "2026-01-05T08:23:11Z", "rating": 5, "review": "Absolutely fantastic course! Loved every module.", "isTop": true },
+  { "id": 2, "username": "john_doe92", "createdAt": "2026-01-12T14:10:45Z", "rating": 4, "review": "Very informative, but some sections felt rushed.", "isTop": false },
+  { "id": 3, "username": "sara_m", "createdAt": "2026-01-19T09:55:30Z", "rating": 5, "review": "Best investment I made this year. Highly recommend!", "isTop": true },
+  { "id": 4, "username": "mike_t", "createdAt": "2026-02-03T11:40:22Z", "rating": 3, "review": "Decent content but the UI could be improved.", "isTop": false },
+  { "id": 5, "username": "priya_k", "createdAt": "2026-02-14T16:05:18Z", "rating": 5, "review": "Exceptional explanations, especially for beginners.", "isTop": true },
+  { "id": 6, "username": "leo_burns", "createdAt": "2026-02-28T10:33:50Z", "rating": 2, "review": "Expected more depth in the advanced topics.", "isTop": false },
+  { "id": 7, "username": "nina_ray", "createdAt": "2026-03-07T13:22:41Z", "rating": 4, "review": "Great course overall. Would love more practice problems.", "isTop": false },
+  { "id": 8, "username": "carlos_v", "createdAt": "2026-03-15T08:11:09Z", "rating": 5, "review": "Instructor is very clear and engaging throughout.", "isTop": true },
+  { "id": 9, "username": "emma_stone99", "createdAt": "2026-03-22T15:47:33Z", "rating": 3, "review": "Good start but content needs regular updates.", "isTop": false },
+  { "id": 10, "username": "rahul_dev", "createdAt": "2026-04-01T07:58:27Z", "rating": 4, "review": "Solid course with real-world examples. Very practical.", "isTop": true }
+]
