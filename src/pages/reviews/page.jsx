@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Autocomplete, TextField, Switch } from "@mui/material";
+import { Autocomplete, TextField, Switch, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
 import { propertyListApiPayload, markTopPropertiesApiHandler, removeTopPropertiesApiHandler } from "../../services/postProperty";
 import { fetchCities } from "../../services/cities";
@@ -9,6 +9,7 @@ import CustomDataGrid from "../../components/common/CustomDataGrid";
 import MainWrapper from "../../components/common/layout/mainWrapper";
 import reviewsData from './dummyData.json';
 import { format, parseISO } from "date-fns";
+import { CheckCheck, Flag, OctagonMinusIcon, X } from "lucide-react";
 
 export default function ReviewsList() {
   const [tableData, setTableData] = useState(reviewsData);
@@ -145,6 +146,22 @@ export default function ReviewsList() {
         </div>
       ),
     },
+    {
+                field: "actions",
+                headerName: "Actions",
+                width: 80,
+                renderCell: (params) => (
+                    <div className="w-full flex justify-end items-center">
+                        <Tooltip title={params.row.isApprove ? "Approve" : "Reject" }>
+                            <button className={`mr-2 mt-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isApprove ? "bg-red-50" : "bg-green-50" }`} onClick={() => setConfirmationDialog({ id: String(params.id), isApprove: params.row.isApprove })}>
+                                {
+                                    params.row.isApprove ? <X className="text-red-800 w-4.5 h-4.5" /> : <CheckCheck className="text-green-800 w-4.5 h-4.5" />  
+                                }
+                            </button>
+                        </Tooltip>
+                    </div>
+                ),
+            },
   ];
 
   const rows = useMemo(() => {
@@ -156,6 +173,7 @@ export default function ReviewsList() {
       rating: item.rating,
       review: item.review,
       isTop: item.isTop,
+      isApprove: item.isApprove,
     }));
   }, [tableData]);
 
