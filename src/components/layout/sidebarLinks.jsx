@@ -1,4 +1,4 @@
-import { Binary, Building, ChartArea, CircleUserRound, Gauge, Cog , Logs, Users, UserStar, BookUser, MessageSquare, Star, Info, User, CircleStar  } from "lucide-react";
+import { Binary, Building, ChartArea, CircleUserRound, Gauge, Cog , Logs, Users, UserStar, BookUser, MessageSquare, Star, Info, User, CircleStar, HandCoins, Coins  } from "lucide-react";
 
 export const navLinks = [
     {
@@ -75,6 +75,15 @@ export const navLinks = [
         icon: <Info className="w-5 h-5" />,
         children: [
             { name: "About Us Content", path: "/about-us", icon: <Info className="w-5 h-5" /> },
+        ],
+    },
+    {
+        name: "Referrals",
+        path: "/referrals",
+        icon: <HandCoins className="w-5 h-5" />,
+        children: [
+            { name: "All Referrals", path: "/referrals/list", icon: <HandCoins className="w-5 h-5" /> },
+            { name: "Payout", path: "/referrals/payout", icon: <Coins className="w-5 h-5" /> },
         ],
     },
     {
