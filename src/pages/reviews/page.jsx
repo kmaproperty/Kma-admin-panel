@@ -147,21 +147,21 @@ export default function ReviewsList() {
       ),
     },
     {
-                field: "actions",
-                headerName: "Actions",
-                width: 80,
-                renderCell: (params) => (
-                    <div className="w-full flex justify-end items-center">
-                        <Tooltip title={params.row.isApprove ? "Approve" : "Reject" }>
-                            <button className={`mr-2 mt-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isApprove ? "bg-red-50" : "bg-green-50" }`} onClick={() => setConfirmationDialog({ id: String(params.id), isApprove: params.row.isApprove })}>
-                                {
-                                    params.row.isApprove ? <X className="text-red-800 w-4.5 h-4.5" /> : <CheckCheck className="text-green-800 w-4.5 h-4.5" />  
-                                }
-                            </button>
-                        </Tooltip>
-                    </div>
-                ),
-            },
+        field: "actions",
+        headerName: "Actions",
+        width: 80,
+        renderCell: (params) => (
+            <div className="w-full flex justify-end items-center">
+                <Tooltip title={params.row.isApprove ? "Reject" : "Approve" }>
+                    <button className={`mr-2 mt-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isApprove ? "bg-red-50" : "bg-green-50" }`} onClick={() => setConfirmationDialog({ id: String(params.id), isApprove: params.row.isApprove })}>
+                        {
+                            params.row.isApprove ? <X className="text-red-800 w-4.5 h-4.5" /> : <CheckCheck className="text-green-800 w-4.5 h-4.5" />  
+                        }
+                    </button>
+                </Tooltip>
+            </div>
+        ),
+    },
   ];
 
   const rows = useMemo(() => {
@@ -190,7 +190,7 @@ export default function ReviewsList() {
         page={pagination.page - 1}
         pageSize={pagination.limit}
         rowCount={pagination.totalPage}
-        style={{ height: "calc(100vh - 240px)" }}
+        style={{ height: "calc(100vh - 150px)" }}
       />
     </MainWrapper>
   );
