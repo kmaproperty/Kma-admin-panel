@@ -35,6 +35,7 @@ import EditCustomer from "../pages/customers/editCustomer.jsx";
 import ViewOwner from "../pages/owners/ViewOwner.jsx";
 import ViewCustomer from "../pages/customers/ViewCustomer.jsx";
 import ReviewsList from "../pages/reviews/page.jsx";
+import ReferralsAdminPage from "../pages/referrals/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
           { path: '/customers/view/:id', element: <ViewCustomer /> },
           { path: '/customers/edit/:id', element: <EditCustomer  /> },
           { path: '/reviews', element: <ReviewsList /> },
+          { path: '/referrals', element: <ReferralsAdminPage /> },
           { path: '/admins', element: <AdminList /> },
           { path: '/admins/add', element: <AddEditAdmin /> },
           { path: '/permissions', element: <PermissionList /> },
