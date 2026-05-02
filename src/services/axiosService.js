@@ -10,10 +10,15 @@ export const axiosInstance = axios.create({
   },
 });
 
-// Request Interceptor: Attach access token
+// Request Interceptor: Attach access token.
+// The "Add KMA Property" page stashes a Channel-Partner-shaped token in
+// sessionStorage so its property/* and uploads/* calls are authenticated as
+// the KMA Internal CP (not as the admin). Honour that override when set,
+// otherwise fall back to the regular admin accessToken in localStorage.
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const cpToken = sessionStorage.getItem("cpAccessToken");
+    const accessToken = cpToken || localStorage.getItem("accessToken");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
