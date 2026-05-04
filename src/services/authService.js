@@ -32,6 +32,11 @@ export const handleRefreshToken = async () => {
 
 export const loginApi = async (payload) => {
   try {
+    // Clear any stale KMA Internal CP tokens left in sessionStorage from a
+    // previous Add-KMA-Property session — otherwise the axios interceptor
+    // could attach them to fresh admin requests and trigger an instant 401.
+    sessionStorage.removeItem("cpAccessToken");
+    sessionStorage.removeItem("cpRefreshToken");
     const response = await axiosInstance.post("admin/login", payload);
     return response.data;
   } catch (error) {
