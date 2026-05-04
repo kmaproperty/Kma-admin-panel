@@ -26,6 +26,36 @@ const STEPS = [
   { id: 4, label: "Photos" },
 ];
 
+/**
+ * Defensive shape unwrap. The backend returns a mix of:
+ *   - bare arrays
+ *   - { success, data: [...] }
+ *   - { success, <namedKey>: [...] } (e.g. bhkTypes, listingTypes)
+ *   - { success, message, data: ["string", "string"] } (cities)
+ * Always returns an array — never throws on bad shapes.
+ */
+const toArr = (r, ...keys) => {
+  if (Array.isArray(r)) return r;
+  if (!r || typeof r !== "object") return [];
+  for (const k of keys) {
+    if (Array.isArray(r[k])) return r[k];
+  }
+  if (Array.isArray(r.data)) return r.data;
+  // last resort: pick first array-typed value
+  for (const v of Object.values(r)) {
+    if (Array.isArray(v)) return v;
+  }
+  return [];
+};
+
+/** Cities endpoint sometimes returns ["Delhi","Noida"] strings instead of objects. */
+const normalizeCities = (raw) => {
+  const arr = toArr(raw, "cities");
+  return arr.map((c, i) =>
+    typeof c === "string" ? { id: c, name: c, _stringRef: true } : { id: c?.id ?? c?.name ?? `city-${i}`, name: c?.name ?? c?.id }
+  );
+};
+
 function useKmaCpSession() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(null);
@@ -53,37 +83,65 @@ function useKmaCpSession() {
   return { ready, error };
 }
 
-const Field = ({ label, required, error, children, full }) => (
-  <label className={`block ${full ? "md:col-span-2" : ""}`}>
-    <span className="block text-xs font-medium text-gray-700 mb-1">
-      {label} {required && <span className="text-red-600">*</span>}
-    </span>
+const Field = ({ label, required, error, hint, children, className = "" }) => (
+  <label className={`block ${className}`}>
+    <div className="flex items-center justify-between mb-1.5">
+      <span className="text-xs font-medium text-text-black">
+        {label} {required && <span className="text-text-red">*</span>}
+      </span>
+      {hint && <span className="text-[11px] text-text-gray">{hint}</span>}
+    </div>
     {children}
-    {error && <span className="block mt-1 text-xs text-red-600">{error}</span>}
+    {error && <span className="block mt-1 text-xs text-text-red">{error}</span>}
   </label>
 );
-const Input = (props) => <input {...props} className={`w-full h-10 rounded-md border border-gray-300 px-3 text-sm ${props.className ?? ""}`} />;
-const Select = ({ children, ...props }) => <select {...props} className={`w-full h-10 rounded-md border border-gray-300 px-3 text-sm ${props.className ?? ""}`}>{children}</select>;
-const Textarea = (props) => <textarea {...props} className={`w-full rounded-md border border-gray-300 p-3 text-sm ${props.className ?? ""}`} />;
+const inputBase = "w-full h-10 rounded-full border border-border focus:border-blue focus:outline-none px-4 text-sm text-text-black placeholder:text-text-gray bg-white transition";
+const Input = ({ className = "", ...props }) => <input {...props} className={`${inputBase} ${className}`} />;
+const Select = ({ children, className = "", ...props }) => (
+  <select {...props} className={`${inputBase} pr-8 appearance-none cursor-pointer ${className}`}>
+    {children}
+  </select>
+);
+const Textarea = ({ className = "", ...props }) => (
+  <textarea {...props} className={`w-full rounded-2xl border border-border focus:border-blue focus:outline-none p-4 text-sm text-text-black placeholder:text-text-gray bg-white transition ${className}`} />
+);
+
+const SectionTitle = ({ children }) => (
+  <h3 className="text-sm font-semibold text-text-black border-b border-border pb-2 mb-4">{children}</h3>
+);
 
 const Stepper = ({ active }) => (
-  <div className="flex items-center gap-2 mb-5 flex-wrap">
-    {STEPS.map((s, i) => (
-      <div key={s.id} className="flex items-center gap-2">
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
-          active === s.id
-            ? "bg-blue-600 text-white border-blue-600"
-            : active > s.id
-              ? "bg-green-50 text-green-700 border-green-200"
-              : "bg-gray-50 text-gray-600 border-gray-200"
-        }`}>
-          {active > s.id ? <Check className="w-3.5 h-3.5" /> : <span>{s.id}</span>}
-          <span>{s.label}</span>
+  <div className="flex items-center gap-3 mb-6 flex-wrap bg-white rounded-2xl border border-border p-4">
+    {STEPS.map((s, i) => {
+      const done = active > s.id;
+      const current = active === s.id;
+      return (
+        <div key={s.id} className="flex items-center gap-3">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold border transition ${
+            current ? "bg-blue text-white border-blue" : done ? "bg-light-purple text-blue border-blue" : "bg-background-gray text-text-gray border-border"
+          }`}>
+            <span className={`flex items-center justify-center w-5 h-5 rounded-full ${current ? "bg-white text-blue" : done ? "bg-blue text-white" : "bg-white text-text-gray border border-border"}`}>
+              {done ? <Check className="w-3 h-3" /> : s.id}
+            </span>
+            <span>{s.label}</span>
+          </div>
+          {i < STEPS.length - 1 && <span className="text-border">—</span>}
         </div>
-        {i < STEPS.length - 1 && <span className="text-gray-300">—</span>}
-      </div>
-    ))}
+      );
+    })}
   </div>
+);
+
+const PillCard = ({ active, onClick, children, className = "" }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`px-5 py-3 rounded-2xl border text-sm font-medium transition ${
+      active ? "bg-light-purple border-blue text-blue" : "bg-white border-border text-text-black hover:border-blue"
+    } ${className}`}
+  >
+    {children}
+  </button>
 );
 
 export default function AddKmaProperty() {
@@ -114,7 +172,7 @@ export default function AddKmaProperty() {
   const [societyName, setSocietyName] = useState("");
   const [localityName, setLocalityName] = useState("");
 
-  // Step 2 (sale + rent)
+  // Step 2
   const [floorNumber, setFloorNumber] = useState("");
   const [totalFloors, setTotalFloors] = useState("");
   const [price, setPrice] = useState("");
@@ -130,7 +188,7 @@ export default function AddKmaProperty() {
   const [lockInMonths, setLockInMonths] = useState("");
   const [brokerageType, setBrokerageType] = useState("none");
   const [brokerageAmount, setBrokerageAmount] = useState("");
-  const [tenantType, setTenantType] = useState([]); // array
+  const [tenantType, setTenantType] = useState([]);
   const [isLiftAvailable, setIsLiftAvailable] = useState(false);
   const [privateParking, setPrivateParking] = useState("");
   const [publicParking, setPublicParking] = useState("");
@@ -141,38 +199,37 @@ export default function AddKmaProperty() {
   const [reservedParkingOpen, setReservedParkingOpen] = useState("");
   const [powerBackup, setPowerBackup] = useState("No Back-up");
   const [furnishType, setFurnishType] = useState("Unfurnished");
-  const [furnishingsCounts, setFurnishingsCounts] = useState({}); // {item: count}
+  const [furnishingsCounts, setFurnishingsCounts] = useState({});
   const [amenities, setAmenities] = useState([]);
   const [waterSource, setWaterSource] = useState("Municipal Supply");
   const [description, setDescription] = useState("");
 
   // Step 4
-  const [photos, setPhotos] = useState([]); // [{file, preview, view, isCover}]
+  const [photos, setPhotos] = useState([]);
 
-  // Master data
   const enabled = session.ready;
-  const { data: listingTypes } = useQuery({ queryKey: ["pp-lt"], queryFn: getPropertyListApiHandler, enabled, select: (r) => r?.data ?? r ?? [] });
-  const { data: categories } = useQuery({ queryKey: ["pp-cat"], queryFn: getPropertyCategoryApiHandler, enabled, select: (r) => r?.data ?? r ?? [] });
-  const { data: cities } = useQuery({ queryKey: ["pp-city"], queryFn: getCityApiHandler, enabled, select: (r) => r?.data ?? r ?? [] });
-  const { data: amenityList } = useQuery({ queryKey: ["pp-am"], queryFn: getAmenitiesApiHandler, enabled, select: (r) => r?.data ?? r ?? [] });
-  const { data: furnishingList } = useQuery({ queryKey: ["pp-fu"], queryFn: getFurnishingsApiHandler, enabled, select: (r) => r?.data ?? r ?? [] });
-  const { data: roomsList } = useQuery({ queryKey: ["pp-rm"], queryFn: getAdditionalRoomsApiHandler, enabled, select: (r) => r?.data ?? r ?? [] });
+  const { data: listingTypes = [] } = useQuery({ queryKey: ["pp-lt"], queryFn: getPropertyListApiHandler, enabled, select: (r) => toArr(r, "listingTypes") });
+  const { data: categories = [] } = useQuery({ queryKey: ["pp-cat"], queryFn: getPropertyCategoryApiHandler, enabled, select: (r) => toArr(r, "categories") });
+  const { data: cities = [] } = useQuery({ queryKey: ["pp-city"], queryFn: getCityApiHandler, enabled, select: normalizeCities });
+  const { data: amenityList = [] } = useQuery({ queryKey: ["pp-am"], queryFn: getAmenitiesApiHandler, enabled, select: (r) => toArr(r, "amenities") });
+  const { data: furnishingList = [] } = useQuery({ queryKey: ["pp-fu"], queryFn: getFurnishingsApiHandler, enabled, select: (r) => toArr(r, "furnishings") });
+  const { data: roomsList = [] } = useQuery({ queryKey: ["pp-rm"], queryFn: getAdditionalRoomsApiHandler, enabled, select: (r) => toArr(r, "rooms") });
 
-  const listingTypeCode = useMemo(() => listingTypes?.find((l) => l.id === listingTypeId)?.code, [listingTypes, listingTypeId]);
-  const categoryCode = useMemo(() => categories?.find((c) => c.id === categoryId)?.code, [categories, categoryId]);
+  const listingTypeCode = useMemo(() => listingTypes.find((l) => l.id === listingTypeId)?.code, [listingTypes, listingTypeId]);
+  const categoryCode = useMemo(() => categories.find((c) => c.id === categoryId)?.code, [categories, categoryId]);
   const isRent = listingTypeCode === "rent";
 
-  const { data: propertyTypes } = useQuery({
+  const { data: propertyTypes = [] } = useQuery({
     queryKey: ["pp-pt", listingTypeCode, categoryCode],
     queryFn: () => getPropertyTypeApiHandler({ propertyListType: listingTypeCode, propertyCategory: categoryCode }),
     enabled: !!listingTypeCode && !!categoryCode,
-    select: (r) => r?.data ?? r ?? [],
+    select: (r) => toArr(r, "propertyTypes"),
   });
-  const { data: bhkTypes } = useQuery({
+  const { data: bhkTypes = [] } = useQuery({
     queryKey: ["pp-bhk", propertyTypeId],
     queryFn: () => getBhkApiHandler({ propertyTypeId }),
     enabled: !!propertyTypeId,
-    select: (r) => r?.bhkTypes ?? r?.data ?? r ?? [],
+    select: (r) => toArr(r, "bhkTypes"),
   });
 
   useEffect(() => { setPropertyTypeId(""); setBhkTypeId(""); }, [listingTypeId, categoryId]);
@@ -226,6 +283,13 @@ export default function AddKmaProperty() {
     return Object.keys(e).length === 0;
   };
 
+  const buildCity = () => {
+    const c = cities.find((x) => x.id === cityId);
+    if (!c) return { id: cityId };
+    if (c._stringRef) return { name: c.name };
+    return { id: c.id };
+  };
+
   const submitStep1 = async () => {
     const payload = {
       ...(propertyId ? { propertyId } : {}),
@@ -244,7 +308,7 @@ export default function AddKmaProperty() {
           },
         }
         : {}),
-      city: { id: cityId },
+      city: buildCity(),
       society: { name: societyName.trim(), localityName: localityName.trim() },
       ...(builtUpArea ? { builtUpArea: Number(builtUpArea), builtUpAreaUnit: "Sq.Ft." } : {}),
       ...(carpetArea ? { carpetArea: Number(carpetArea), carpetAreaUnit: "Sq.Ft." } : {}),
@@ -355,7 +419,6 @@ export default function AddKmaProperty() {
     try {
       await submitStep4(propertyId);
       toast.update(tId, { render: "Property published & live!", type: "success", isLoading: false, autoClose: 4000 });
-      // Reset everything
       setActive(1); setPropertyId(null); setErrors({});
       setListingTypeId(""); setCategoryId(""); setPropertyTypeId(""); setBhkTypeId("");
       setBedrooms(""); setBathrooms(""); setBalconies(""); setBuiltUpArea(""); setCarpetArea("");
@@ -378,137 +441,174 @@ export default function AddKmaProperty() {
   };
 
   if (session.error) {
-    return <div className="p-6"><div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">{session.error}</div></div>;
+    return <div className="p-6"><div className="rounded-2xl border border-text-red/30 bg-text-red/5 p-4 text-sm text-text-red">{session.error}</div></div>;
   }
   if (!session.ready) {
-    return <div className="p-6 flex items-center gap-3 text-sm text-gray-600"><Loader2 className="w-4 h-4 animate-spin" />Initialising KMA Internal CP session…</div>;
+    return <div className="p-6 flex items-center gap-3 text-sm text-text-gray"><Loader2 className="w-4 h-4 animate-spin" />Initialising KMA Internal CP session…</div>;
   }
 
   return (
     <div className="p-4 lg:p-6 max-w-6xl">
-      <div className="mb-4">
-        <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">Add KMA Property</h1>
-        <p className="text-xs text-gray-500 mt-1">
-          Posting as <span className="font-medium">KMA Internal CP</span>. Auto-approved and live on submit.
+      <div className="mb-5">
+        <h1 className="text-xl lg:text-2xl font-semibold text-text-black">Add KMA Property</h1>
+        <p className="text-xs text-text-gray mt-1">
+          Posting as <span className="font-medium text-text-black">KMA Internal CP</span>. Properties added here are auto-approved and go live immediately.
         </p>
       </div>
 
       <Stepper active={active} />
 
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm space-y-6">
         {active === 1 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Listing Type" required error={errors.listingTypeId}>
-                <Select value={listingTypeId} onChange={(e) => setListingTypeId(e.target.value)}>
-                  <option value="">Select…</option>
-                  {(listingTypes ?? []).map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
-                </Select>
-              </Field>
-              <Field label="Category" required error={errors.categoryId}>
-                <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                  <option value="">Select…</option>
-                  {(categories ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </Select>
-              </Field>
-              <Field label="Property Type" required error={errors.propertyTypeId}>
-                <Select value={propertyTypeId} onChange={(e) => setPropertyTypeId(e.target.value)} disabled={!listingTypeCode || !categoryCode}>
-                  <option value="">{!listingTypeCode || !categoryCode ? "Pick listing + category first" : "Select…"}</option>
-                  {(propertyTypes ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </Select>
-              </Field>
-              <Field label="BHK Type">
-                <Select value={bhkTypeId} onChange={(e) => setBhkTypeId(e.target.value)} disabled={!propertyTypeId}>
-                  <option value="">{!propertyTypeId ? "Pick property type first" : "Select…"}</option>
-                  {(bhkTypes ?? []).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-                </Select>
-              </Field>
+            <div>
+              <SectionTitle>Listing Type</SectionTitle>
+              <div className="flex flex-wrap gap-3">
+                {listingTypes.length === 0 && <span className="text-xs text-text-gray">Loading…</span>}
+                {listingTypes.map((l) => (
+                  <PillCard key={l.id} active={listingTypeId === l.id} onClick={() => setListingTypeId(l.id)}>
+                    {l.name}
+                  </PillCard>
+                ))}
+              </div>
+              {errors.listingTypeId && <span className="block mt-1 text-xs text-text-red">{errors.listingTypeId}</span>}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <Field label="Bedrooms"><Input type="number" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} /></Field>
-              <Field label="Bathrooms"><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} /></Field>
-              <Field label="Balconies"><Input type="number" value={balconies} onChange={(e) => setBalconies(e.target.value)} /></Field>
-              <Field label="Built-up (Sq.Ft.)"><Input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(e.target.value)} /></Field>
-              <Field label="Carpet (Sq.Ft.)"><Input type="number" value={carpetArea} onChange={(e) => setCarpetArea(e.target.value)} /></Field>
+            <div>
+              <SectionTitle>Category</SectionTitle>
+              <div className="flex flex-wrap gap-3">
+                {categories.length === 0 && <span className="text-xs text-text-gray">Loading…</span>}
+                {categories.map((c) => (
+                  <PillCard key={c.id} active={categoryId === c.id} onClick={() => setCategoryId(c.id)}>
+                    {c.name}
+                  </PillCard>
+                ))}
+              </div>
+              {errors.categoryId && <span className="block mt-1 text-xs text-text-red">{errors.categoryId}</span>}
             </div>
 
-            {!isRent && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Field label="Transaction Type">
-                  <Select value={transactionType} onChange={(e) => setTransactionType(e.target.value)}>
-                    <option value="resale">Resale</option>
-                    <option value="new_booking">New Booking</option>
-                  </Select>
-                </Field>
-                <Field label="Construction Status">
-                  <Select value={constructionStatus} onChange={(e) => setConstructionStatus(e.target.value)}>
-                    <option value="ready_to_move">Ready to Move</option>
-                    <option value="under_construction">Under Construction</option>
-                  </Select>
-                </Field>
-                <Field label="Age of Property (years)"><Input type="number" value={ageOfProperty} onChange={(e) => setAgeOfProperty(e.target.value)} /></Field>
+            {!!listingTypeCode && !!categoryCode && (
+              <div>
+                <SectionTitle>Property Type</SectionTitle>
+                <div className="flex flex-wrap gap-3">
+                  {propertyTypes.length === 0 && <span className="text-xs text-text-gray">Loading…</span>}
+                  {propertyTypes.map((p) => (
+                    <PillCard key={p.id} active={propertyTypeId === p.id} onClick={() => setPropertyTypeId(p.id)}>
+                      {p.name}
+                    </PillCard>
+                  ))}
+                </div>
+                {errors.propertyTypeId && <span className="block mt-1 text-xs text-text-red">{errors.propertyTypeId}</span>}
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Field label="Possession Status">
-                <Select value={possessionStatus} onChange={(e) => setPossessionStatus(e.target.value)}>
-                  <option value="immediate">Immediate</option>
-                  <option value="future">Future</option>
-                </Select>
-              </Field>
-              {possessionStatus === "future" && (
-                <Field label="Possession Date"><Input type="date" value={possessionDate} onChange={(e) => setPossessionDate(e.target.value)} /></Field>
-              )}
-              <Field label="Facing">
-                <Select value={facing} onChange={(e) => setFacing(e.target.value)}>
-                  <option value="">Select…</option>
-                  {FACING_OPTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
-                </Select>
-              </Field>
-              <Field label="Ownership">
-                <Select value={ownership} onChange={(e) => setOwnership(e.target.value)}>
-                  <option value="">Select…</option>
-                  {OWNERSHIP_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-                </Select>
-              </Field>
+            {!!propertyTypeId && bhkTypes.length > 0 && (
+              <div>
+                <SectionTitle>BHK Type</SectionTitle>
+                <div className="flex flex-wrap gap-3">
+                  {bhkTypes.map((b) => (
+                    <PillCard key={b.id} active={bhkTypeId === b.id} onClick={() => setBhkTypeId(b.id)}>
+                      {b.name}
+                    </PillCard>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <SectionTitle>Room & Area Details</SectionTitle>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <Field label="Bedrooms"><Input type="number" value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} /></Field>
+                <Field label="Bathrooms"><Input type="number" value={bathrooms} onChange={(e) => setBathrooms(e.target.value)} /></Field>
+                <Field label="Balconies"><Input type="number" value={balconies} onChange={(e) => setBalconies(e.target.value)} /></Field>
+                <Field label="Built-up (Sq.Ft.)"><Input type="number" value={builtUpArea} onChange={(e) => setBuiltUpArea(e.target.value)} /></Field>
+                <Field label="Carpet (Sq.Ft.)"><Input type="number" value={carpetArea} onChange={(e) => setCarpetArea(e.target.value)} /></Field>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Field label="City" required error={errors.cityId}>
-                <Select value={cityId} onChange={(e) => setCityId(e.target.value)}>
-                  <option value="">Select…</option>
-                  {(cities ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </Select>
-              </Field>
-              <Field label="Locality" required error={errors.localityName}>
-                <Input value={localityName} onChange={(e) => setLocalityName(e.target.value)} placeholder="e.g. Sector 49" />
-              </Field>
-              <Field label="Society / Project" required error={errors.societyName}>
-                <Input value={societyName} onChange={(e) => setSocietyName(e.target.value)} placeholder="e.g. Pyramid Midtown" />
-              </Field>
+            <div>
+              <SectionTitle>Possession & Ownership</SectionTitle>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {!isRent && (
+                  <>
+                    <Field label="Transaction Type">
+                      <Select value={transactionType} onChange={(e) => setTransactionType(e.target.value)}>
+                        <option value="resale">Resale</option>
+                        <option value="new_booking">New Booking</option>
+                      </Select>
+                    </Field>
+                    <Field label="Construction Status">
+                      <Select value={constructionStatus} onChange={(e) => setConstructionStatus(e.target.value)}>
+                        <option value="ready_to_move">Ready to Move</option>
+                        <option value="under_construction">Under Construction</option>
+                      </Select>
+                    </Field>
+                  </>
+                )}
+                <Field label="Age of Property (years)"><Input type="number" value={ageOfProperty} onChange={(e) => setAgeOfProperty(e.target.value)} /></Field>
+                <Field label="Possession Status">
+                  <Select value={possessionStatus} onChange={(e) => setPossessionStatus(e.target.value)}>
+                    <option value="immediate">Immediate</option>
+                    <option value="future">Future</option>
+                  </Select>
+                </Field>
+                {possessionStatus === "future" && (
+                  <Field label="Possession Date"><Input type="date" value={possessionDate} onChange={(e) => setPossessionDate(e.target.value)} /></Field>
+                )}
+                <Field label="Facing">
+                  <Select value={facing} onChange={(e) => setFacing(e.target.value)}>
+                    <option value="">Select…</option>
+                    {FACING_OPTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Ownership">
+                  <Select value={ownership} onChange={(e) => setOwnership(e.target.value)}>
+                    <option value="">Select…</option>
+                    {OWNERSHIP_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                  </Select>
+                </Field>
+              </div>
+            </div>
+
+            <div>
+              <SectionTitle>Location</SectionTitle>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Field label="City" required error={errors.cityId}>
+                  <Select value={cityId} onChange={(e) => setCityId(e.target.value)}>
+                    <option value="">Select…</option>
+                    {cities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </Select>
+                </Field>
+                <Field label="Locality" required error={errors.localityName}>
+                  <Input value={localityName} onChange={(e) => setLocalityName(e.target.value)} placeholder="e.g. Sector 49" />
+                </Field>
+                <Field label="Society / Project" required error={errors.societyName}>
+                  <Input value={societyName} onChange={(e) => setSocietyName(e.target.value)} placeholder="e.g. Pyramid Midtown" />
+                </Field>
+              </div>
             </div>
           </>
         )}
 
         {active === 2 && (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Field label="Floor Number"><Input type="number" value={floorNumber} onChange={(e) => setFloorNumber(e.target.value)} /></Field>
-              <Field label="Total Floors"><Input type="number" value={totalFloors} onChange={(e) => setTotalFloors(e.target.value)} /></Field>
-              <Field label="Private Parking"><Input type="number" value={privateParking} onChange={(e) => setPrivateParking(e.target.value)} /></Field>
-              <Field label="Public Parking"><Input type="number" value={publicParking} onChange={(e) => setPublicParking(e.target.value)} /></Field>
+            <div>
+              <SectionTitle>Floor & Parking</SectionTitle>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Field label="Floor Number"><Input type="number" value={floorNumber} onChange={(e) => setFloorNumber(e.target.value)} /></Field>
+                <Field label="Total Floors"><Input type="number" value={totalFloors} onChange={(e) => setTotalFloors(e.target.value)} /></Field>
+                <Field label="Private Parking"><Input type="number" value={privateParking} onChange={(e) => setPrivateParking(e.target.value)} /></Field>
+                <Field label="Public Parking"><Input type="number" value={publicParking} onChange={(e) => setPublicParking(e.target.value)} /></Field>
+              </div>
+              <label className="inline-flex items-center gap-2 text-sm text-text-black mt-4 cursor-pointer">
+                <input type="checkbox" checked={isLiftAvailable} onChange={(e) => setIsLiftAvailable(e.target.checked)} className="h-4 w-4 rounded border-border text-blue focus:ring-blue" />
+                Lift Available
+              </label>
             </div>
 
-            <label className="inline-flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" checked={isLiftAvailable} onChange={(e) => setIsLiftAvailable(e.target.checked)} />
-              Lift Available
-            </label>
-
-            {!isRent && (
-              <div className="space-y-4">
-                <h3 className="font-medium text-gray-800 text-sm border-b pb-2">Sale Pricing</h3>
+            {!isRent ? (
+              <div>
+                <SectionTitle>Sale Pricing</SectionTitle>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Field label="Sale Price (₹)" required error={errors.price}>
                     <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 7500000" />
@@ -520,8 +620,7 @@ export default function AddKmaProperty() {
                   </Field>
                   <Field label="Brokerage">
                     <Select value={brokerageType} onChange={(e) => setBrokerageType(e.target.value)}>
-                      <option value="none">None</option>
-                      <option value="custom">Custom</option>
+                      <option value="none">None</option><option value="custom">Custom</option>
                     </Select>
                   </Field>
                   {brokerageType === "custom" && (
@@ -531,11 +630,9 @@ export default function AddKmaProperty() {
                   )}
                 </div>
               </div>
-            )}
-
-            {isRent && (
-              <div className="space-y-4">
-                <h3 className="font-medium text-gray-800 text-sm border-b pb-2">Rent Pricing</h3>
+            ) : (
+              <div>
+                <SectionTitle>Rent Pricing</SectionTitle>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Field label="Monthly Rent (₹)" required error={errors.monthlyRent}>
                     <Input type="number" value={monthlyRent} onChange={(e) => setMonthlyRent(e.target.value)} placeholder="e.g. 25000" />
@@ -551,8 +648,6 @@ export default function AddKmaProperty() {
                       <Input type="date" value={availableFromDate} onChange={(e) => setAvailableFromDate(e.target.value)} />
                     </Field>
                   )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Field label="Maintenance">
                     <Select value={maintenanceType} onChange={(e) => setMaintenanceType(e.target.value)}>
                       <option value="include_in_rent">Included in rent</option>
@@ -580,8 +675,7 @@ export default function AddKmaProperty() {
                   )}
                   <Field label="Lock-in Period">
                     <Select value={lockInType} onChange={(e) => setLockInType(e.target.value)}>
-                      <option value="none">None</option>
-                      <option value="custom">Custom</option>
+                      <option value="none">None</option><option value="custom">Custom</option>
                     </Select>
                   </Field>
                   {lockInType === "custom" && (
@@ -601,16 +695,16 @@ export default function AddKmaProperty() {
                   )}
                 </div>
 
-                <Field label="Tenant Type">
-                  <div className="flex flex-wrap gap-3 mt-1">
+                <div className="mt-4">
+                  <span className="block text-xs font-medium text-text-black mb-2">Tenant Type</span>
+                  <div className="flex flex-wrap gap-3">
                     {["family", "bachelors", "company"].map((t) => (
-                      <label key={t} className="inline-flex items-center gap-2 text-sm">
-                        <input type="checkbox" checked={tenantType.includes(t)} onChange={() => toggleArray(tenantType, setTenantType, t)} />
-                        <span className="capitalize">{t}</span>
-                      </label>
+                      <PillCard key={t} active={tenantType.includes(t)} onClick={() => toggleArray(tenantType, setTenantType, t)} className="capitalize">
+                        {t}
+                      </PillCard>
                     ))}
                   </div>
-                </Field>
+                </div>
               </div>
             )}
           </>
@@ -618,117 +712,136 @@ export default function AddKmaProperty() {
 
         {active === 3 && (
           <>
-            <Field label="Additional Rooms">
-              <div className="flex flex-wrap gap-3 mt-1">
-                {(roomsList ?? ["Pooja Room", "Servant Room", "Study Room", "Extra Room"]).map((r) => {
+            <div>
+              <SectionTitle>Additional Rooms</SectionTitle>
+              <div className="flex flex-wrap gap-3">
+                {(roomsList.length ? roomsList : [{ name: "Pooja Room" }, { name: "Servant Room" }, { name: "Study Room" }, { name: "Extra Room" }]).map((r) => {
                   const name = typeof r === "string" ? r : r?.name;
                   if (!name) return null;
                   return (
-                    <label key={name} className="inline-flex items-center gap-2 text-sm">
-                      <input type="checkbox" checked={additionalRooms.includes(name)} onChange={() => toggleArray(additionalRooms, setAdditionalRooms, name)} />
-                      <span>{name}</span>
-                    </label>
+                    <PillCard key={name} active={additionalRooms.includes(name)} onClick={() => toggleArray(additionalRooms, setAdditionalRooms, name)}>
+                      {name}
+                    </PillCard>
                   );
                 })}
               </div>
-            </Field>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Field label="Reserved Parking (Covered)"><Input type="number" value={reservedParkingCovered} onChange={(e) => setReservedParkingCovered(e.target.value)} /></Field>
-              <Field label="Reserved Parking (Open)"><Input type="number" value={reservedParkingOpen} onChange={(e) => setReservedParkingOpen(e.target.value)} /></Field>
-              <Field label="Power Backup">
-                <Select value={powerBackup} onChange={(e) => setPowerBackup(e.target.value)}>
-                  <option value="No Back-up">No Back-up</option>
-                  <option value="Available">Available</option>
-                </Select>
-              </Field>
-              <Field label="Furnish Type">
-                <Select value={furnishType} onChange={(e) => setFurnishType(e.target.value)}>
-                  <option value="Unfurnished">Unfurnished</option>
-                  <option value="Semi-Furnished">Semi-Furnished</option>
-                  <option value="Furnished">Furnished</option>
-                </Select>
-              </Field>
-              <Field label="Water Source">
-                <Select value={waterSource} onChange={(e) => setWaterSource(e.target.value)}>
-                  <option value="Municipal Supply">Municipal Supply</option>
-                  <option value="BoreWell/ Underground">Borewell / Underground</option>
-                  <option value="other">Other</option>
-                </Select>
-              </Field>
             </div>
 
-            {furnishType !== "Unfurnished" && (furnishingList ?? []).length > 0 && (
-              <Field label="Furnishings (counts)">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-1">
-                  {(furnishingList ?? []).map((f) => {
-                    const name = typeof f === "string" ? f : f?.name ?? f?.label;
-                    if (!name) return null;
-                    return (
-                      <div key={name} className="flex items-center gap-2 border rounded-md px-2 py-1">
-                        <span className="text-xs flex-1 truncate">{name}</span>
-                        <input type="number" min="0" value={furnishingsCounts[name] ?? ""} onChange={(e) => setFurnishingsCounts({ ...furnishingsCounts, [name]: e.target.value })}
-                          className="w-14 h-7 text-xs border rounded px-1" />
-                      </div>
-                    );
-                  })}
-                </div>
-              </Field>
-            )}
+            <div>
+              <SectionTitle>Parking & Power</SectionTitle>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Field label="Reserved Parking (Covered)"><Input type="number" value={reservedParkingCovered} onChange={(e) => setReservedParkingCovered(e.target.value)} /></Field>
+                <Field label="Reserved Parking (Open)"><Input type="number" value={reservedParkingOpen} onChange={(e) => setReservedParkingOpen(e.target.value)} /></Field>
+                <Field label="Power Backup">
+                  <Select value={powerBackup} onChange={(e) => setPowerBackup(e.target.value)}>
+                    <option value="No Back-up">No Back-up</option>
+                    <option value="Available">Available</option>
+                  </Select>
+                </Field>
+              </div>
+            </div>
 
-            <Field label="Amenities">
-              <div className="flex flex-wrap gap-2 mt-1 max-h-60 overflow-y-auto border rounded-md p-3">
-                {(amenityList ?? []).map((a) => {
+            <div>
+              <SectionTitle>Furnishing</SectionTitle>
+              <div className="flex flex-wrap gap-3 mb-4">
+                {["Unfurnished", "Semi-Furnished", "Furnished"].map((f) => (
+                  <PillCard key={f} active={furnishType === f} onClick={() => setFurnishType(f)}>{f}</PillCard>
+                ))}
+              </div>
+              {furnishType !== "Unfurnished" && furnishingList.length > 0 && (
+                <div>
+                  <span className="block text-xs font-medium text-text-black mb-2">Furnishings (counts)</span>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {furnishingList.map((f) => {
+                      const name = typeof f === "string" ? f : f?.name ?? f?.label;
+                      if (!name) return null;
+                      return (
+                        <div key={name} className="flex items-center gap-2 border border-border rounded-full px-3 py-1.5">
+                          <span className="text-xs flex-1 truncate text-text-black">{name}</span>
+                          <input
+                            type="number" min="0"
+                            value={furnishingsCounts[name] ?? ""}
+                            onChange={(e) => setFurnishingsCounts({ ...furnishingsCounts, [name]: e.target.value })}
+                            className="w-14 h-7 text-xs border border-border rounded-full px-2 text-center"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <SectionTitle>Amenities</SectionTitle>
+              <div className="flex flex-wrap gap-2 max-h-72 overflow-y-auto border border-border rounded-2xl p-4 bg-background-gray">
+                {amenityList.length === 0 && <span className="text-xs text-text-gray">No amenities loaded</span>}
+                {amenityList.map((a) => {
                   const id = typeof a === "string" ? a : a?.id ?? a?.name;
                   const name = typeof a === "string" ? a : a?.name;
                   if (!id) return null;
+                  const active = amenities.includes(id);
                   return (
-                    <label key={id} className="inline-flex items-center gap-2 text-xs border rounded px-2 py-1">
-                      <input type="checkbox" checked={amenities.includes(id)} onChange={() => toggleArray(amenities, setAmenities, id)} />
-                      <span>{name}</span>
-                    </label>
+                    <button key={id} type="button" onClick={() => toggleArray(amenities, setAmenities, id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition ${active ? "bg-blue text-white border-blue" : "bg-white text-text-black border-border hover:border-blue"}`}>
+                      {active && <Check className="w-3 h-3 inline mr-1" />}
+                      {name}
+                    </button>
                   );
                 })}
               </div>
-            </Field>
+            </div>
 
-            <Field label="Description">
-              <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the property" />
-            </Field>
+            <div>
+              <SectionTitle>Description & Water</SectionTitle>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <Field label="Water Source">
+                  <Select value={waterSource} onChange={(e) => setWaterSource(e.target.value)}>
+                    <option value="Municipal Supply">Municipal Supply</option>
+                    <option value="BoreWell/ Underground">Borewell / Underground</option>
+                    <option value="other">Other</option>
+                  </Select>
+                </Field>
+              </div>
+              <Field label="Description">
+                <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the property" />
+              </Field>
+            </div>
           </>
         )}
 
         {active === 4 && (
           <>
+            <SectionTitle>Photos & Cover</SectionTitle>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-700">
-                Photos <span className="text-red-600">*</span> <span className="ml-2 text-gray-500">min 2 — pick a cover</span>
-              </span>
-              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-blue-700 hover:underline">
+              <span className="text-xs text-text-gray">Min 2 photos. Pick one as the cover.</span>
+              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-blue hover:underline">
                 <Upload className="w-4 h-4" /> Add photos
                 <input type="file" multiple accept="image/*" className="hidden" onChange={onAddPhotos} />
               </label>
             </div>
-            {errors.photos && <div className="text-xs text-red-600">{errors.photos}</div>}
+            {errors.photos && <div className="text-xs text-text-red">{errors.photos}</div>}
             {photos.length === 0 ? (
-              <div className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-md p-6 text-center">
-                No photos yet. Click <span className="font-medium">Add photos</span> above.
+              <div className="text-xs text-text-gray border border-dashed border-border rounded-2xl p-8 text-center bg-background-gray">
+                No photos yet. Click <span className="font-medium text-text-black">Add photos</span> above.
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {photos.map((p, idx) => (
-                  <div key={idx} className={`relative border rounded-md p-2 ${p.isCover ? "border-blue-500 bg-blue-50" : "border-gray-200"}`}>
-                    <img src={p.preview} alt="" className="w-full h-28 object-cover rounded" />
-                    <Select value={p.view} onChange={(e) => setPhotos((prev) => prev.map((x, i) => i === idx ? { ...x, view: e.target.value } : x))} className="mt-2 h-7 text-[11px]">
+                  <div key={idx} className={`relative border-2 rounded-2xl p-2 transition ${p.isCover ? "border-blue bg-light-purple" : "border-border bg-white"}`}>
+                    <img src={p.preview} alt="" className="w-full h-32 object-cover rounded-xl" />
+                    <select value={p.view}
+                      onChange={(e) => setPhotos((prev) => prev.map((x, i) => i === idx ? { ...x, view: e.target.value } : x))}
+                      className="mt-2 w-full h-7 rounded-full border border-border px-2 text-[11px] cursor-pointer">
                       {PHOTO_VIEWS.map((v) => <option key={v} value={v}>{v}</option>)}
-                    </Select>
-                    <div className="mt-1 flex items-center justify-between">
+                    </select>
+                    <div className="mt-1 flex items-center justify-between text-[11px]">
                       <button type="button" onClick={() => setPhotos((prev) => prev.map((x, i) => ({ ...x, isCover: i === idx })))}
-                        className={`inline-flex items-center gap-1 text-[11px] font-medium ${p.isCover ? "text-blue-700" : "text-gray-600 hover:text-gray-900"}`}>
-                        <Star className={`w-3.5 h-3.5 ${p.isCover ? "fill-blue-500 text-blue-500" : ""}`} />
+                        className={`inline-flex items-center gap-1 font-medium ${p.isCover ? "text-blue" : "text-text-gray hover:text-text-black"}`}>
+                        <Star className={`w-3.5 h-3.5 ${p.isCover ? "fill-blue text-blue" : ""}`} />
                         {p.isCover ? "Cover" : "Set cover"}
                       </button>
-                      <button type="button" onClick={() => removePhoto(idx)} className="text-[11px] text-red-600 hover:underline inline-flex items-center gap-1">
+                      <button type="button" onClick={() => removePhoto(idx)} className="text-text-red hover:underline inline-flex items-center gap-1">
                         <Trash2 className="w-3.5 h-3.5" /> Remove
                       </button>
                     </div>
@@ -739,20 +852,20 @@ export default function AddKmaProperty() {
           </>
         )}
 
-        <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+        <div className="pt-5 border-t border-border flex items-center justify-between">
           <button type="button" disabled={active === 1 || submitting} onClick={() => setActive((a) => Math.max(1, a - 1))}
-            className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50">
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-5 py-2 text-sm font-medium text-text-black disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue">
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
           {active < 4 ? (
             <button type="button" onClick={onNext} disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60">
+              className="inline-flex items-center gap-2 rounded-full bg-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 disabled:opacity-60">
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Save & Next <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
             <button type="button" onClick={onPublish} disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60">
+              className="inline-flex items-center gap-2 rounded-full bg-blue px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 disabled:opacity-60">
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               {submitting ? "Publishing…" : "Publish Property"}
             </button>
