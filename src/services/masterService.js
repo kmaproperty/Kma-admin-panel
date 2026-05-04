@@ -94,6 +94,34 @@ export const getBhkApiHandler = async ({ societyId, propertyTypeId }) => {
   }
 };
 
+// --- Amenities / Furnishings / Rooms ---
+export const getAmenitiesApiHandler = async () => {
+  try {
+    const response = await axiosInstance.get("property/amenities");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
+export const getFurnishingsApiHandler = async () => {
+  try {
+    const response = await axiosInstance.get("property/furnishings");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
+export const getAdditionalRoomsApiHandler = async () => {
+  try {
+    const response = await axiosInstance.get("property/rooms");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data ?? error;
+  }
+};
+
 // --- Presigned URL for File Upload ---
 export const getFileUploadUrlApiHandler = async (payload) => {
   try {
