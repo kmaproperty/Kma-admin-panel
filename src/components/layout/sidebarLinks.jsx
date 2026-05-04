@@ -1,4 +1,4 @@
-import { Binary, Building, ChartArea, CircleUserRound, Gauge, Cog , Logs, Users, UserStar, BookUser, MessageSquare, Star, Info, User, CircleStar, Gift, Plus  } from "lucide-react";
+import { Binary, Building, ChartArea, CircleUserRound, Gauge, Cog, Logs, Users, UserStar, BookUser, MessageSquare, Star, Info, User, CircleStar, Gift, Plus, Briefcase } from "lucide-react";
 
 export const navLinks = [
     {
@@ -103,11 +103,20 @@ export const navLinks = [
         ],
     },
     {
+        name: "Jobs",
+        path: "/jobs",
+        icon: <Briefcase className="w-5 h-5" />,
+        children: [
+            { name: "Jobs List", path: "/jobs", icon: <Logs className="w-5 h-5" /> },
+            { name: "Job Categories", path: "/job-categories", icon: <Logs className="w-5 h-5" /> },
+        ],
+    },
+    {
         name: "Master Configuration",
         path: "/aboutus-configuration",
         icon: <Cog className="w-5 h-5" />,
         children: [
-            { name: "About us Configuraiton", path: "/aboutus-configuration", icon: <BookUser  className="w-5 h-5" /> },
+            { name: "About us Configuraiton", path: "/aboutus-configuration", icon: <BookUser className="w-5 h-5" /> },
         ],
     },
 ]
