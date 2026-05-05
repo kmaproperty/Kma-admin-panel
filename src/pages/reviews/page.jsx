@@ -1,84 +1,80 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Autocomplete, TextField, Switch, Tooltip } from "@mui/material";
+import { Switch } from "@mui/material";
 import { toast } from "react-toastify";
-import { propertyListApiPayload, markTopPropertiesApiHandler, removeTopPropertiesApiHandler } from "../../services/postProperty";
-import { fetchCities } from "../../services/cities";
+import { format, parseISO } from "date-fns";
+import {
+  fetchKmaReviews,
+  approveKmaReview,
+  disapproveKmaReview,
+} from "../../services/reviews";
 import PageTitle from "../../components/common/layout/PageTitle";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import MainWrapper from "../../components/common/layout/mainWrapper";
-import reviewsData from './dummyData.json';
-import { format, parseISO } from "date-fns";
-import { CheckCheck, Flag, OctagonMinusIcon, X } from "lucide-react";
 
 export default function ReviewsList() {
-  const [tableData, setTableData] = useState(reviewsData);
+  const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     limit: 10,
     page: 1,
     totalPage: 0,
   });
+  const [pendingToggleId, setPendingToggleId] = useState(null);
 
-  // Fetch properties for selected city
-  // const { mutate: fetchProperties, isLoading } = useMutation({
-  //   mutationFn: propertyListApiPayload,
-  //   onSuccess: (data) => {
-  //     if (data) {
-  //       setPagination((pre) => ({
-  //         ...pre,
-  //         totalPage: data.total,
-  //       }));
-  //     }
-  //     setTableData(data?.data ?? data?.properties ?? []);
-  //   },
-  //   onError: () => {
-  //     toast.error("Failed to load properties");
-  //   },
-  // });
+  const { mutate: fetchData, isPending: isLoading } = useMutation({
+    mutationFn: fetchKmaReviews,
+    onSuccess: (data) => {
+      setTableData(data?.data ?? []);
+      setPagination((pre) => ({
+        ...pre,
+        totalPage: data?.total ?? 0,
+      }));
+    },
+    onError: () => {
+      toast.error("Failed to load reviews");
+    },
+  });
 
-  // // Mark as top property
-  // const { mutate: markTop } = useMutation({
-  //   mutationFn: markTopPropertiesApiHandler,
-  //   onSuccess: () => {
-  //     toast.success("Property marked as top");
-  //     if (selectedCity) {
-  //       fetchProperties({
-  //         page: pagination.page,
-  //         limit: pagination.limit,
-  //         cityId: selectedCity.id,
-  //       });
-  //     }
-  //   },
-  //   onError: () => {
-  //     toast.error("Failed to mark property as top");
-  //   },
-  // });
+  const refetch = useCallback(() => {
+    fetchData({ page: pagination.page, limit: pagination.limit });
+  }, [fetchData, pagination.page, pagination.limit]);
 
-  // // Remove from top properties
-  // const { mutate: removeTop } = useMutation({
-  //   mutationFn: removeTopPropertiesApiHandler,
-  //   onSuccess: () => {
-  //     toast.success("Property removed from top");
-  //     if (selectedCity) {
-  //       fetchProperties({
-  //         page: pagination.page,
-  //         limit: pagination.limit,
-  //         cityId: selectedCity.id,
-  //       });
-  //     }
-  //   },
-  //   onError: () => {
-  //     toast.error("Failed to remove property from top");
-  //   },
-  // });
+  const { mutate: approveMutate } = useMutation({
+    mutationFn: approveKmaReview,
+    onSuccess: () => {
+      toast.success("Review marked as top");
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Failed to approve review");
+    },
+    onSettled: () => setPendingToggleId(null),
+  });
 
-  const handleToggleTop = useCallback((id, isTop) => {
-    // if (isTop) {
-    //   removeTop({ id });
-    // } else {
-    //   markTop({ id });
-    // }
-  }, []);
+  const { mutate: disapproveMutate } = useMutation({
+    mutationFn: disapproveKmaReview,
+    onSuccess: () => {
+      toast.success("Review removed from top");
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Failed to disapprove review");
+    },
+    onSettled: () => setPendingToggleId(null),
+  });
+
+  const handleToggleTop = useCallback(
+    (id, currentlyApproved) => {
+      if (!id) return;
+      setPendingToggleId(id);
+      if (currentlyApproved) {
+        disapproveMutate({ id });
+      } else {
+        approveMutate({ id });
+      }
+    },
+    [approveMutate, disapproveMutate],
+  );
 
   const onPageChange = useCallback((uiPage) => {
     const newPage = uiPage + 1;
@@ -95,10 +91,26 @@ export default function ReviewsList() {
     });
   }, []);
 
+  useEffect(() => {
+    fetchData({ page: pagination.page, limit: pagination.limit });
+  }, [pagination.page, pagination.limit]);
+
   const columns = [
     {
       field: "username",
       headerName: "Username",
+      flex: 0.6,
+      renderCell: (params) => (
+        <div className="h-full flex items-center">
+          <p className="truncate" title={params.value}>
+            {params.value}
+          </p>
+        </div>
+      ),
+    },
+    {
+      field: "phoneNumber",
+      headerName: "Phone",
       flex: 0.5,
       renderCell: (params) => (
         <div className="h-full flex items-center">
@@ -111,7 +123,7 @@ export default function ReviewsList() {
     {
       field: "rating",
       headerName: "Ratings",
-      flex: 0.5,
+      flex: 0.4,
       renderCell: (params) => (
         <div className="h-full flex items-center">
           <p className="truncate" title={params.value}>
@@ -123,7 +135,7 @@ export default function ReviewsList() {
     {
       field: "review",
       headerName: "Review",
-      flex: 1,
+      flex: 1.2,
       renderCell: (params) => (
         <div className="h-full flex items-center">
           <p className="truncate" title={params.value}>
@@ -133,47 +145,41 @@ export default function ReviewsList() {
       ),
     },
     {
-      field: "isTop",
+      field: "createdAt",
+      headerName: "Created",
+      flex: 0.6,
+    },
+    {
+      field: "isApproved",
       headerName: "Top Review",
       flex: 0.5,
+      sortable: false,
+      filterable: false,
       renderCell: (params) => (
         <div className="h-full flex items-center">
           <Switch
             checked={!!params.value}
+            disabled={pendingToggleId === params.row.id}
             onChange={() => handleToggleTop(params.row.id, params.value)}
             size="small"
           />
         </div>
       ),
     },
-    {
-                field: "actions",
-                headerName: "Actions",
-                width: 80,
-                renderCell: (params) => (
-                    <div className="w-full flex justify-end items-center">
-                        <Tooltip title={params.row.isApprove ? "Approve" : "Reject" }>
-                            <button className={`mr-2 mt-3 py-2 px-3 bg-gray-50 rounded-sm cursor-pointer ${params.row.isApprove ? "bg-red-50" : "bg-green-50" }`} onClick={() => setConfirmationDialog({ id: String(params.id), isApprove: params.row.isApprove })}>
-                                {
-                                    params.row.isApprove ? <X className="text-red-800 w-4.5 h-4.5" /> : <CheckCheck className="text-green-800 w-4.5 h-4.5" />  
-                                }
-                            </button>
-                        </Tooltip>
-                    </div>
-                ),
-            },
   ];
 
   const rows = useMemo(() => {
     if (!tableData) return [];
     return tableData.map((item) => ({
       id: item.id,
-      username: item.username || "-",
-      createdAt: format(parseISO(item.createdAt), "dd/MM/yyyy"),
-      rating: item.rating,
-      review: item.review,
-      isTop: item.isTop,
-      isApprove: item.isApprove,
+      username: item.endUser?.name || item.name || "-",
+      phoneNumber: item.phoneNumber || item.endUser?.phone || "-",
+      rating: item.rating ?? "-",
+      review: item.review || "-",
+      isApproved: !!item.isApproved,
+      createdAt: item.createdAt
+        ? format(parseISO(item.createdAt), "dd/MM/yyyy")
+        : "-",
     }));
   }, [tableData]);
 
@@ -184,7 +190,7 @@ export default function ReviewsList() {
       <CustomDataGrid
         columns={columns}
         rows={rows}
-        // loading={isLoading}
+        loading={isLoading}
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
         page={pagination.page - 1}
