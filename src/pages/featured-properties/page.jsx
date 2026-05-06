@@ -11,6 +11,7 @@ import MainWrapper from "../../components/common/layout/mainWrapper";
 export default function FeaturedProperties() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [cities, setCities] = useState([]);
+  const [citySearch, setCitySearch] = useState("");
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     limit: 10,
@@ -78,9 +79,15 @@ export default function FeaturedProperties() {
     },
   });
 
+  // Backend caps `limit` at 100, so a single page can't return every city
+  // (Pune, Gurugram and others sit beyond the alphabetical first 100).
+  // Debounce the search input and let the server filter.
   useEffect(() => {
-    loadCities({ page: 1, limit: 100, search: "" });
-  }, []);
+    const t = setTimeout(() => {
+      loadCities({ page: 1, limit: 100, search: citySearch || "" });
+    }, citySearch ? 250 : 0);
+    return () => clearTimeout(t);
+  }, [citySearch]);
 
   useEffect(() => {
     if (selectedCity) {
@@ -129,14 +136,31 @@ export default function FeaturedProperties() {
 
   const columns = [
     {
+      field: "imageUrl",
+      headerName: "Photo",
+      width: 70,
+      sortable: false,
+      renderCell: (params) => (
+        <div className="h-full flex items-center">
+          {params.value ? (
+            <img
+              src={params.value}
+              alt="property"
+              style={{ width: 48, height: 40, objectFit: "cover", borderRadius: 4 }}
+            />
+          ) : (
+            <div style={{ width: 48, height: 40, background: "#e5e7eb", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#9ca3af" }}>No img</div>
+          )}
+        </div>
+      ),
+    },
+    {
       field: "propertyName",
       headerName: "Property Name",
       flex: 1.5,
       renderCell: (params) => (
         <div className="h-full flex items-center">
-          <p className="truncate" title={params.value}>
-            {params.value}
-          </p>
+          <p className="truncate" title={params.value}>{params.value}</p>
         </div>
       ),
     },
@@ -146,11 +170,14 @@ export default function FeaturedProperties() {
       flex: 1.5,
       renderCell: (params) => (
         <div className="h-full flex items-center">
-          <p className="truncate" title={params.value}>
-            {params.value}
-          </p>
+          <p className="truncate" title={params.value}>{params.value}</p>
         </div>
       ),
+    },
+    {
+      field: "listingType",
+      headerName: "Type",
+      flex: 0.7,
     },
     {
       field: "price",
@@ -190,13 +217,22 @@ export default function FeaturedProperties() {
       const address = [society, locality, city].filter(Boolean).join(", ") || "-";
       const price = item.price || item.monthlyRent;
 
+      const coverPhoto = Array.isArray(item.photos)
+        ? item.photos.find((p) => p.isCoverImage) || item.photos[0]
+        : null;
+      const imageUrl = coverPhoto?.fileKey
+        ? `${import.meta.env.VITE_AWS_URL || ""}${coverPhoto.fileKey}`
+        : null;
+
       return {
         id: item.id,
         propertyName: name,
         address,
+        listingType: item.listingType?.name || "-",
         price: price ? formatPrice(price) + (item.monthlyRent && !item.price ? "/mo" : "") : "-",
         status: item.status || "-",
         isFeatured: item.isFeatured,
+        imageUrl,
       };
     });
   }, [tableData]);
@@ -214,7 +250,13 @@ export default function FeaturedProperties() {
             setSelectedCity(newValue);
             setPagination((prev) => ({ ...prev, page: 1 }));
           }}
+          inputValue={citySearch}
+          onInputChange={(_, value, reason) => {
+            if (reason !== "reset") setCitySearch(value);
+          }}
+          filterOptions={(opts) => opts /* server already filtered */}
           isOptionEqualToValue={(option, value) => option.id === value.id}
+          noOptionsText={citySearch ? `No matches for "${citySearch}"` : "Type to search…"}
           renderInput={(params) => (
             <TextField
               {...params}
