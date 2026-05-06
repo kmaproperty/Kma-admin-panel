@@ -39,6 +39,7 @@ import ReviewsList from "../pages/reviews/page.jsx";
 import ReferralsAdminPage from "../pages/referrals/page.jsx";
 import JobsPage from "../pages/jobs/page.jsx";
 import JobCategoriesPage from "../pages/job-categories/page.jsx";
+import LeadsListingPage from "../pages/leads/page.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -88,6 +89,7 @@ export const router = createBrowserRouter([
           { path: '/aboutus-configuration', element: <AboutUSConfiguration /> },
           { path: '/property-photo-type', element: <PropertyPhotoType /> },
           { path: '/contact-us', element: <ContactUsList /> },
+          { path: '/leads', element: <LeadsListingPage /> },
           { path: '/about-us', element: <AboutUsPage /> },
           { path: '/top-properties', element: <TopPropertiesPage /> },
           { path: '/featured-properties', element: <FeaturedPropertiesPage /> },
