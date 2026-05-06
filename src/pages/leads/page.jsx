@@ -5,54 +5,41 @@ import { fetchLeads, deleteLead } from "../../services/leadAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { Tooltip } from "@mui/material";
-import { Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import CustomDataGrid from "../../components/common/CustomDataGrid";
 import CustomDialog from "../../components/common/CustomDialog";
 import { toast } from "react-toastify";
+import ViewLeadDialog from "./viewLeadDialog";
 
 const LeadsListingPage = () => {
   const [pagination, setPagination] = useState({ limit: 10, page: 1, totalPage: 1 });
   const [search, setSearch] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [viewLeadId, setViewLeadId] = useState(null);
 
   const columns = [
-    { field: "name", headerName: "Name", flex: 1 },
-    { field: "phone", headerName: "Phone", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1.2 },
-    { field: "buildingType", headerName: "Building", width: 120 },
-    {
-      field: "budgetRange",
-      headerName: "Budget",
-      flex: 1,
-      renderCell: (params) => params.row.budgetRange || "-",
-    },
-    {
-      field: "propertyTypes",
-      headerName: "Property Types",
-      flex: 1,
-      renderCell: (params) => params.row.propertyTypes || "-",
-    },
-    {
-      field: "locations",
-      headerName: "Locations",
-      flex: 1.2,
-      renderCell: (params) => params.row.locations || "-",
-    },
-    {
-      field: "propertiesContactedCount",
-      headerName: "Properties",
-      width: 100,
-    },
-    { field: "status", headerName: "Status", width: 110 },
-    { field: "lastContactedAt", headerName: "Last Contact", width: 130 },
-    { field: "createdAt", headerName: "Created", width: 120 },
+    { field: "name", headerName: "Name", flex: 1, minWidth: 140 },
+    { field: "phone", headerName: "Phone", width: 150 },
+    { field: "email", headerName: "Email", flex: 1.2, minWidth: 180 },
+    { field: "buildingType", headerName: "Building", width: 130 },
+    { field: "propertiesContactedCount", headerName: "Properties", width: 110 },
+    { field: "status", headerName: "Status", width: 130 },
+    { field: "lastContactedAt", headerName: "Last Contact", width: 140 },
     {
       field: "actions",
       headerName: "Actions",
-      width: 90,
+      width: 130,
       renderCell: (params) => (
-        <div className="w-full flex justify-end items-center">
+        <div className="w-full flex justify-end items-center gap-2">
+          <Tooltip title="View">
+            <button
+              className="py-2 px-3 bg-gray-50 cursor-pointer rounded-sm"
+              onClick={() => setViewLeadId(params.row.id)}
+            >
+              <Eye className="text-gray-700 w-4 h-4" />
+            </button>
+          </Tooltip>
           <Tooltip title="Delete">
             <button
               className="py-2 px-3 bg-red-50 cursor-pointer rounded-sm"
@@ -190,6 +177,11 @@ const LeadsListingPage = () => {
       >
         <p>This will permanently remove the lead and any notes attached to it.</p>
       </CustomDialog>
+      <ViewLeadDialog
+        open={viewLeadId !== null}
+        leadId={viewLeadId}
+        onClose={() => setViewLeadId(null)}
+      />
     </MainWrapper>
   );
 };
