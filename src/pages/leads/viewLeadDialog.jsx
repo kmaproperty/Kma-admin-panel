@@ -30,6 +30,21 @@ const safeDate = (iso) => {
   try { return format(parseISO(iso), "dd MMM yyyy, hh:mm a"); } catch { return "—"; }
 };
 
+const stripHtml = (s) => {
+  if (!s) return "";
+  // Remove HTML tags and decode common entities; collapse whitespace.
+  return String(s)
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
 const Row = ({ label, value, href }) => (
   <div className="flex justify-between items-start gap-4 py-3 border-b border-gray-100">
     <p className="text-gray-500 text-sm shrink-0">{label}</p>
@@ -114,7 +129,7 @@ export default function ViewLeadDialog({ open, leadId, onClose }) {
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                               <Home className="w-4 h-4 shrink-0" />
-                              <span className="truncate">{p.title || "Untitled property"}</span>
+                              <span className="truncate">{stripHtml(p.title) || "Untitled property"}</span>
                             </p>
                             {(p.societyName || p.localityName) && (
                               <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
