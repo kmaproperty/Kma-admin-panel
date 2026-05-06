@@ -25,6 +25,13 @@ const CustomDialog = ({
       className={className}
       maxWidth={size || "sm"}
       fullWidth
+      scroll="paper"
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          overflow: "hidden",
+        },
+      }}
     >
       <div className="p-4">
         {/* Header */}
@@ -36,7 +43,7 @@ const CustomDialog = ({
             justifyContent: "space-between",
           }}
         >
-          <span>{heading}</span>
+          <span className="text-base font-semibold text-gray-800">{heading}</span>
 
           {showCloseButton && (
             <IconButton
@@ -50,11 +57,13 @@ const CustomDialog = ({
         </DialogTitle>
 
         {/* Body */}
-        <div className="py-3">{children}</div>
+        <div className="py-3">
+          <div className="max-h-[70vh] overflow-auto pr-1">{children}</div>
+        </div>
 
         {/* Footer */}
         {hasActions && (
-          <div className="flex gap-2 pt-2 mt-2 border-t border-gray-200 justify-end">
+          <div className="flex gap-2 pt-3 mt-2 border-t border-gray-200 justify-end bg-white sticky bottom-0">
             {actions.map((action, index) => (
               <button
                 key={index}

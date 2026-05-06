@@ -264,122 +264,145 @@ export default function JobsPage() {
           },
         ]}
       >
-        <div className="space-y-3">
-          <InputBase value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Job title" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.companyName} onChange={(e) => setForm((p) => ({ ...p, companyName: e.target.value }))} placeholder="Company name" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} placeholder="Location" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.jobType} onChange={(e) => setForm((p) => ({ ...p, jobType: e.target.value }))} placeholder="Job type (Full-time, Contract...)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.openingsCount} type="number" onChange={(e) => setForm((p) => ({ ...p, openingsCount: e.target.value }))} placeholder="No. of openings" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))} placeholder="Country" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.state} onChange={(e) => setForm((p) => ({ ...p, state: e.target.value }))} placeholder="State" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} placeholder="City" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <FormControl fullWidth size="small">
-            <InputLabel id="work-mode">Work Mode</InputLabel>
-            <Select labelId="work-mode" value={form.workMode} label="Work Mode" onChange={(e) => setForm((p) => ({ ...p, workMode: e.target.value }))}>
-              <MenuItem value="WORK_FROM_OFFICE">Work from Office</MenuItem>
-              <MenuItem value="WORK_FROM_HOME">Work from Home</MenuItem>
-              <MenuItem value="HYBRID">Hybrid</MenuItem>
-            </Select>
-          </FormControl>
-          <InputBase value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="Job description" multiline minRows={3} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.responsibilities} onChange={(e) => setForm((p) => ({ ...p, responsibilities: e.target.value }))} placeholder="Responsibilities" multiline minRows={2} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.requirements} onChange={(e) => setForm((p) => ({ ...p, requirements: e.target.value }))} placeholder="Requirements" multiline minRows={2} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.benefits} onChange={(e) => setForm((p) => ({ ...p, benefits: e.target.value }))} placeholder="Benefits" multiline minRows={2} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <FormControl fullWidth size="small">
-            <InputLabel id="salary-type">Salary Type</InputLabel>
-            <Select labelId="salary-type" value={form.salaryType} label="Salary Type" onChange={(e) => setForm((p) => ({ ...p, salaryType: e.target.value }))}>
-              <MenuItem value="MONTHLY">Monthly</MenuItem>
-              <MenuItem value="YEARLY">Yearly</MenuItem>
-              <MenuItem value="FIXED">Fixed</MenuItem>
-              <MenuItem value="RANGE">Range</MenuItem>
-            </Select>
-          </FormControl>
-          <InputBase value={form.salaryMin} type="number" onChange={(e) => setForm((p) => ({ ...p, salaryMin: e.target.value }))} placeholder="Min salary" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.salaryMax} type="number" onChange={(e) => setForm((p) => ({ ...p, salaryMax: e.target.value }))} placeholder="Max salary" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.minimumQualification} onChange={(e) => setForm((p) => ({ ...p, minimumQualification: e.target.value }))} placeholder="Minimum qualification" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.experienceLabel} onChange={(e) => setForm((p) => ({ ...p, experienceLabel: e.target.value }))} placeholder="Experience (e.g. Fresher / 1-2 yrs)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.skillsText} onChange={(e) => setForm((p) => ({ ...p, skillsText: e.target.value }))} placeholder="Skills comma separated (Flutter, Sales, API)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.hrName} onChange={(e) => setForm((p) => ({ ...p, hrName: e.target.value }))} placeholder="HR Name" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.hrMobileNumber} onChange={(e) => setForm((p) => ({ ...p, hrMobileNumber: e.target.value }))} placeholder="HR Mobile Number" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.contactEmail} onChange={(e) => setForm((p) => ({ ...p, contactEmail: e.target.value }))} placeholder="Email ID" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.companyWebsite} onChange={(e) => setForm((p) => ({ ...p, companyWebsite: e.target.value }))} placeholder="Company Website (optional)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <InputBase value={form.applicationDeadline} type="date" onChange={(e) => setForm((p) => ({ ...p, applicationDeadline: e.target.value }))} placeholder="Last Date to Apply" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          <FormControl fullWidth size="small">
-            <InputLabel id="apply-type">Apply Type</InputLabel>
-            <Select labelId="apply-type" value={form.applyType} label="Apply Type" onChange={(e) => setForm((p) => ({ ...p, applyType: e.target.value }))}>
-              <MenuItem value="IN_APP">Apply in App</MenuItem>
-              <MenuItem value="EXTERNAL_LINK">External Link</MenuItem>
-            </Select>
-          </FormControl>
-          {form.applyType === "EXTERNAL_LINK" && (
-            <InputBase value={form.applyLink} onChange={(e) => setForm((p) => ({ ...p, applyLink: e.target.value }))} placeholder="Apply Link" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
-          )}
-          <FormControl fullWidth size="small">
-            <InputLabel id="approval-status">Approval Status</InputLabel>
-            <Select labelId="approval-status" value={form.approvalStatus} label="Approval Status" onChange={(e) => setForm((p) => ({ ...p, approvalStatus: e.target.value }))}>
-              <MenuItem value="PENDING">Pending</MenuItem>
-              <MenuItem value="APPROVED">Approved</MenuItem>
-              <MenuItem value="REJECTED">Rejected</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth size="small">
-            <InputLabel id="job-status">Status</InputLabel>
-            <Select
-              labelId="job-status"
-              value={form.status}
-              label="Status"
-              onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
-            >
-              <MenuItem value="DRAFT">DRAFT</MenuItem>
-              <MenuItem value="PUBLISHED">PUBLISHED</MenuItem>
-              <MenuItem value="CLOSED">CLOSED</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth size="small">
-            <InputLabel id="job-categories">Categories</InputLabel>
-            <Select
-              labelId="job-categories"
-              multiple
-              value={form.categoryIds}
-              label="Categories"
-              onChange={(e) => setForm((p) => ({ ...p, categoryIds: e.target.value }))}
-              renderValue={(selected) =>
-                selected
-                  .map(
-                    (id) =>
-                      (categoriesQuery.data?.data ?? []).find((c) => c.id === id)?.name || id,
-                  )
-                  .join(", ")
-              }
-            >
-              {(categoriesQuery.data?.data ?? []).map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Active</span>
-            <Switch
-              checked={form.isActive}
-              onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))}
-            />
+        <div className="space-y-4">
+          <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-3">
+            <div className="text-sm font-semibold text-gray-800">Basic details</div>
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <InputBase value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Job title" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.companyName} onChange={(e) => setForm((p) => ({ ...p, companyName: e.target.value }))} placeholder="Company name" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} placeholder="Location" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.jobType} onChange={(e) => setForm((p) => ({ ...p, jobType: e.target.value }))} placeholder="Job type (Full-time, Contract...)" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.openingsCount} type="number" onChange={(e) => setForm((p) => ({ ...p, openingsCount: e.target.value }))} placeholder="No. of openings" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <FormControl fullWidth size="small">
+                <InputLabel id="work-mode">Work Mode</InputLabel>
+                <Select labelId="work-mode" value={form.workMode} label="Work Mode" onChange={(e) => setForm((p) => ({ ...p, workMode: e.target.value }))}>
+                  <MenuItem value="WORK_FROM_OFFICE">Work from Office</MenuItem>
+                  <MenuItem value="WORK_FROM_HOME">Work from Home</MenuItem>
+                  <MenuItem value="HYBRID">Hybrid</MenuItem>
+                </Select>
+              </FormControl>
+              <InputBase value={form.country} onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))} placeholder="Country" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.state} onChange={(e) => setForm((p) => ({ ...p, state: e.target.value }))} placeholder="State" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} placeholder="City" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <FormControl fullWidth size="small">
+                <InputLabel id="job-categories">Categories</InputLabel>
+                <Select
+                  labelId="job-categories"
+                  multiple
+                  value={form.categoryIds}
+                  label="Categories"
+                  onChange={(e) => setForm((p) => ({ ...p, categoryIds: e.target.value }))}
+                  renderValue={(selected) =>
+                    selected
+                      .map(
+                        (id) =>
+                          (categoriesQuery.data?.data ?? []).find((c) => c.id === id)?.name || id,
+                      )
+                      .join(", ")
+                  }
+                >
+                  {(categoriesQuery.data?.data ?? []).map((cat) => (
+                    <MenuItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Featured</span>
-            <Switch checked={form.featured} onChange={(e) => setForm((p) => ({ ...p, featured: e.target.checked }))} />
+
+          <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="text-sm font-semibold text-gray-800">Description</div>
+            <div className="mt-3 grid grid-cols-1 gap-3">
+              <InputBase value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="Job description" multiline minRows={3} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.responsibilities} onChange={(e) => setForm((p) => ({ ...p, responsibilities: e.target.value }))} placeholder="Responsibilities" multiline minRows={2} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.requirements} onChange={(e) => setForm((p) => ({ ...p, requirements: e.target.value }))} placeholder="Requirements" multiline minRows={2} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.benefits} onChange={(e) => setForm((p) => ({ ...p, benefits: e.target.value }))} placeholder="Benefits" multiline minRows={2} className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Urgent Hiring</span>
-            <Switch checked={form.urgentHiring} onChange={(e) => setForm((p) => ({ ...p, urgentHiring: e.target.checked }))} />
+
+          <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-3">
+            <div className="text-sm font-semibold text-gray-800">Compensation</div>
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <FormControl fullWidth size="small">
+                <InputLabel id="salary-type">Salary Type</InputLabel>
+                <Select labelId="salary-type" value={form.salaryType} label="Salary Type" onChange={(e) => setForm((p) => ({ ...p, salaryType: e.target.value }))}>
+                  <MenuItem value="MONTHLY">Monthly</MenuItem>
+                  <MenuItem value="YEARLY">Yearly</MenuItem>
+                  <MenuItem value="FIXED">Fixed</MenuItem>
+                  <MenuItem value="RANGE">Range</MenuItem>
+                </Select>
+              </FormControl>
+              <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2">
+                <span className="text-sm text-gray-700">Show Salary</span>
+                <Switch checked={form.salaryVisibility} onChange={(e) => setForm((p) => ({ ...p, salaryVisibility: e.target.checked }))} />
+              </div>
+              <InputBase value={form.salaryMin} type="number" onChange={(e) => setForm((p) => ({ ...p, salaryMin: e.target.value }))} placeholder="Min salary" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+              <InputBase value={form.salaryMax} type="number" onChange={(e) => setForm((p) => ({ ...p, salaryMax: e.target.value }))} placeholder="Max salary" className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2" />
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-700">Show Salary</span>
-            <Switch checked={form.salaryVisibility} onChange={(e) => setForm((p) => ({ ...p, salaryVisibility: e.target.checked }))} />
+
+          <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="text-sm font-semibold text-gray-800">Applicant & HR</div>
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <InputBase value={form.minimumQualification} onChange={(e) => setForm((p) => ({ ...p, minimumQualification: e.target.value }))} placeholder="Minimum qualification" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.experienceLabel} onChange={(e) => setForm((p) => ({ ...p, experienceLabel: e.target.value }))} placeholder="Experience (e.g. Fresher / 1-2 yrs)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.skillsText} onChange={(e) => setForm((p) => ({ ...p, skillsText: e.target.value }))} placeholder="Skills comma separated (Flutter, Sales, API)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.applicationDeadline} type="date" onChange={(e) => setForm((p) => ({ ...p, applicationDeadline: e.target.value }))} placeholder="Last Date to Apply" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.hrName} onChange={(e) => setForm((p) => ({ ...p, hrName: e.target.value }))} placeholder="HR Name" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.hrMobileNumber} onChange={(e) => setForm((p) => ({ ...p, hrMobileNumber: e.target.value }))} placeholder="HR Mobile Number" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.contactEmail} onChange={(e) => setForm((p) => ({ ...p, contactEmail: e.target.value }))} placeholder="Email ID" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <InputBase value={form.companyWebsite} onChange={(e) => setForm((p) => ({ ...p, companyWebsite: e.target.value }))} placeholder="Company Website (optional)" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              <FormControl fullWidth size="small">
+                <InputLabel id="apply-type">Apply Type</InputLabel>
+                <Select labelId="apply-type" value={form.applyType} label="Apply Type" onChange={(e) => setForm((p) => ({ ...p, applyType: e.target.value }))}>
+                  <MenuItem value="IN_APP">Apply in App</MenuItem>
+                  <MenuItem value="EXTERNAL_LINK">External Link</MenuItem>
+                </Select>
+              </FormControl>
+              {form.applyType === "EXTERNAL_LINK" && (
+                <InputBase value={form.applyLink} onChange={(e) => setForm((p) => ({ ...p, applyLink: e.target.value }))} placeholder="Apply Link" className="w-full rounded-lg border border-gray-300 px-3 py-2" />
+              )}
+              <FormControl fullWidth size="small">
+                <InputLabel id="approval-status">Approval Status</InputLabel>
+                <Select labelId="approval-status" value={form.approvalStatus} label="Approval Status" onChange={(e) => setForm((p) => ({ ...p, approvalStatus: e.target.value }))}>
+                  <MenuItem value="PENDING">Pending</MenuItem>
+                  <MenuItem value="APPROVED">Approved</MenuItem>
+                  <MenuItem value="REJECTED">Rejected</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small">
+                <InputLabel id="job-status">Status</InputLabel>
+                <Select
+                  labelId="job-status"
+                  value={form.status}
+                  label="Status"
+                  onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
+                >
+                  <MenuItem value="DRAFT">DRAFT</MenuItem>
+                  <MenuItem value="PUBLISHED">PUBLISHED</MenuItem>
+                  <MenuItem value="CLOSED">CLOSED</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="text-sm font-semibold text-gray-800">Flags</div>
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2">
+                <span className="text-sm text-gray-700">Active</span>
+                <Switch checked={form.isActive} onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))} />
+              </div>
+              <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2">
+                <span className="text-sm text-gray-700">Featured</span>
+                <Switch checked={form.featured} onChange={(e) => setForm((p) => ({ ...p, featured: e.target.checked }))} />
+              </div>
+              <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2">
+                <span className="text-sm text-gray-700">Urgent Hiring</span>
+                <Switch checked={form.urgentHiring} onChange={(e) => setForm((p) => ({ ...p, urgentHiring: e.target.checked }))} />
+              </div>
+            </div>
           </div>
         </div>
       </CustomDialog>
