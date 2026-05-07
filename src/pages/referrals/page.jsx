@@ -699,7 +699,7 @@ export default function ReferralsAdminPage() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <MainWrapper>
-        <PageTitle
+        {/* <PageTitle
           title="Referrals — Admin"
           actions={[
             {
@@ -708,7 +708,7 @@ export default function ReferralsAdminPage() {
               onClick: runExport,
             },
           ]}
-        />
+        /> */}
 
         {USE_MOCK && (
           <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
@@ -721,14 +721,14 @@ export default function ReferralsAdminPage() {
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
           <Tabs value={tab} onChange={(_, v) => setTab(v)}>
             <Tab label="All referrals" />
-            <Tab label="Payouts & audit" />
+            {/* <Tab label="Payouts & audit" /> */}
           </Tabs>
         </Box>
 
         {tab === 0 && (
           <>
             <div className="flex flex-wrap gap-3 mb-4 items-end">
-              <TextField
+              {/* <TextField
                 size="small"
                 label="Keyword (client / mobile / location)"
                 value={keyword}
@@ -737,7 +737,7 @@ export default function ReferralsAdminPage() {
                   setPagination((p) => ({ ...p, page: 1 }));
                 }}
                 sx={{ minWidth: 260 }}
-              />
+              /> */}
               <TextField
                 size="small"
                 label="Referrer name or ID"
@@ -748,7 +748,7 @@ export default function ReferralsAdminPage() {
                 }}
                 sx={{ minWidth: 200 }}
               />
-              <FormControl size="small" sx={{ minWidth: 200 }}>
+              {/* <FormControl size="small" sx={{ minWidth: 200 }}>
                 <InputLabel id="cp-filter">Channel partner</InputLabel>
                 <Select
                   labelId="cp-filter"
@@ -825,7 +825,7 @@ export default function ReferralsAdminPage() {
                   setPagination((p) => ({ ...p, page: 1 }));
                 }}
                 slotProps={{ textField: { size: "small" } }}
-              />
+              /> */}
             </div>
 
             <CustomDataGrid
