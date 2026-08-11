@@ -1,4 +1,5 @@
-import { createSlice} from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from './store';
 
 const initialState = {
   step1: {
@@ -11,7 +12,7 @@ const postPropertyFormSlice = createSlice({
   initialState,
   reducers: {
     
-    setStep1Data: (state, action) => {
+    setStep1Data: (state, action: PayloadAction<any>) => {
       state.step1 = {...state.step1, propertyType: action.payload.propertyType }
     }
   },
@@ -19,7 +20,7 @@ const postPropertyFormSlice = createSlice({
 
 export const { setStep1Data } = postPropertyFormSlice.actions;
 
-export const step1Data = (state) => state.postPropertyForm.step1;
+export const step1Data = (state: RootState) => state.postPropertyForm.step1;
 
 export default postPropertyFormSlice.reducer;
 

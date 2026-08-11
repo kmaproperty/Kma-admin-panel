@@ -22,6 +22,7 @@ import PermissionList from "../pages/permissions/page.jsx";
 import AddEditAdmin from "../pages/admin/AddEditAdmin.jsx";
 import ViewProperty from "../pages/post-property/view/page.jsx";
 import AddKmaProperty from "../pages/post-property/addKmaProperty.jsx";
+import KmaPropertiesList from "../pages/post-property/kmaPropertiesList.jsx";
 import AboutUSConfiguration from "../pages/masterConfiguration/index.jsx";
 import PropertyPhotoType from "../pages/propertyPhotoType/index.jsx";
 import VerifyPropertyList from "../pages/propety-verify/index.jsx";
@@ -56,6 +57,8 @@ export const router = createBrowserRouter([
           { path: "/", element: <Dashbaord /> },
           { path: '/properties', element: <PropertyList /> },
           { path: '/add-kma-property', element: <AddKmaProperty /> },
+          { path: '/add-kma-property/:propertyId', element: <AddKmaProperty /> },
+          { path: '/kma-properties', element: <KmaPropertiesList /> },
           { path: '/verify-property', element: <VerifyPropertyList /> },
           { path: '/properties/:propertyId', element: <PostProperty /> },
           { path: '/verify-property/:propertyId', element: <ViewVerifyProperty /> },

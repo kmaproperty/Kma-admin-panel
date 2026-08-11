@@ -15,6 +15,7 @@ export const navLinks = [
         icon: <Building className="w-5 h-5" />,
         children: [
             { name: "Add KMA Property", path: "/add-kma-property", icon: <Plus className="w-5 h-5" /> },
+            { name: "KMA Properties", path: "/kma-properties", icon: <Logs className="w-5 h-5" /> },
             { name: "Properties List", path: "/properties", icon: <Logs className="w-5 h-5" /> },
             { name: "Verify Properties List", path: "/verify-property", icon: <Logs className="w-5 h-5" /> },
             { name: "Amenities List", path: "/amenities", icon: <Logs className="w-5 h-5" /> },

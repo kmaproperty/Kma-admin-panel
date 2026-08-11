@@ -11,6 +11,7 @@ import MainWrapper from "../../components/common/layout/mainWrapper";
 export default function TopProperties() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [cities, setCities] = useState([]);
+  const [citySearch, setCitySearch] = useState("");
   const [tableData, setTableData] = useState([]);
   const [pagination, setPagination] = useState({
     limit: 10,
@@ -82,9 +83,16 @@ export default function TopProperties() {
     },
   });
 
+  // Backend caps `limit` at 100, so a single page can't return every city
+  // (Pune, Gurugram and others sit beyond the alphabetical first 100).
+  // Debounce the search input and let the server filter — the Autocomplete
+  // is now fully searchable instead of capped to a static prefix.
   useEffect(() => {
-    loadCities({ page: 1, limit: 100, search: "" });
-  }, []);
+    const t = setTimeout(() => {
+      loadCities({ page: 1, limit: 100, search: citySearch || "" });
+    }, citySearch ? 250 : 0);
+    return () => clearTimeout(t);
+  }, [citySearch]);
 
   useEffect(() => {
     if (selectedCity) {
@@ -218,7 +226,15 @@ export default function TopProperties() {
             setSelectedCity(newValue);
             setPagination((prev) => ({ ...prev, page: 1 }));
           }}
+          inputValue={citySearch}
+          onInputChange={(_, value, reason) => {
+            // Skip the synthetic "reset" event MUI fires after selection,
+            // otherwise picking a city blanks the input back out.
+            if (reason !== "reset") setCitySearch(value);
+          }}
+          filterOptions={(opts) => opts /* server already filtered */}
           isOptionEqualToValue={(option, value) => option.id === value.id}
+          noOptionsText={citySearch ? `No matches for "${citySearch}"` : "Type to search…"}
           renderInput={(params) => (
             <TextField
               {...params}
