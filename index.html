@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <title>KMA Admin Panel</title>
+
+    <!--
+      Runtime payout/redeem response mapper. This was hot-patched straight onto
+      S3 on 2026-06-29 and existed nowhere in git; it is checked in here so that
+      CI deploys reproduce production instead of silently dropping it.
+      TODO: fix the field mapping in the redeem page/API and delete this file.
+    -->
+    <script src="/assets/patch-payout.js"></script>
   </head>
   <body>
     <div id="root"></div>

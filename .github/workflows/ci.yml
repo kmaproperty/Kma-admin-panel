@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint --if-present
+      # Dummy values: we only care that the bundle compiles, not what it points at.
+      - run: npm run build
+        env:
+          VITE_API_URL: http://localhost:3000
+          VITE_AWS_URL: https://example.invalid/
