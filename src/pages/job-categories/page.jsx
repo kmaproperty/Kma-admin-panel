@@ -84,7 +84,7 @@ export default function JobCategoriesPage() {
 
   const columns = [
     { field: "name", headerName: "Category", flex: 1 },
-    { field: "slug", headerName: "Slug", flex: 1 },
+    { field: "slug", headerName: "Slugs", flex: 1 },
     { field: "description", headerName: "Description", flex: 1.5 },
     { field: "isActive", headerName: "Is Active", width: 120 },
     {
