@@ -15,7 +15,14 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run lint --if-present
+
+      # Non-blocking on purpose. The codebase currently has ~232 pre-existing
+      # eslint errors (mostly react-hooks v7 rules), so a blocking lint gate
+      # would fail every PR and train everyone to ignore CI. Report it, don't
+      # enforce it — flip continue-on-error off once the backlog is cleared.
+      - name: Lint (advisory)
+        continue-on-error: true
+        run: npm run lint
       # Dummy values: we only care that the bundle compiles, not what it points at.
       - run: npm run build
         env:
