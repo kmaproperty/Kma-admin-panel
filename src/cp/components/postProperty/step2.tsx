@@ -1861,7 +1861,7 @@ export default function Step2({containerRef}) {
             onChange={(value: string, dropdownValue: string) => {
               const isOnlyDigits = /^\d*$/.test(value);
               if(!isOnlyDigits) return
-              if(Number(value) > 99999) return
+              if(Number(value) > 99999999) return
               setDynamicFieldDetails((pre) => ({...pre, rent: value,}))
               setErrors((pre) => ({...pre, rent: ''}))
               }}
