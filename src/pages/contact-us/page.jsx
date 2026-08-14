@@ -100,7 +100,7 @@ export default function ContactUsList() {
   return (
     <MainWrapper>
       <PageTitle
-        title="Contact Us Query"
+        title="Contact Us Queries"
         isSearch
         searchValue={search}
         onSearchChange={handleSearch}

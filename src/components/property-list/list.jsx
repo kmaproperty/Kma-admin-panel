@@ -166,10 +166,10 @@ export default function PropertiesTable({ propertyList, propertyData, openFilter
         <PageTitle
           title="Property List"
         />
-        <button className={`px-5 flex gap-2 items-center cursor-pointer py-2 border border-gray-300  rounded-md bg-gray-100 text-sm font-medium`} onClick={openFilterPopup}>
+        {/* <button className={`px-5 flex gap-2 items-center cursor-pointer py-2 border border-gray-300  rounded-md bg-gray-100 text-sm font-medium`} onClick={openFilterPopup}>
           <ListFilter className="w-3.5 h-3.5"/>
           Filter
-        </button>
+        </button> */}
       </Box>
 
       <CustomDataGrid
