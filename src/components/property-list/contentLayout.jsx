@@ -1834,14 +1834,26 @@ export default function ContentLayout() {
   };
 
   // 🌟 Page Change Handler
+  // const handlePageChange = (newPage) => {
+  //   if (isClientSideFilteringActive) {
+  //     localStorage.setItem("admin_property_search_page", newPage.toString());
+  //   } else {
+  //     localStorage.setItem("admin_property_page_number", newPage.toString());
+  //   }
+  //   setPagination((prev) => ({ ...prev, page: newPage }));
+  // };
+
   const handlePageChange = (newPage) => {
-    if (isClientSideFilteringActive) {
-      localStorage.setItem("admin_property_search_page", newPage.toString());
-    } else {
-      localStorage.setItem("admin_property_page_number", newPage.toString());
-    }
-    setPagination((prev) => ({ ...prev, page: newPage }));
-  };
+  const safePage = Math.max(1, Number(newPage) || 1);
+
+  if (isClientSideFilteringActive) {
+    localStorage.setItem("admin_property_search_page", safePage.toString());
+  } else {
+    localStorage.setItem("admin_property_page_number", safePage.toString());
+  }
+
+  setPagination((prev) => ({ ...prev, page: safePage }));
+};
 
   const openFilterPopup = (e) => {
     setIsFilterPopupOpen(e.currentTarget);
@@ -1929,7 +1941,7 @@ export default function ContentLayout() {
             </select>
           </div>
 
-          <PropertiesTable
+          {/* <PropertiesTable
             openFilterPopup={openFilterPopup}
             propertyList={currentTableRows}
             propertyData={{
@@ -1954,7 +1966,44 @@ export default function ContentLayout() {
                 handlePageChange(updater.page);
               }
             }}
-          />
+          /> */}
+
+          <PropertiesTable
+  openFilterPopup={openFilterPopup}
+  propertyList={currentTableRows}
+  propertyData={{
+    ...propertyList,
+    data: currentTableRows,
+    total: totalCountForTable,
+    pagination: {
+      ...pagination,
+      total: totalCountForTable,
+    },
+  }}
+  fetchPropertyList={fetchPropertyList}
+  isLoading={isClientSideFilteringActive ? isSearchLoading : isNormalLoading}
+  pagination={pagination}
+  setPagination={(updater) => {
+    if (typeof updater === "function") {
+      setPagination((prev) => {
+        const nextState = updater(prev);
+        const safePage = Math.max(1, Number(nextState.page) || 1);
+        
+        if (safePage !== prev.page) {
+          if (isClientSideFilteringActive) {
+            localStorage.setItem("admin_property_search_page", safePage.toString());
+          } else {
+            localStorage.setItem("admin_property_page_number", safePage.toString());
+          }
+        }
+        
+        return { ...nextState, page: safePage };
+      });
+    } else if (updater && updater.page !== undefined) {
+      handlePageChange(updater.page);
+    }
+  }}
+/>
 
           <CustomPopover
             anchorEl={isFilterPopupOpen}
