@@ -1519,6 +1519,508 @@
 //   );
 // }
 
+// import { useEffect, useMemo, useState } from "react";
+// import { useSearchParams } from "react-router-dom";
+// import { useQuery } from "@tanstack/react-query";
+
+// import ListFilter from "./filter";
+// import PropertiesTable from "./list";
+// import { decodeFilters } from "../../lib/helper";
+// import { propertyListApiPayload } from "../../services/postProperty";
+// import { Building2, Calendar, MonitorCheck, RotateCcw, Search, ShieldCheck, ShieldQuestionMark } from "lucide-react";
+// import CustomPopover from "../common/popover";
+
+// export const defaultFilters = {
+//   propertyTypeIds: [],
+//   categoryIds: [],
+//   listingTypeIds: [],
+//   furnishingTypes: [],
+//   projectStatuses: [],
+//   statuses: [],
+//   minPrice: 0,
+//   maxPrice: 10000000,
+// };
+
+// export default function ContentLayout() {
+//   const [searchParams] = useSearchParams();
+//   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(null);
+//   const [enableQuery, setEnableQuery] = useState(false);
+//   const [filters, setFilters] = useState(defaultFilters);
+
+//   // 🌟 Search Query directly from localStorage
+//   const [searchQuery, setSearchQuery] = useState(() => {
+//     return localStorage.getItem("admin_property_search_query") || "";
+//   });
+
+//   // 🌟 Status preserved in localStorage
+//   const [statusFilter, setStatusFilter] = useState(() => {
+//     return localStorage.getItem("admin_property_status_filter") || "";
+//   });
+
+//   // 🌟 Date Range Filters from localStorage
+//   const [dateRange, setDateRange] = useState(() => {
+//     return {
+//       fromDate: localStorage.getItem("admin_property_date_from") || "",
+//       toDate: localStorage.getItem("admin_property_date_to") || "",
+//     };
+//   });
+
+//   // 🌟 Page preserved in localStorage
+//   const [pagination, setPagination] = useState(() => {
+//     const savedSearch = localStorage.getItem("admin_property_search_query") || "";
+//     const savedFrom = localStorage.getItem("admin_property_date_from") || "";
+//     const savedTo = localStorage.getItem("admin_property_date_to") || "";
+//     const isCustomFilterActive = savedSearch.trim() !== "" || savedFrom !== "" || savedTo !== "";
+
+//     const savedPage = isCustomFilterActive
+//       ? Number(localStorage.getItem("admin_property_search_page")) || 1
+//       : Number(localStorage.getItem("admin_property_page_number")) || 1;
+
+//     return {
+//       limit: 10,
+//       page: savedPage,
+//       totalPage: 1,
+//     };
+//   });
+
+//   useEffect(() => {
+//     const handleBeforeUnload = () => {
+//       localStorage.removeItem("admin_property_search_query");
+//       localStorage.removeItem("admin_property_search_page");
+//     };
+
+//     window.addEventListener("beforeunload", handleBeforeUnload);
+//     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+//   }, []);
+
+//   const [propertyStats, setPropertyStats] = useState([
+//     { title: "Total Properties", count: 0, icon: <Building2 className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//     { title: "Active Properties", count: 0, icon: <MonitorCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//     { title: "Pending Properties", count: 0, icon: <ShieldQuestionMark className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//     { title: "Verified Properties", count: 0, icon: <ShieldCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//   ]);
+
+//   const [sorting, setSorting] = useState({
+//     order: "ASC",
+//     fieldName: "createdAt",
+//   });
+
+//   // 🌟 Normal Paginated Server Query
+//   const {
+//     data: propertyList,
+//     refetch: fetchPropertyList,
+//     isLoading: isNormalLoading,
+//   } = useQuery({
+//     queryKey: ["property-list-paginated", filters, sorting, pagination.page, pagination.limit, statusFilter],
+//     queryFn: () => {
+//       const activeStatuses = statusFilter 
+//         ? statusFilter 
+//         : filters.statuses.length > 0 
+//           ? filters.statuses.join(",") 
+//           : undefined;
+
+//       const payload = {
+//         page: pagination.page,
+//         limit: pagination.limit,
+//         ...(filters.listingTypeIds.length > 0 && { listingTypeIds: filters.listingTypeIds.join(",") }),
+//         ...(filters.categoryIds.length > 0 && { categoryIds: filters.categoryIds.join(",") }),
+//         ...(filters.furnishingTypes.length > 0 && { furnishingTypes: filters.furnishingTypes.join(",") }),
+//         ...(activeStatuses && { statuses: activeStatuses }),
+//       };
+
+//       return propertyListApiPayload(payload);
+//     },
+//     enabled: enableQuery,
+//     staleTime: 1000 * 60 * 2,
+//     refetchOnMount: true,
+//   });
+
+//   // 🌟 Background Database Query for Full-text Search and Date Filtering
+//   const isDateFilterActive = Boolean(dateRange.fromDate || dateRange.toDate);
+//   const isSearchActive = searchQuery.trim() !== "";
+//   const isClientSideFilteringActive = isSearchActive || isDateFilterActive;
+
+//   const { data: allDatabaseProperties = [], isLoading: isSearchLoading } = useQuery({
+//     queryKey: ["all-database-properties", filters, statusFilter, propertyList?.total],
+//     queryFn: async () => {
+//       const total = propertyList?.total || 100;
+//       const batchLimit = 100;
+//       const totalBatches = Math.ceil(total / batchLimit);
+
+//       const activeStatuses = statusFilter 
+//         ? statusFilter 
+//         : filters.statuses.length > 0 
+//           ? filters.statuses.join(",") 
+//           : undefined;
+
+//       const promises = [];
+//       for (let i = 1; i <= totalBatches; i++) {
+//         promises.push(
+//           propertyListApiPayload({
+//             page: i,
+//             limit: batchLimit,
+//             ...(filters.listingTypeIds.length > 0 && { listingTypeIds: filters.listingTypeIds.join(",") }),
+//             ...(filters.categoryIds.length > 0 && { categoryIds: filters.categoryIds.join(",") }),
+//             ...(filters.furnishingTypes.length > 0 && { furnishingTypes: filters.furnishingTypes.join(",") }),
+//             ...(activeStatuses && { statuses: activeStatuses }),
+//           })
+//         );
+//       }
+
+//       const results = await Promise.all(promises);
+//       return results.flatMap((res) => res?.data || []);
+//     },
+//     enabled: !!propertyList?.total,
+//     staleTime: 1000 * 60 * 5,
+//   });
+
+//   useEffect(() => {
+//     const query = searchParams.get("filters");
+//     if (query) {
+//       const parsed = decodeFilters(query);
+//       if (parsed) setFilters(parsed);
+//     }
+//     setEnableQuery(true);
+//   }, [searchParams]);
+
+//   useEffect(() => {
+//     if (propertyList?.summary) {
+//       const stats = [
+//         { title: "Total Properties", count: propertyList.summary.totalProperties, icon: <Building2 className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//         { title: "Active Properties", count: propertyList.summary.activeProperties, icon: <MonitorCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//         { title: "Pending Properties", count: propertyList.summary.pendingProperties, icon: <ShieldQuestionMark className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//         { title: "Verified Properties", count: propertyList.summary.verifiedProperties, icon: <ShieldCheck className="w-9 h-9 text-[#604AE3]" strokeWidth={1.5} /> },
+//       ];
+//       setPropertyStats(stats);
+//     }
+//   }, [propertyList]);
+
+//   // 🌟 Filter Data by Search Text & CreatedAt Date Range
+//   const fullFilteredSearchResults = useMemo(() => {
+//     if (!isClientSideFilteringActive) return null;
+
+//     const q = searchQuery.trim().toLowerCase();
+//     const fromTime = dateRange.fromDate ? new Date(dateRange.fromDate).setHours(0, 0, 0, 0) : null;
+//     const toTime = dateRange.toDate ? new Date(dateRange.toDate).setHours(23, 59, 59, 999) : null;
+
+//     return allDatabaseProperties.filter((item) => {
+//       // 1. Date Range Check on item.createdAt
+//       if (item?.createdAt) {
+//         const itemCreatedTime = new Date(item.createdAt).getTime();
+//         if (fromTime && itemCreatedTime < fromTime) return false;
+//         if (toTime && itemCreatedTime > toTime) return false;
+//       } else if (fromTime || toTime) {
+//         return false;
+//       }
+
+//       // 2. Search Text Check
+//       if (!q) return true;
+
+//       const ownerName = (item?.owner?.name || "").toLowerCase();
+//       const ownerEmail = (item?.owner?.email || "").toLowerCase();
+//       const ownerPhone = (item?.owner?.phone || "").toLowerCase();
+//       const postedByMatch = ownerName.includes(q) || ownerEmail.includes(q) || ownerPhone.includes(q);
+
+//       const categoryName = (item?.category?.name || "").toLowerCase();
+//       const propertyTypeName = (item?.propertyType?.name || "").toLowerCase();
+//       const listingTypeName = (item?.listingType?.name || "").toLowerCase();
+//       const categoryTypeMatch = categoryName.includes(q) || propertyTypeName.includes(q) || listingTypeName.includes(q);
+
+//       const societyName = (item?.society?.name || "").toLowerCase();
+//       const localityName = (item?.locality?.name || "").toLowerCase();
+//       const cityName = (item?.city?.name || "").toLowerCase();
+//       const fullAddress = (item?.society?.address || "").toLowerCase();
+//       const bhkName = (item?.bhkType?.name || "").toLowerCase();
+//       const locationMatch =
+//         societyName.includes(q) ||
+//         localityName.includes(q) ||
+//         cityName.includes(q) ||
+//         fullAddress.includes(q) ||
+//         bhkName.includes(q);
+
+//       const propertyDescription = (item?.propertyDescription || "").toLowerCase();
+//       const descMatch = propertyDescription.includes(q);
+
+//       return postedByMatch || categoryTypeMatch || locationMatch || descMatch;
+//     });
+//   }, [allDatabaseProperties, searchQuery, dateRange, isClientSideFilteringActive]);
+
+//   // 🌟 Dynamic Total Pages Sync
+//   useEffect(() => {
+//     const totalCount = isClientSideFilteringActive
+//       ? (fullFilteredSearchResults?.length || 0)
+//       : (propertyList?.total || 0);
+
+//     if (totalCount !== undefined) {
+//       const newTotalPages = Math.max(1, Math.ceil(totalCount / pagination.limit));
+//       setPagination((prev) => {
+//         if (prev.totalPage === newTotalPages) return prev;
+//         return { ...prev, totalPage: newTotalPages };
+//       });
+//     }
+//   }, [isClientSideFilteringActive, fullFilteredSearchResults?.length, propertyList?.total, pagination.limit]);
+
+//   // 🌟 Current Rows for Table
+//   const currentTableRows = useMemo(() => {
+//     if (isClientSideFilteringActive && fullFilteredSearchResults) {
+//       const startIndex = (pagination.page - 1) * pagination.limit;
+//       return fullFilteredSearchResults.slice(startIndex, startIndex + pagination.limit);
+//     }
+//     return propertyList?.data ?? [];
+//   }, [isClientSideFilteringActive, fullFilteredSearchResults, propertyList?.data, pagination.page, pagination.limit]);
+
+//   const totalCountForTable = useMemo(() => {
+//     if (isClientSideFilteringActive && fullFilteredSearchResults) {
+//       return fullFilteredSearchResults.length;
+//     }
+//     return propertyList?.total || 0;
+//   }, [isClientSideFilteringActive, fullFilteredSearchResults, propertyList?.total]);
+
+//   // 🌟 Search Change Handler
+//   const handleSearchChange = (val) => {
+//     setSearchQuery(val);
+//     if (val.trim() !== "") {
+//       localStorage.setItem("admin_property_search_query", val);
+//       localStorage.setItem("admin_property_search_page", "1");
+//       setPagination((prev) => ({ ...prev, page: 1 }));
+//     } else {
+//       localStorage.removeItem("admin_property_search_query");
+//       if (!isDateFilterActive) {
+//         localStorage.removeItem("admin_property_search_page");
+//         const savedPage = Number(localStorage.getItem("admin_property_page_number")) || 1;
+//         setPagination((prev) => ({ ...prev, page: savedPage }));
+//       }
+//     }
+//   };
+
+//   // 🌟 Date Range Change Handler
+//   const handleDateChange = (field, val) => {
+//     const nextRange = { ...dateRange, [field]: val };
+//     setDateRange(nextRange);
+
+//     if (val) {
+//       localStorage.setItem(field === "fromDate" ? "admin_property_date_from" : "admin_property_date_to", val);
+//     } else {
+//       localStorage.removeItem(field === "fromDate" ? "admin_property_date_from" : "admin_property_date_to");
+//     }
+
+//     localStorage.setItem("admin_property_search_page", "1");
+//     setPagination((prev) => ({ ...prev, page: 1 }));
+//   };
+
+//   // 🌟 Reset Date Range Filter
+//   const handleResetDateFilter = () => {
+//     setDateRange({ fromDate: "", toDate: "" });
+//     localStorage.removeItem("admin_property_date_from");
+//     localStorage.removeItem("admin_property_date_to");
+
+//     if (!isSearchActive) {
+//       localStorage.removeItem("admin_property_search_page");
+//       const savedPage = Number(localStorage.getItem("admin_property_page_number")) || 1;
+//       setPagination((prev) => ({ ...prev, page: savedPage }));
+//     } else {
+//       setPagination((prev) => ({ ...prev, page: 1 }));
+//     }
+//   };
+
+//   // 🌟 Status Dropdown Handler
+//   const handleStatusChange = (newStatus) => {
+//     setStatusFilter(newStatus);
+//     localStorage.setItem("admin_property_status_filter", newStatus);
+
+//     localStorage.setItem("admin_property_page_number", "1");
+//     localStorage.setItem("admin_property_search_page", "1");
+//     setPagination((prev) => ({ ...prev, page: 1 }));
+//   };
+
+//   // 🌟 Page Change Handler
+//   // const handlePageChange = (newPage) => {
+//   //   if (isClientSideFilteringActive) {
+//   //     localStorage.setItem("admin_property_search_page", newPage.toString());
+//   //   } else {
+//   //     localStorage.setItem("admin_property_page_number", newPage.toString());
+//   //   }
+//   //   setPagination((prev) => ({ ...prev, page: newPage }));
+//   // };
+
+//   const handlePageChange = (newPage) => {
+//   const safePage = Math.max(1, Number(newPage) || 1);
+
+//   if (isClientSideFilteringActive) {
+//     localStorage.setItem("admin_property_search_page", safePage.toString());
+//   } else {
+//     localStorage.setItem("admin_property_page_number", safePage.toString());
+//   }
+
+//   setPagination((prev) => ({ ...prev, page: safePage }));
+// };
+
+//   const openFilterPopup = (e) => {
+//     setIsFilterPopupOpen(e.currentTarget);
+//   };
+
+//   return (
+//     <div
+//       className="bg-[#F9F9F9] relative w-full md:min-w-96 md:min-h-[450px] h-auto rounded-xl p-5 pt-4"
+//       style={{ boxShadow: "0px 4px 20px 0px #0000000D" }}
+//     >
+//       <div className="flex flex-col gap-6 w-full">
+//         <div className="grid grid-cols-1 gap-4">
+//           <div className="flex gap-5 pt-3">
+//             {propertyStats.map((stat, index) => (
+//               <div key={index} className="bg-white rounded-lg shadow-md py-4 px-6 flex-1 flex items-center gap-2">
+//                 <div className="flex items-center justify-center min-w-16 h-16 rounded-full bg-violet-50">
+//                   {stat.icon}
+//                 </div>
+//                 <div className="text-right w-full">
+//                   <h3 className="text-md w-full font-medium text-gray-500">{stat.title}</h3>
+//                   <p className="text-3xl mt-1 w-full font-bold text-gray-800">{stat.count}</p>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+
+//           <div className="flex flex-wrap items-center justify-between gap-3">
+//             {/* Search Input */}
+//             <div className="relative flex-1 min-w-[240px] max-w-sm">
+//               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+//               <input
+//                 type="text"
+//                 placeholder="Search properties, societies, owners..."
+//                 value={searchQuery}
+//                 onChange={(e) => handleSearchChange(e.target.value)}
+//                 className="w-full h-10 rounded-full border border-gray-200 pl-10 pr-4 text-sm focus:border-indigo-500 focus:outline-none bg-white shadow-sm"
+//               />
+//             </div>
+
+//             {/* Date Range Filter Controls */}
+//             <div className="flex items-center gap-2 bg-white px-3 py-2.5 rounded-full border border-gray-200 shadow-sm">
+//               {/* <Calendar className="w-4 h-4 text-indigo-500 shrink-0" /> */}
+//               <div className="flex items-center gap-1.5 text-xs text-gray-600">
+//                 <span className="font-medium text-gray-400 text-[14px]">From:</span>
+//                 <input
+//                   type="date"
+//                   value={dateRange.fromDate}
+//                   onChange={(e) => handleDateChange("fromDate", e.target.value)}
+//                   className="bg-transparent border-0 text-xs text-gray-700 outline-none cursor-pointer"
+//                 />
+//                 <span className="font-medium text-gray-400 text-[14px]">To:</span>
+//                 <input
+//                   type="date"
+//                   value={dateRange.toDate}
+//                   onChange={(e) => handleDateChange("toDate", e.target.value)}
+//                   className="bg-transparent border-0 text-xs text-gray-700 outline-none cursor-pointer"
+//                 />
+//               </div>
+
+//               {isDateFilterActive && (
+//                 <button
+//                   type="button"
+//                   onClick={handleResetDateFilter}
+//                   title="Reset Date Range"
+//                   className="inline-flex items-center gap-1 text-[11px] text-red-500 hover:text-red-700 font-medium pl-1 pr-1 border-l border-gray-200 cursor-pointer"
+//                 >
+//                   <RotateCcw className="w-3 h-3" />
+//                   Reset
+//                 </button>
+//               )}
+//             </div>
+
+//             {/* Status Dropdown */}
+//             <select
+//               value={statusFilter}
+//               onChange={(e) => handleStatusChange(e.target.value)}
+//               className="h-10 rounded-full border border-gray-200 px-4 text-sm bg-white cursor-pointer focus:border-indigo-500 focus:outline-none shadow-sm text-gray-700"
+//             >
+//               <option value="">All statuses</option>
+//               <option value="active">Active</option>
+//               <option value="pending_review">Pending Review</option>
+//               <option value="draft">Draft</option>
+//               <option value="rejected">Rejected</option>
+//               <option value="deactivated">Deactivated</option>
+//             </select>
+//           </div>
+
+//           {/* <PropertiesTable
+//             openFilterPopup={openFilterPopup}
+//             propertyList={currentTableRows}
+//             propertyData={{
+//               ...propertyList,
+//               data: currentTableRows,
+//               total: totalCountForTable,
+//               pagination: {
+//                 ...pagination,
+//                 total: totalCountForTable,
+//               },
+//             }}
+//             fetchPropertyList={fetchPropertyList}
+//             isLoading={isClientSideFilteringActive ? isSearchLoading : isNormalLoading}
+//             pagination={pagination}
+//             setPagination={(updater) => {
+//               if (typeof updater === "function") {
+//                 const nextState = updater(pagination);
+//                 if (nextState.page !== pagination.page) {
+//                   handlePageChange(nextState.page);
+//                 }
+//               } else if (updater && updater.page !== undefined) {
+//                 handlePageChange(updater.page);
+//               }
+//             }}
+//           /> */}
+
+//           <PropertiesTable
+//   openFilterPopup={openFilterPopup}
+//   propertyList={currentTableRows}
+//   propertyData={{
+//     ...propertyList,
+//     data: currentTableRows,
+//     total: totalCountForTable,
+//     pagination: {
+//       ...pagination,
+//       total: totalCountForTable,
+//     },
+//   }}
+//   fetchPropertyList={fetchPropertyList}
+//   isLoading={isClientSideFilteringActive ? isSearchLoading : isNormalLoading}
+//   pagination={pagination}
+//   setPagination={(updater) => {
+//     if (typeof updater === "function") {
+//       setPagination((prev) => {
+//         const nextState = updater(prev);
+//         const safePage = Math.max(1, Number(nextState.page) || 1);
+        
+//         if (safePage !== prev.page) {
+//           if (isClientSideFilteringActive) {
+//             localStorage.setItem("admin_property_search_page", safePage.toString());
+//           } else {
+//             localStorage.setItem("admin_property_page_number", safePage.toString());
+//           }
+//         }
+        
+//         return { ...nextState, page: safePage };
+//       });
+//     } else if (updater && updater.page !== undefined) {
+//       handlePageChange(updater.page);
+//     }
+//   }}
+// />
+
+//           <CustomPopover
+//             anchorEl={isFilterPopupOpen}
+//             onClose={() => setIsFilterPopupOpen(null)}
+//           >
+//             <ListFilter
+//               statusData={propertyList?.summary ?? {}}
+//               filters={filters}
+//               setFilters={setFilters}
+//             />
+//           </CustomPopover>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -1539,6 +2041,25 @@ export const defaultFilters = {
   statuses: [],
   minPrice: 0,
   maxPrice: 10000000,
+};
+
+const resolvePropertyStatus = (item) => {
+  const currentStatus = (item?.status || "").toLowerCase();
+  const verifiedStatus = (item?.isVerified || "").toLowerCase();
+
+  if (["draft", "rejected", "deactivated"].includes(currentStatus)) {
+    return item.status;
+  }
+
+  if (verifiedStatus === "verified") {
+    return "active";
+  }
+
+  if (verifiedStatus === "unverified") {
+    return "pending_review";
+  }
+
+  return item?.status;
 };
 
 export default function ContentLayout() {
@@ -1570,7 +2091,8 @@ export default function ContentLayout() {
     const savedSearch = localStorage.getItem("admin_property_search_query") || "";
     const savedFrom = localStorage.getItem("admin_property_date_from") || "";
     const savedTo = localStorage.getItem("admin_property_date_to") || "";
-    const isCustomFilterActive = savedSearch.trim() !== "" || savedFrom !== "" || savedTo !== "";
+    const savedStatus = localStorage.getItem("admin_property_status_filter") || "";
+    const isCustomFilterActive = savedSearch.trim() !== "" || savedFrom !== "" || savedTo !== "" || savedStatus !== "";
 
     const savedPage = isCustomFilterActive
       ? Number(localStorage.getItem("admin_property_search_page")) || 1
@@ -1605,27 +2127,26 @@ export default function ContentLayout() {
     fieldName: "createdAt",
   });
 
+  const isDateFilterActive = Boolean(dateRange.fromDate || dateRange.toDate);
+  const isSearchActive = searchQuery.trim() !== "";
+  const isStatusFilterActive = Boolean(statusFilter);
+  const isClientSideFilteringActive = isSearchActive || isDateFilterActive || isStatusFilterActive;
+
   // 🌟 Normal Paginated Server Query
   const {
     data: propertyList,
     refetch: fetchPropertyList,
     isLoading: isNormalLoading,
   } = useQuery({
-    queryKey: ["property-list-paginated", filters, sorting, pagination.page, pagination.limit, statusFilter],
+    queryKey: ["property-list-paginated", filters, sorting, pagination.page, pagination.limit],
     queryFn: () => {
-      const activeStatuses = statusFilter 
-        ? statusFilter 
-        : filters.statuses.length > 0 
-          ? filters.statuses.join(",") 
-          : undefined;
-
       const payload = {
         page: pagination.page,
         limit: pagination.limit,
         ...(filters.listingTypeIds.length > 0 && { listingTypeIds: filters.listingTypeIds.join(",") }),
         ...(filters.categoryIds.length > 0 && { categoryIds: filters.categoryIds.join(",") }),
         ...(filters.furnishingTypes.length > 0 && { furnishingTypes: filters.furnishingTypes.join(",") }),
-        ...(activeStatuses && { statuses: activeStatuses }),
+        ...(filters.statuses.length > 0 && { statuses: filters.statuses.join(",") }),
       };
 
       return propertyListApiPayload(payload);
@@ -1635,23 +2156,13 @@ export default function ContentLayout() {
     refetchOnMount: true,
   });
 
-  // 🌟 Background Database Query for Full-text Search and Date Filtering
-  const isDateFilterActive = Boolean(dateRange.fromDate || dateRange.toDate);
-  const isSearchActive = searchQuery.trim() !== "";
-  const isClientSideFilteringActive = isSearchActive || isDateFilterActive;
-
+  // 🌟 Background Database Query for Full-text Search, Date & isVerified Dropdown Filtering
   const { data: allDatabaseProperties = [], isLoading: isSearchLoading } = useQuery({
-    queryKey: ["all-database-properties", filters, statusFilter, propertyList?.total],
+    queryKey: ["all-database-properties", filters, propertyList?.total],
     queryFn: async () => {
       const total = propertyList?.total || 100;
       const batchLimit = 100;
       const totalBatches = Math.ceil(total / batchLimit);
-
-      const activeStatuses = statusFilter 
-        ? statusFilter 
-        : filters.statuses.length > 0 
-          ? filters.statuses.join(",") 
-          : undefined;
 
       const promises = [];
       for (let i = 1; i <= totalBatches; i++) {
@@ -1662,7 +2173,7 @@ export default function ContentLayout() {
             ...(filters.listingTypeIds.length > 0 && { listingTypeIds: filters.listingTypeIds.join(",") }),
             ...(filters.categoryIds.length > 0 && { categoryIds: filters.categoryIds.join(",") }),
             ...(filters.furnishingTypes.length > 0 && { furnishingTypes: filters.furnishingTypes.join(",") }),
-            ...(activeStatuses && { statuses: activeStatuses }),
+            ...(filters.statuses.length > 0 && { statuses: filters.statuses.join(",") }),
           })
         );
       }
@@ -1670,7 +2181,7 @@ export default function ContentLayout() {
       const results = await Promise.all(promises);
       return results.flatMap((res) => res?.data || []);
     },
-    enabled: !!propertyList?.total,
+    enabled: !!propertyList?.total && isClientSideFilteringActive,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -1695,55 +2206,66 @@ export default function ContentLayout() {
     }
   }, [propertyList]);
 
-  // 🌟 Filter Data by Search Text & CreatedAt Date Range
+  // 🌟 Filter Data by Search Text, CreatedAt Date Range & isVerified Status
   const fullFilteredSearchResults = useMemo(() => {
     if (!isClientSideFilteringActive) return null;
 
     const q = searchQuery.trim().toLowerCase();
     const fromTime = dateRange.fromDate ? new Date(dateRange.fromDate).setHours(0, 0, 0, 0) : null;
     const toTime = dateRange.toDate ? new Date(dateRange.toDate).setHours(23, 59, 59, 999) : null;
+    const targetStatus = statusFilter.trim().toLowerCase();
 
-    return allDatabaseProperties.filter((item) => {
-      // 1. Date Range Check on item.createdAt
-      if (item?.createdAt) {
-        const itemCreatedTime = new Date(item.createdAt).getTime();
-        if (fromTime && itemCreatedTime < fromTime) return false;
-        if (toTime && itemCreatedTime > toTime) return false;
-      } else if (fromTime || toTime) {
-        return false;
-      }
+    return allDatabaseProperties
+      .map((item) => ({
+        ...item,
+        status: resolvePropertyStatus(item),
+      }))
+      .filter((item) => {
+        // 1. Status Dropdown Check (Matches post-resolved status with isVerified logic)
+        if (targetStatus && (item.status || "").toLowerCase() !== targetStatus) {
+          return false;
+        }
 
-      // 2. Search Text Check
-      if (!q) return true;
+        // 2. Date Range Check on item.createdAt
+        if (item?.createdAt) {
+          const itemCreatedTime = new Date(item.createdAt).getTime();
+          if (fromTime && itemCreatedTime < fromTime) return false;
+          if (toTime && itemCreatedTime > toTime) return false;
+        } else if (fromTime || toTime) {
+          return false;
+        }
 
-      const ownerName = (item?.owner?.name || "").toLowerCase();
-      const ownerEmail = (item?.owner?.email || "").toLowerCase();
-      const ownerPhone = (item?.owner?.phone || "").toLowerCase();
-      const postedByMatch = ownerName.includes(q) || ownerEmail.includes(q) || ownerPhone.includes(q);
+        // 3. Search Text Check
+        if (!q) return true;
 
-      const categoryName = (item?.category?.name || "").toLowerCase();
-      const propertyTypeName = (item?.propertyType?.name || "").toLowerCase();
-      const listingTypeName = (item?.listingType?.name || "").toLowerCase();
-      const categoryTypeMatch = categoryName.includes(q) || propertyTypeName.includes(q) || listingTypeName.includes(q);
+        const ownerName = (item?.owner?.name || "").toLowerCase();
+        const ownerEmail = (item?.owner?.email || "").toLowerCase();
+        const ownerPhone = (item?.owner?.phone || "").toLowerCase();
+        const postedByMatch = ownerName.includes(q) || ownerEmail.includes(q) || ownerPhone.includes(q);
 
-      const societyName = (item?.society?.name || "").toLowerCase();
-      const localityName = (item?.locality?.name || "").toLowerCase();
-      const cityName = (item?.city?.name || "").toLowerCase();
-      const fullAddress = (item?.society?.address || "").toLowerCase();
-      const bhkName = (item?.bhkType?.name || "").toLowerCase();
-      const locationMatch =
-        societyName.includes(q) ||
-        localityName.includes(q) ||
-        cityName.includes(q) ||
-        fullAddress.includes(q) ||
-        bhkName.includes(q);
+        const categoryName = (item?.category?.name || "").toLowerCase();
+        const propertyTypeName = (item?.propertyType?.name || "").toLowerCase();
+        const listingTypeName = (item?.listingType?.name || "").toLowerCase();
+        const categoryTypeMatch = categoryName.includes(q) || propertyTypeName.includes(q) || listingTypeName.includes(q);
 
-      const propertyDescription = (item?.propertyDescription || "").toLowerCase();
-      const descMatch = propertyDescription.includes(q);
+        const societyName = (item?.society?.name || "").toLowerCase();
+        const localityName = (item?.locality?.name || "").toLowerCase();
+        const cityName = (item?.city?.name || "").toLowerCase();
+        const fullAddress = (item?.society?.address || "").toLowerCase();
+        const bhkName = (item?.bhkType?.name || "").toLowerCase();
+        const locationMatch =
+          societyName.includes(q) ||
+          localityName.includes(q) ||
+          cityName.includes(q) ||
+          fullAddress.includes(q) ||
+          bhkName.includes(q);
 
-      return postedByMatch || categoryTypeMatch || locationMatch || descMatch;
-    });
-  }, [allDatabaseProperties, searchQuery, dateRange, isClientSideFilteringActive]);
+        const propertyDescription = (item?.propertyDescription || "").toLowerCase();
+        const descMatch = propertyDescription.includes(q);
+
+        return postedByMatch || categoryTypeMatch || locationMatch || descMatch;
+      });
+  }, [allDatabaseProperties, searchQuery, dateRange, statusFilter, isClientSideFilteringActive]);
 
   // 🌟 Dynamic Total Pages Sync
   useEffect(() => {
@@ -1766,7 +2288,11 @@ export default function ContentLayout() {
       const startIndex = (pagination.page - 1) * pagination.limit;
       return fullFilteredSearchResults.slice(startIndex, startIndex + pagination.limit);
     }
-    return propertyList?.data ?? [];
+
+    return (propertyList?.data ?? []).map((item) => ({
+      ...item,
+      status: resolvePropertyStatus(item),
+    }));
   }, [isClientSideFilteringActive, fullFilteredSearchResults, propertyList?.data, pagination.page, pagination.limit]);
 
   const totalCountForTable = useMemo(() => {
@@ -1785,7 +2311,7 @@ export default function ContentLayout() {
       setPagination((prev) => ({ ...prev, page: 1 }));
     } else {
       localStorage.removeItem("admin_property_search_query");
-      if (!isDateFilterActive) {
+      if (!isDateFilterActive && !statusFilter) {
         localStorage.removeItem("admin_property_search_page");
         const savedPage = Number(localStorage.getItem("admin_property_page_number")) || 1;
         setPagination((prev) => ({ ...prev, page: savedPage }));
@@ -1814,7 +2340,7 @@ export default function ContentLayout() {
     localStorage.removeItem("admin_property_date_from");
     localStorage.removeItem("admin_property_date_to");
 
-    if (!isSearchActive) {
+    if (!isSearchActive && !statusFilter) {
       localStorage.removeItem("admin_property_search_page");
       const savedPage = Number(localStorage.getItem("admin_property_page_number")) || 1;
       setPagination((prev) => ({ ...prev, page: savedPage }));
@@ -1826,34 +2352,27 @@ export default function ContentLayout() {
   // 🌟 Status Dropdown Handler
   const handleStatusChange = (newStatus) => {
     setStatusFilter(newStatus);
-    localStorage.setItem("admin_property_status_filter", newStatus);
+    if (newStatus) {
+      localStorage.setItem("admin_property_status_filter", newStatus);
+    } else {
+      localStorage.removeItem("admin_property_status_filter");
+    }
 
-    localStorage.setItem("admin_property_page_number", "1");
     localStorage.setItem("admin_property_search_page", "1");
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
-  // 🌟 Page Change Handler
-  // const handlePageChange = (newPage) => {
-  //   if (isClientSideFilteringActive) {
-  //     localStorage.setItem("admin_property_search_page", newPage.toString());
-  //   } else {
-  //     localStorage.setItem("admin_property_page_number", newPage.toString());
-  //   }
-  //   setPagination((prev) => ({ ...prev, page: newPage }));
-  // };
-
   const handlePageChange = (newPage) => {
-  const safePage = Math.max(1, Number(newPage) || 1);
+    const safePage = Math.max(1, Number(newPage) || 1);
 
-  if (isClientSideFilteringActive) {
-    localStorage.setItem("admin_property_search_page", safePage.toString());
-  } else {
-    localStorage.setItem("admin_property_page_number", safePage.toString());
-  }
+    if (isClientSideFilteringActive) {
+      localStorage.setItem("admin_property_search_page", safePage.toString());
+    } else {
+      localStorage.setItem("admin_property_page_number", safePage.toString());
+    }
 
-  setPagination((prev) => ({ ...prev, page: safePage }));
-};
+    setPagination((prev) => ({ ...prev, page: safePage }));
+  };
 
   const openFilterPopup = (e) => {
     setIsFilterPopupOpen(e.currentTarget);
@@ -1895,7 +2414,6 @@ export default function ContentLayout() {
 
             {/* Date Range Filter Controls */}
             <div className="flex items-center gap-2 bg-white px-3 py-2.5 rounded-full border border-gray-200 shadow-sm">
-              {/* <Calendar className="w-4 h-4 text-indigo-500 shrink-0" /> */}
               <div className="flex items-center gap-1.5 text-xs text-gray-600">
                 <span className="font-medium text-gray-400 text-[14px]">From:</span>
                 <input
@@ -1941,7 +2459,7 @@ export default function ContentLayout() {
             </select>
           </div>
 
-          {/* <PropertiesTable
+          <PropertiesTable
             openFilterPopup={openFilterPopup}
             propertyList={currentTableRows}
             propertyData={{
@@ -1958,52 +2476,25 @@ export default function ContentLayout() {
             pagination={pagination}
             setPagination={(updater) => {
               if (typeof updater === "function") {
-                const nextState = updater(pagination);
-                if (nextState.page !== pagination.page) {
-                  handlePageChange(nextState.page);
-                }
+                setPagination((prev) => {
+                  const nextState = updater(prev);
+                  const safePage = Math.max(1, Number(nextState.page) || 1);
+
+                  if (safePage !== prev.page) {
+                    if (isClientSideFilteringActive) {
+                      localStorage.setItem("admin_property_search_page", safePage.toString());
+                    } else {
+                      localStorage.setItem("admin_property_page_number", safePage.toString());
+                    }
+                  }
+
+                  return { ...nextState, page: safePage };
+                });
               } else if (updater && updater.page !== undefined) {
                 handlePageChange(updater.page);
               }
             }}
-          /> */}
-
-          <PropertiesTable
-  openFilterPopup={openFilterPopup}
-  propertyList={currentTableRows}
-  propertyData={{
-    ...propertyList,
-    data: currentTableRows,
-    total: totalCountForTable,
-    pagination: {
-      ...pagination,
-      total: totalCountForTable,
-    },
-  }}
-  fetchPropertyList={fetchPropertyList}
-  isLoading={isClientSideFilteringActive ? isSearchLoading : isNormalLoading}
-  pagination={pagination}
-  setPagination={(updater) => {
-    if (typeof updater === "function") {
-      setPagination((prev) => {
-        const nextState = updater(prev);
-        const safePage = Math.max(1, Number(nextState.page) || 1);
-        
-        if (safePage !== prev.page) {
-          if (isClientSideFilteringActive) {
-            localStorage.setItem("admin_property_search_page", safePage.toString());
-          } else {
-            localStorage.setItem("admin_property_page_number", safePage.toString());
-          }
-        }
-        
-        return { ...nextState, page: safePage };
-      });
-    } else if (updater && updater.page !== undefined) {
-      handlePageChange(updater.page);
-    }
-  }}
-/>
+          />
 
           <CustomPopover
             anchorEl={isFilterPopupOpen}
