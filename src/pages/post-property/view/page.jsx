@@ -194,36 +194,92 @@ export default function ViewProperty() {
         return null;
     };
 
+    // const propertyInfoData = useMemo(() => {
+    //     const fromApi = [
+    //         ["Listing Type", asString(propertyDetails?.listingTypeName)],
+    //         ["Building Type", asString(propertyDetails?.categoryName)],
+    //         ["Property Type", asString(propertyDetails?.propertyTypeName)],
+    //         ["City", asString(propertyDetails?.city?.name) ?? asString(propertyDetails?.city?.name)],
+    //         ["Locality", asString(propertyDetails?.locality?.name) ?? asString(propertyDetails?.locality?.name)],
+    //         ["Project Name", asString(propertyDetails?.society?.name) ?? asString(propertyDetails?.society?.name)],
+    //         [
+    //             "Area",
+    //             asNumber(propertyDetails?.buildUpAreaSqFt)
+    //                 ? `${formatInr(Number(propertyDetails?.buildUpAreaSqFt))} Sq.Ft. (Area)`
+    //                 : null,
+    //         ],
+    //         ["Facing", asString(propertyDetails?.facing)],
+    //         ["View", asString(propertyDetails?.facing)],
+    //         ["Built in", asString(propertyDetails?.age)],
+    //         ["Age", asString(propertyDetails?.age)],
+    //         ["Additional Rooms", asString(propertyDetails?.additionalRoomsText)],
+    //         ["Total Floor Count", asString(propertyDetails?.totalFloorCount)],
+    //         ["Floor Number", asString(propertyDetails?.floorNumber)],
+    //         ["Tower/Block", asString(propertyDetails?.towerOrBlock)],
+    //     ];
+
+    //     return propertyInformation.map(([label, fallback]) => {
+    //         const match = fromApi.find(([apiLabel]) => apiLabel === label);
+    //         return [label, match?.[1] ?? fallback];
+    //     });
+    // }, [propertyDetails]);
+
     const propertyInfoData = useMemo(() => {
-        const fromApi = [
-            ["Listing Type", asString(propertyDetails?.listingTypeName)],
-            ["Building Type", asString(propertyDetails?.categoryName)],
-            ["Property Type", asString(propertyDetails?.propertyTypeName)],
-            ["City", asString(propertyDetails?.city?.name) ?? asString(propertyDetails?.city?.name)],
-            ["Locality", asString(propertyDetails?.locality?.name) ?? asString(propertyDetails?.locality?.name)],
-            ["Project Name", asString(propertyDetails?.society?.name) ?? asString(propertyDetails?.society?.name)],
-            [
-                "Area",
-                asNumber(propertyDetails?.buildUpAreaSqFt)
-                    ? `${formatInr(Number(propertyDetails?.buildUpAreaSqFt))} Sq.Ft. (Area)`
-                    : null,
-            ],
+        if (!propertyDetails) return [];
+
+        const rawArea =
+            propertyDetails?.builtUpArea ??
+            propertyDetails?.builtUpAreaMetadata?.superBuiltUpArea ??
+            propertyDetails?.plotArea ??
+            null;
+        const areaUnit =
+            propertyDetails?.builtUpAreaUnit === "sq_ft"
+                ? "Sq.Ft."
+                : propertyDetails?.builtUpAreaUnit || "Sq.Ft.";
+        const formattedArea = rawArea ? `${rawArea} ${areaUnit}` : null;
+
+        const propertyAgeStr =
+            propertyDetails?.ageOfProperty !== null && propertyDetails?.ageOfProperty !== undefined
+                ? propertyDetails.ageOfProperty === 0
+                    ? "New Construction (0 years)"
+                    : `${propertyDetails.ageOfProperty} Years`
+                : null;
+
+        const currentYear = new Date().getFullYear();
+        const builtInYear =
+            propertyDetails?.ageOfProperty !== null && propertyDetails?.ageOfProperty !== undefined
+                ? String(currentYear - Number(propertyDetails.ageOfProperty))
+                : propertyDetails?.createdAt
+                ? String(new Date(propertyDetails.createdAt).getFullYear())
+                : null;
+
+        const microMarketVal =
+            asString(propertyDetails?.zone) ||
+            asString(propertyDetails?.society?.localityName) ||
+            asString(propertyDetails?.locality?.name);
+
+        const list = [
+            ["Listing Type", asString(propertyDetails?.listingType?.name)],
+            ["Building Type", asString(propertyDetails?.category?.name)],
+            ["Property Type", asString(propertyDetails?.propertyType?.name)],
+            ["City", asString(propertyDetails?.city?.name)],
+            ["Micro market", microMarketVal],
+            ["Locality", asString(propertyDetails?.locality?.name) || asString(propertyDetails?.society?.localityName)],
+            ["Project Name", asString(propertyDetails?.society?.name)],
+            ["Area", formattedArea],
             ["Facing", asString(propertyDetails?.facing)],
             ["View", asString(propertyDetails?.facing)],
-            ["Built in", asString(propertyDetails?.age)],
-            ["Age", asString(propertyDetails?.age)],
-            ["Additional Rooms", asString(propertyDetails?.additionalRoomsText)],
-            ["Total Floor Count", asString(propertyDetails?.totalFloorCount)],
-            ["Floor Number", asString(propertyDetails?.floorNumber)],
-            ["Tower/Block", asString(propertyDetails?.towerOrBlock)],
+            ["Built in", builtInYear],
+            ["Age", propertyAgeStr],
+            ["Additional Rooms", asString(propertyDetails?.additionalRooms) || "None"],
+            ["Total Floor Count", propertyDetails?.totalFloors !== null && propertyDetails?.totalFloors !== undefined ? String(propertyDetails.totalFloors) : null],
+            ["Floor Number", propertyDetails?.floorNumber !== null && propertyDetails?.floorNumber !== undefined ? String(propertyDetails.floorNumber) : null],
+            ["Tower/Block", asString(propertyDetails?.towerBlock) || "—"],
         ];
 
-        return propertyInformation.map(([label, fallback]) => {
-            const match = fromApi.find(([apiLabel]) => apiLabel === label);
-            return [label, match?.[1] ?? fallback];
-        });
+        return list.filter(([, value]) => value !== null && value !== undefined && value !== "");
     }, [propertyDetails]);
-
+    
     return (
         <div className="pl-6 py-3 pb-8 flex justify-start gap-3 flex-col ">
             <PageTitle title="Property Overview" actions={buttons} />
