@@ -31,6 +31,21 @@ import { toast } from "react-toastify";
 import CustomDataGrid from "../common/CustomDataGrid";
 import PageTitle from "../common/layout/PageTitle";
 
+const getPropertyImageUrl = (rawKey) => {
+  if (!rawKey) return "";
+
+  if (rawKey.includes(".amazonaws.com/http")) {
+    const splitIndex = rawKey.indexOf(".amazonaws.com/");
+    return rawKey.substring(splitIndex + ".amazonaws.com/".length);
+  }
+
+  if (rawKey.startsWith("http://") || rawKey.startsWith("https://")) {
+    return rawKey;
+  }
+
+  const baseUrl = import.meta.env.VITE_AWS_URL || "";
+  return `${baseUrl}${rawKey}`;
+};
 
 export default function PropertiesTable({ propertyList, propertyData, openFilterPopup, fetchPropertyList, pagination, setPagination, isLoading }) {
 
@@ -141,24 +156,46 @@ export default function PropertiesTable({ propertyList, propertyData, openFilter
     fetchPropertyList()
   }, [pagination])
 
+  // const rows = useMemo(() => {
+  //   if (!propertyList) return [];
+  //   return propertyList.map((item) => ({
+  //     id: item.id,
+  //     name: item.society?.name ?? '',
+  //     img: item?.photos?.length
+  //       ? `${import.meta.env.VITE_AWS_URL}${item.photos[0]?.fileKey}`
+  //       : '',
+  //     category: item?.category?.name ?? '',
+  //     price: item?.price ?? '',
+  //     carpetArea: item?.carpetArea ?? '',
+  //     city: item?.city?.name ?? '',
+  //     listingType: item?.listingType?.name ?? '',
+  //     postedBy: item?.owner?.name ?? '',
+  //     role: item?.owner?.role ?? '',
+  //     status: item?.status ?? '',
+  //   }));
+  // }, [propertyList]);
+
   const rows = useMemo(() => {
-    if (!propertyList) return [];
-    return propertyList.map((item) => ({
+  if (!propertyList) return [];
+  return propertyList.map((item) => {
+    const coverPhoto = item?.photos?.find((p) => p.isCoverImage) || item?.photos?.[0];
+    const rawImageKey = coverPhoto?.fileKey || "";
+
+    return {
       id: item.id,
       name: item.society?.name ?? '',
-      img: item?.photos?.length
-        ? `${import.meta.env.VITE_AWS_URL}${item.photos[0]?.fileKey}`
-        : '',
+      img: getPropertyImageUrl(rawImageKey),
       category: item?.category?.name ?? '',
-      price: item?.price ?? '',
-      carpetArea: item?.carpetArea ?? '',
+      price: item?.monthlyRent ? `₹${item.monthlyRent}/mo` : (item?.price ?? ''),
+      carpetArea: item?.carpetArea ? `${item.carpetArea} sq ft` : '',
       city: item?.city?.name ?? '',
       listingType: item?.listingType?.name ?? '',
       postedBy: item?.owner?.name ?? '',
       role: item?.owner?.role ?? '',
       status: item?.status ?? '',
-    }));
-  }, [propertyList]);
+    };
+  });
+}, [propertyList]);
 
   return (
     <Paper sx={{ padding: 2, paddingTop: 0 }}>
